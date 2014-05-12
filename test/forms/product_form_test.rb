@@ -56,7 +56,7 @@ class ProductFormTest < ActiveSupport::TestCase
       units: 10
     }
 
-    assert_difference("Product.count", +1) {
+    assert_difference("Product.count", 1) {
       @product_form.save(params)
     }
 
@@ -83,5 +83,30 @@ class ProductFormTest < ActiveSupport::TestCase
     assert_equal product_form.model.units, params[:units]
     assert_equal product_form.model.title, product.title
     assert_equal product_form.model.description, product.description
+  end
+
+  test "form object can validate attributes" do
+    @product_form.save({})
+    assert_equal 4, @product_form.errors.size
+    assert @product_form.errors[:title].any?
+    assert @product_form.errors[:description].any?
+    assert @product_form.errors[:price].any?
+    assert @product_form.errors[:units].any?
+  end
+
+  test "from object accounts model validations" do
+    product = products(:phone)
+    product_form = ProductForm.new(product)
+
+    params = {
+      title: product.title,
+      description: "A sample product",
+      price: 699.50,
+      units: 4
+    }
+
+    assert_difference "Product.count", 0 do
+      product_form.save(params)
+    end
   end
 end

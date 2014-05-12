@@ -28,15 +28,20 @@ module FormObject
       @model.id.to_s
     end
 
+    def valid?
+      valid = @model.valid?
+      @errors = @model.errors
+      valid && super
+    end
+
     def save(params)
+      @model.attributes = params
+
       if valid?
         if @model.persisted?
-          @model.update! params
-          true
+          @model.update params
         else
-          @model.attributes = params
-          @model.save!
-          true
+          @model.save
         end
       else
         false
@@ -45,6 +50,14 @@ module FormObject
 
     def to_partial_path
       ""
+    end
+
+    def method_missing(*args, &block)
+      if @model
+        @model.send(*args, &block)
+      else
+        super
+      end
     end
 
     def self.attributes(*names)
