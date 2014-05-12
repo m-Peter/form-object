@@ -15,24 +15,25 @@ class ProductsController < ApplicationController
   # GET /products/new
   def new
     @product = Product.new
+    @product_form = ProductForm.new(@product)
   end
 
   # GET /products/1/edit
   def edit
+    @product_form = ProductForm.new(@product)
   end
 
   # POST /products
   # POST /products.json
   def create
-    @product = Product.new(product_params)
+    @product = Product.new
+    @product_form = ProductForm.new(@product)
 
     respond_to do |format|
-      if @product.save
-        format.html { redirect_to @product, notice: 'Product was successfully created.' }
-        format.json { render :show, status: :created, location: @product }
+      if @product_form.save(product_params)
+        format.html { redirect_to @product_form, notice: 'Product was successfully created.' }
       else
         format.html { render :new }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -40,13 +41,13 @@ class ProductsController < ApplicationController
   # PATCH/PUT /products/1
   # PATCH/PUT /products/1.json
   def update
+    @product_form = ProductForm.new(@product)
+
     respond_to do |format|
-      if @product.update(product_params)
-        format.html { redirect_to @product, notice: 'Product was successfully updated.' }
-        format.json { render :show, status: :ok, location: @product }
+      if @product_form.save(product_params)
+        format.html { redirect_to @product_form, notice: 'Product was successfully updated.' }
       else
         format.html { render :edit }
-        format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -55,9 +56,9 @@ class ProductsController < ApplicationController
   # DELETE /products/1.json
   def destroy
     @product.destroy
+
     respond_to do |format|
       format.html { redirect_to products_url, notice: 'Product was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 

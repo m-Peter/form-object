@@ -47,4 +47,32 @@ class ProductFormTest < ActiveSupport::TestCase
   test "product form responds to to_model" do
     assert_equal @product, @product_form.to_model
   end
+
+  test "product form can save the model" do
+    params = {
+      title: "Nexus 4S",
+      description: "Smartphone by Google.",
+      price: 500.49,
+      units: 10
+    }
+
+    assert_difference("Product.count", +1) {
+      @product_form.save(params)
+    }
+  end
+
+  test "product form can update the model" do
+    product = products(:phone)
+    product_form = ProductForm.new(product)
+
+    params = {
+      price: 699.50
+    }
+
+    assert_difference "Product.count", 0 do
+      product_form.save(params)
+    end
+
+    assert_equal params[:price], product_form.model.price
+  end
 end

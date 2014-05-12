@@ -28,6 +28,21 @@ module FormObject
       @model.id.to_s
     end
 
+    def save(params)
+      if valid?
+        if @model.persisted?
+          @model.update! params
+          true
+        else
+          @model.attributes = params
+          @model.save!
+          true
+        end
+      else
+        false
+      end
+    end
+
     def to_partial_path
       ""
     end

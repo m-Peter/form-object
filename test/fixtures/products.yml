@@ -1,5 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+phone:
+  title: iPhone 5S
+  description: A state of the art smart phone, brought to you by Apple Inc.
+  price: 659.99
+  units: 10
+
 one:
   title: MyString
   description: MyText
