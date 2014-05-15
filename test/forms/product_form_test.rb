@@ -94,12 +94,12 @@ class ProductFormTest < ActiveSupport::TestCase
     assert @product_form.errors[:units].any?
   end
 
-  test "from object accounts model validations" do
-    product = products(:phone)
+  test "form object accounts model validations" do
+    product = Product.new
     product_form = ProductForm.new(product)
 
     params = {
-      title: product.title,
+      title: products(:phone).title,
       description: "A sample product",
       price: 699.50,
       units: 4
@@ -108,5 +108,26 @@ class ProductFormTest < ActiveSupport::TestCase
     assert_difference "Product.count", 0 do
       product_form.save(params)
     end
+
+    assert_equal ["has already been taken"], product_form.errors[:title]
+  end
+
+  test "form object accounts model and self defined validations" do
+    product = Product.new
+    product_form = ProductForm.new(product)
+
+    params = {
+      title: products(:phone).title,
+      description: "",
+      price: 699.50,
+      units: 4
+    }
+
+    assert_difference "Product.count", 0 do
+      product_form.save(params)
+    end
+
+    assert_equal ["has already been taken"], product_form.errors[:title]
+    assert_equal ["can't be blank"], product_form.errors[:description]
   end
 end

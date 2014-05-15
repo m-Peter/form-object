@@ -29,9 +29,14 @@ module FormObject
     end
 
     def valid?
-      valid = @model.valid?
-      @errors = @model.errors
-      valid && super
+      result = super
+      valid = @model.valid? && result
+      
+      @model.errors.each do |attribute, error|
+        @errors.add(attribute, error)
+      end
+
+      valid
     end
 
     def save(params)
