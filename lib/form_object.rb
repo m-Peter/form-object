@@ -33,7 +33,7 @@ module FormObject
       valid = @model.valid? && result
       
       @model.errors.each do |attribute, error|
-        @errors.add(attribute, error)
+        errors.add(attribute, error)
       end
 
       valid
