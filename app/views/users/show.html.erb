@@ -15,5 +15,10 @@
   <%= @user.gender_display_name %>
 </p>
 
+<p>
+  <strong>Email:</strong>
+  <%= @user.email.address %>
+</p>
+
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
