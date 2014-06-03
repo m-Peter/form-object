@@ -25,6 +25,12 @@ class UserForm
     errors.empty?
   end
 
+  def submit(params)
+    params.each do |key, value|
+      send("#{key}=", value)
+    end
+  end
+
   private
 
   def validate_models

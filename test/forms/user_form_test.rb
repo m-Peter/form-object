@@ -71,4 +71,20 @@ class UserFormTest < ActiveSupport::TestCase
     assert_includes @user_form.errors.messages[:name], "has already been taken"
     assert_includes @user_form.errors.messages[:address], "has already been taken"
   end
+
+  test "sync models with form input data" do
+    params = {
+      name: "petrakos",
+      age: 23,
+      gender: 0,
+      address: "petrakos@gmail.com"
+    }
+
+    @user_form.submit(params)
+
+    assert_equal params[:name], @user_form.name
+    assert_equal params[:gender], @user_form.gender
+    assert_equal params[:age], @user_form.age
+    assert_equal params[:address], @user_form.address
+  end
 end
