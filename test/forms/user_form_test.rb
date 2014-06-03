@@ -46,4 +46,13 @@ class UserFormTest < ActiveSupport::TestCase
 
     assert_equal "petrakos@gmail.com", @email.address
   end
+
+  test "validates itself" do
+    @user_form.name = nil
+    @user_form.age = nil
+    @user_form.gender = nil
+    @user_form.address = nil
+
+    assert_not @user_form.valid?
+  end
 end
