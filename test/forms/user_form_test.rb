@@ -54,5 +54,21 @@ class UserFormTest < ActiveSupport::TestCase
     @user_form.address = nil
 
     assert_not @user_form.valid?
+    assert_includes @user_form.errors.messages[:name], "can't be blank"
+    assert_includes @user_form.errors.messages[:age], "can't be blank"
+    assert_includes @user_form.errors.messages[:gender], "can't be blank"
+    assert_includes @user_form.errors.messages[:address], "can't be blank"
+  end
+
+  test "validates the models" do
+    peter = users(:peter)
+    @user_form.name = peter.name
+    @user_form.age = 23
+    @user_form.gender = 0
+    @user_form.address = peter.email.address
+
+    assert_not @user_form.valid?
+    assert_includes @user_form.errors.messages[:name], "has already been taken"
+    assert_includes @user_form.errors.messages[:address], "has already been taken"
   end
 end

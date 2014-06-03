@@ -16,4 +16,19 @@ class UserForm
     @user = user
     @email = email
   end
+
+  def valid?
+    result = super
+    result &= @user.valid?
+    result &= @email.valid?
+
+    @user.errors.each do |attribute, error|
+      errors.add(attribute, error)
+    end
+    @email.errors.each do |attribute, error|
+      errors.add(attribute, error)
+    end
+
+    result
+  end
 end
