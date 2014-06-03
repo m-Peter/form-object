@@ -1,5 +1,5 @@
 class UserForm
-  include ActiveModel::Validations
+  include ActiveModel::Model
   attr_reader :user, :email
   
   delegate :address, :address=, to: :email
@@ -41,6 +41,28 @@ class UserForm
     else
       false
     end
+  end
+
+  def persisted?
+    @user.persisted?
+  end
+
+  def to_key
+    return nil unless persisted?
+    @user.id
+  end
+
+  def to_param
+    return nil unless persisted?
+    @user.id.to_s
+  end
+
+  def to_model
+    @user
+  end
+
+  def self.model_name
+    ActiveModel::Name.new(self, nil, "User")
   end
 
   private

@@ -2,6 +2,12 @@ require 'test_helper'
 
 class UserFormTest < ActiveSupport::TestCase
   def setup
+    @params = {
+      name: "petrakos",
+      age: 23,
+      gender: 0,
+      address: "petrakos@gmail.com"
+    }
     @user = User.new
     @email = Email.new
     @user_form = UserForm.new(@user, @email)
@@ -73,30 +79,16 @@ class UserFormTest < ActiveSupport::TestCase
   end
 
   test "sync models with form input data" do
-    params = {
-      name: "petrakos",
-      age: 23,
-      gender: 0,
-      address: "petrakos@gmail.com"
-    }
+    @user_form.submit(@params)
 
-    @user_form.submit(params)
-
-    assert_equal params[:name], @user_form.name
-    assert_equal params[:gender], @user_form.gender
-    assert_equal params[:age], @user_form.age
-    assert_equal params[:address], @user_form.address
+    assert_equal @params[:name], @user_form.name
+    assert_equal @params[:gender], @user_form.gender
+    assert_equal @params[:age], @user_form.age
+    assert_equal @params[:address], @user_form.address
   end
 
   test "saves the models with submitted data" do
-    params = {
-      name: "petrakos",
-      age: 23,
-      gender: 0,
-      address: "petrakos@gmail.com"
-    }
-
-    @user_form.submit(params)
+    @user_form.submit(@params)
 
     assert_difference('User.count') do
       @user_form.save
