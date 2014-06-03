@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :create_new_form, only: [:new, :create]
+  before_action :create_edit_form, only: [:edit, :update]
 
   # GET /users
   # GET /users.json
@@ -14,22 +16,15 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    user = User.new
-    email = Email.new
-    @user_form = UserForm.new(user, email)
   end
 
   # GET /users/1/edit
   def edit
-    @user_form = UserForm.new(@user, @user.email)
   end
 
   # POST /users
   # POST /users.json
   def create
-    user = User.new
-    email = Email.new
-    @user_form = UserForm.new(user, email)
     @user_form.submit(user_params)
 
     respond_to do |format|
@@ -44,7 +39,6 @@ class UsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
-    @user_form = UserForm.new(@user, @user.email)
     @user_form.submit(user_params)
 
     respond_to do |format|
@@ -70,6 +64,14 @@ class UsersController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = User.find(params[:id])
+    end
+
+    def create_new_form
+      @user_form = UserForm.new(User.new, Email.new)
+    end
+
+    def create_edit_form
+      @user_form = UserForm.new(@user, @user.email)
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
