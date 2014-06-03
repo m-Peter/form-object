@@ -31,6 +31,18 @@ class UserForm
     end
   end
 
+  def save
+    if valid?
+      ActiveRecord::Base.transaction do
+        @user.email = email
+        @user.save
+        true
+      end
+    else
+      false
+    end
+  end
+
   private
 
   def validate_models

@@ -87,4 +87,37 @@ class UserFormTest < ActiveSupport::TestCase
     assert_equal params[:age], @user_form.age
     assert_equal params[:address], @user_form.address
   end
+
+  test "saves the models with submitted data" do
+    params = {
+      name: "petrakos",
+      age: 23,
+      gender: 0,
+      address: "petrakos@gmail.com"
+    }
+
+    @user_form.submit(params)
+
+    assert_difference('User.count') do
+      @user_form.save
+    end
+    assert_equal @email, @user.email
+  end
+
+  test "does not saves the models with invalida submitted data" do
+    params = {
+      name: "m-peter",
+      age: 23,
+      gender: 0,
+      address: "markoupetr@gmail.com"
+    }
+
+    @user_form.submit(params)
+
+    assert_difference('User.count', 0) do
+      @user_form.save
+    end
+
+    assert_equal 2, @user_form.errors.size
+  end
 end
