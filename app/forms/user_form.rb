@@ -18,17 +18,30 @@ class UserForm
   end
 
   def valid?
-    result = super
-    result &= @user.valid?
-    result &= @email.valid?
+    super
+    validate_models
+    collect_errors_from_models
 
-    @user.errors.each do |attribute, error|
+    errors.empty?
+  end
+
+  private
+
+  def validate_models
+    [user, email].each do |model|
+      model.valid?
+    end
+  end
+
+  def collect_errors_from_models
+    [user, email].each do |model|
+      collect_model_errors(model)
+    end
+  end
+
+  def collect_model_errors(model)
+    model.errors.each do |attribute, error|
       errors.add(attribute, error)
     end
-    @email.errors.each do |attribute, error|
-      errors.add(attribute, error)
-    end
-
-    result
   end
 end
