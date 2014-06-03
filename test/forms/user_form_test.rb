@@ -13,7 +13,7 @@ class UserFormTest < ActiveSupport::TestCase
     @user_form = UserForm.new(@user, @email)
   end
 
-  test "accepts the User model" do
+  test "contains the User model" do
     assert_equal @user, @user_form.user
   end
 
@@ -35,7 +35,7 @@ class UserFormTest < ActiveSupport::TestCase
     assert_equal 0, @user.gender
   end
 
-  test "accepts the Email model" do
+  test "contains the Email model" do
     assert_equal @email, @user_form.email
   end
 
@@ -96,7 +96,7 @@ class UserFormTest < ActiveSupport::TestCase
     assert_equal @email, @user.email
   end
 
-  test "does not saves the models with invalida submitted data" do
+  test "does not save the models with invalid submitted data" do
     params = {
       name: "m-peter",
       age: 23,
@@ -111,5 +111,8 @@ class UserFormTest < ActiveSupport::TestCase
     end
 
     assert_equal 2, @user_form.errors.size
+    assert_not @user_form.valid?
+    assert_includes @user_form.errors.messages[:name], "has already been taken"
+    assert_includes @user_form.errors.messages[:address], "has already been taken"
   end
 end
