@@ -75,8 +75,8 @@ class FormModel
       end
     end
 
-    def association(name)
-      forms << {assoc_name: name}
+    def association(name, &block)
+      forms << {assoc_name: name, proc: block}
       attr_reader name
     end
 
@@ -95,6 +95,7 @@ class SubForm
     @association_name = args[:assoc_name]
     @parent = args[:parent]
     @model = build_model
+    self.class.class_eval &args[:proc]
   end
 
   def build_model
@@ -106,12 +107,25 @@ class SubForm
       @parent.send("#{@association_name}=", @model)
     end
   end
+
+  class << self
+    def attributes(*names)
+      names.each do |attribute|
+        delegate attribute, to: :model
+        delegate "#{attribute}=", to: :model
+      end
+    end
+
+    alias_method :attribute, :attributes
+  end
 end
 
 class UserFormFixture < FormModel
   attributes :name, :age, :gender
 
-  association :email
+  association :email do
+    attribute :address
+  end
 
   validates :name, :age, :gender, presence: true
   validates :name, length: { in: 6..20 }
@@ -265,6 +279,15 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_equal user_form.model.email, email_form.model
     assert email_form.model.persisted?
     assert_equal "markoupetr@gmail.com", email_form.model.address
+  end
+
+  test "sub-form declares attributes" do
+    email_form = @user_form.email
+    attributes = [:address, :address=]
+
+    attributes.each do |attribute|
+      assert_respond_to email_form, attribute
+    end
   end
 
   test "responds to #persisted?" do
