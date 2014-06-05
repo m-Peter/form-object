@@ -62,11 +62,22 @@ class FormModel
         delegate "#{attribute}=", to: :model
       end
     end
+
+    def association(name)
+      forms << {assoc_name: name}
+      attr_reader name
+    end
+
+    def forms
+      @@forms ||= []
+    end
   end
 end
 
 class UserFormFixture < FormModel
   attributes :name, :age, :gender
+
+  association :email
 
   validates :name, :age, :gender, presence: true
   validates :name, length: { in: 6..20 }
@@ -173,6 +184,20 @@ class NestedFormTest < ActiveSupport::TestCase
       @user_form.save
     end
     assert_includes @user_form.errors.messages[:name], "has already been taken"
+  end
+
+  test "declare association" do
+    assert_respond_to UserFormFixture, :association
+  end
+
+  test "maintains a collection of sub-forms" do
+    assert_respond_to UserFormFixture, :forms
+  end
+
+  test "forms collection contains form definitions" do
+    email_definition = UserFormFixture.forms.first
+
+    assert_equal :email, email_definition[:assoc_name]
   end
 
   test "responds to #persisted?" do
