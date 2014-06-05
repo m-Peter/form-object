@@ -1,14 +1,8 @@
 require 'test_helper'
 
-class UserFormFixture
+class FormModel
   include ActiveModel::Model
-
   attr_reader :model
-  delegate :name, :name=, :age, :age=, :gender, :gender=, to: :model
-
-  validates :name, :age, :gender, presence: true
-  validates :name, length: { in: 6..20 }
-  validates :age, numericality: { only_integer: true }
 
   def initialize(model)
     @model = model
@@ -60,6 +54,14 @@ class UserFormFixture
   def to_model
     @model
   end
+end
+
+class UserFormFixture < FormModel
+  delegate :name, :name=, :age, :age=, :gender, :gender=, to: :model
+
+  validates :name, :age, :gender, presence: true
+  validates :name, length: { in: 6..20 }
+  validates :age, numericality: { only_integer: true }
 end
 
 class NestedFormTest < ActiveSupport::TestCase
