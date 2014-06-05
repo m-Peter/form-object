@@ -290,6 +290,14 @@ class NestedFormTest < ActiveSupport::TestCase
     end
   end
 
+  test "sub-form delegates attributes to model" do
+    email_form = @user_form.email
+    email_form.address = "petrakos@gmail.com"
+
+    assert_equal "petrakos@gmail.com", email_form.address
+    assert_equal "petrakos@gmail.com", email_form.model.address
+  end
+
   test "responds to #persisted?" do
     assert_respond_to @user_form, :persisted?
     assert_not @user_form.persisted?
