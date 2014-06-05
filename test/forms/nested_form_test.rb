@@ -120,6 +120,10 @@ class SubForm
     errors.empty?
   end
 
+  def persisted?
+    @model.persisted?
+  end
+
   def build_model
     if @parent.send("#{@association_name}")
       @model = @parent.send("#{@association_name}")
@@ -372,6 +376,30 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_equal 23, @user_form.age
     assert_equal 0, @user_form.gender
     assert_equal "petrakos@gmail.com", @user_form.email.address
+  end
+
+  test "main form saves all the models" do
+    params = {
+      name: "Petrakos",
+      age: "23",
+      gender: "0",
+      email: {
+        address: "petrakos@gmail.com"
+      }
+    }
+
+    @user_form.submit(params)
+
+    assert_difference(['User.count', 'Email.count']) do
+      @user_form.save
+    end
+
+    assert_equal "Petrakos", @user_form.name
+    assert_equal 23, @user_form.age
+    assert_equal 0, @user_form.gender
+    assert_equal "petrakos@gmail.com", @user_form.email.address
+    assert @user_form.persisted?
+    assert @user_form.email.persisted?
   end
 
   test "responds to #persisted?" do
