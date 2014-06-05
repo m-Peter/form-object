@@ -13,6 +13,15 @@ class UserFormFixture
   def initialize(model)
     @model = model
   end
+
+  def valid?
+    super
+    @model.valid?
+    @model.errors.each do |attribute, error|
+      errors.add(attribute, error)
+    end
+    errors.empty?
+  end
 end
 
 class NestedFormTest < ActiveSupport::TestCase
@@ -59,5 +68,15 @@ class NestedFormTest < ActiveSupport::TestCase
     @user_form.gender = 0
 
     assert @user_form.valid?
+  end
+
+  test "validates the model" do
+    peter = users(:peter)
+    @user_form.name = peter.name
+    @user_form.age = 23
+    @user_form.gender = 0
+
+    assert_not @user_form.valid?
+    assert_includes @user_form.errors.messages[:name], "has already been taken"
   end
 end
