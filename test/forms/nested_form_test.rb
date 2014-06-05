@@ -2,10 +2,22 @@ require 'test_helper'
 
 class FormModel
   include ActiveModel::Model
-  attr_reader :model
+  
+  attr_reader :model, :forms
 
   def initialize(model)
     @model = model
+    @forms = []
+    populate_forms
+  end
+
+  def populate_forms
+    self.class.forms.each do |definition|
+      definition[:parent] = model
+      sub_form = SubForm.new(definition)
+      @forms << sub_form
+      instance_variable_set("@#{definition[:assoc_name]}", sub_form)
+    end
   end
 
   def submit(params)
@@ -71,6 +83,16 @@ class FormModel
     def forms
       @@forms ||= []
     end
+  end
+end
+
+class SubForm
+  attr_reader :association_name
+  attr_reader :parent
+
+  def initialize(args)
+    @association_name = args[:assoc_name]
+    @parent = args[:parent]
   end
 end
 
@@ -198,6 +220,18 @@ class NestedFormTest < ActiveSupport::TestCase
     email_definition = UserFormFixture.forms.first
 
     assert_equal :email, email_definition[:assoc_name]
+  end
+
+  test "sub-forms contains association name" do
+    email_form = @user_form.forms.first
+
+    assert_equal :email, email_form.association_name
+    assert_equal @user, email_form.parent
+  end
+
+  test "contains getter for sub-form" do
+    assert_respond_to @user_form, :email
+    assert_instance_of SubForm, @user_form.email
   end
 
   test "responds to #persisted?" do
