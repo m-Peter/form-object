@@ -89,10 +89,22 @@ end
 class SubForm
   attr_reader :association_name
   attr_reader :parent
+  attr_reader :model
 
   def initialize(args)
     @association_name = args[:assoc_name]
     @parent = args[:parent]
+    @model = build_model
+  end
+
+  def build_model
+    if @parent.send("#{@association_name}")
+      @model = @parent.send("#{@association_name}")
+    else
+      model_class = @association_name.to_s.camelize.constantize
+      @model = model_class.new
+      @parent.send("#{@association_name}=", @model)
+    end
   end
 end
 
@@ -232,6 +244,27 @@ class NestedFormTest < ActiveSupport::TestCase
   test "contains getter for sub-form" do
     assert_respond_to @user_form, :email
     assert_instance_of SubForm, @user_form.email
+  end
+
+  test "sub-form initializes model for new parent" do
+    user = User.new
+    user_form = UserFormFixture.new(user)
+    email_form = user_form.email
+
+    assert_instance_of Email, email_form.model
+    assert_equal user_form.model.email, email_form.model
+    assert email_form.model.new_record?
+  end
+
+  test "sub-form fetches model for existing parent" do
+    user = users(:peter)
+    user_form = UserFormFixture.new(user)
+    email_form = user_form.email
+
+    assert_instance_of Email, email_form.model
+    assert_equal user_form.model.email, email_form.model
+    assert email_form.model.persisted?
+    assert_equal "markoupetr@gmail.com", email_form.model.address
   end
 
   test "responds to #persisted?" do
