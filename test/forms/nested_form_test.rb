@@ -321,6 +321,19 @@ class NestedFormTest < ActiveSupport::TestCase
     assert email_form.valid?
   end
 
+  test "sub-form validates the model" do
+    existing_email = emails(:peters)
+    email_form = @user_form.email
+    email_form.address = existing_email.address
+
+    assert_not email_form.valid?
+    assert_includes email_form.errors.messages[:address], "has already been taken"
+
+    email_form.address = "petrakos@gmail.com"
+
+    assert email_form.valid?
+  end
+
   test "responds to #persisted?" do
     assert_respond_to @user_form, :persisted?
     assert_not @user_form.persisted?
