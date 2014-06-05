@@ -49,6 +49,12 @@ class FormModel
     @model.errors.each do |attribute, error|
       errors.add(attribute, error)
     end
+    @forms.each do |form|
+      form.valid?
+      form.errors.each do |attribute, error|
+        errors.add(attribute, error)
+      end
+    end
     errors.empty?
   end
 
@@ -204,6 +210,7 @@ class NestedFormTest < ActiveSupport::TestCase
     @user_form.name = "Peters"
     @user_form.age = 23
     @user_form.gender = 0
+    @user_form.email.address = "petrakos@gmail.com"
 
     assert @user_form.valid?
   end
@@ -402,6 +409,26 @@ class NestedFormTest < ActiveSupport::TestCase
     assert @user_form.email.persisted?
   end
 
+  test "main form collects all the errors" do
+    params = {
+      name: "m-peter",
+      age: "23",
+      gender: "0",
+      email: {
+        address: "markoupetr@gmail.com"
+      }
+    }
+
+    @user_form.submit(params)
+
+    assert_difference(['User.count', 'Email.count'], 0) do
+      @user_form.save
+    end
+
+    assert_includes @user_form.errors.messages[:name], "has already been taken"
+    assert_includes @user_form.errors.messages[:address], "has already been taken"
+  end
+
   test "responds to #persisted?" do
     assert_respond_to @user_form, :persisted?
     assert_not @user_form.persisted?
@@ -439,6 +466,7 @@ class NestedFormTest < ActiveSupport::TestCase
     @user_form.name = "Peters"
     @user_form.age = 23
     @user_form.gender = 0
+    @user_form.email.address = "petrakos@gmail.com"
 
     @user_form.save
   end
