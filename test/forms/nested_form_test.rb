@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class UserFormFixture
-  include ActiveModel::Validations
+  include ActiveModel::Model
 
   attr_reader :model
   delegate :name, :name=, :age, :age=, :gender, :gender=, to: :model
@@ -38,13 +38,37 @@ class UserFormFixture
     end
     errors.empty?
   end
+
+  def persisted?
+    @model.persisted?
+  end
+
+  def to_key
+    return nil unless persisted?
+    @model.id
+  end
+
+  def to_param
+    return nil unless persisted?
+    @model.id.to_s
+  end
+
+  def to_partial_path
+    ""
+  end
+
+  def to_model
+    @model
+  end
 end
 
 class NestedFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
 
   def setup
     @user = User.new
     @user_form = UserFormFixture.new(@user)
+    @model = @user_form
   end
 
   test "accepts the model it represents" do
@@ -138,5 +162,46 @@ class NestedFormTest < ActiveSupport::TestCase
       @user_form.save
     end
     assert_includes @user_form.errors.messages[:name], "has already been taken"
+  end
+
+  test "responds to #persisted?" do
+    assert_respond_to @user_form, :persisted?
+    assert_not @user_form.persisted?
+    assert save_user
+    assert @user_form.persisted?
+  end
+
+  test "responds to #to_key" do
+    assert_respond_to @user_form, :to_key
+    assert_nil @user_form.to_key
+    assert save_user
+    assert_equal @user.id, @user_form.to_key
+  end
+
+  test "responds to #to_param" do
+    assert_respond_to @user_form, :to_param
+    assert_nil @user_form.to_param
+    assert save_user
+    assert_equal @user.to_param, @user_form.to_param
+  end
+
+  test "responds to #to_partial_path" do
+    assert_respond_to @user_form, :to_partial_path
+    assert_instance_of String, @user_form.to_partial_path
+  end
+
+  test "responds to #to_model" do
+    assert_respond_to @user_form, :to_model
+    assert_equal @user, @user_form.to_model
+  end
+
+  private
+
+  def save_user
+    @user_form.name = "Peters"
+    @user_form.age = 23
+    @user_form.gender = 0
+
+    @user_form.save
   end
 end
