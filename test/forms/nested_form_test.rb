@@ -14,6 +14,12 @@ class UserFormFixture
     @model = model
   end
 
+  def submit(params)
+    params.each do |key, value|
+      send("#{key}=", value)
+    end
+  end
+
   def valid?
     super
     @model.valid?
@@ -78,5 +84,19 @@ class NestedFormTest < ActiveSupport::TestCase
 
     assert_not @user_form.valid?
     assert_includes @user_form.errors.messages[:name], "has already been taken"
+  end
+
+  test "sync the model with submitted data" do
+    params = {
+      name: "Peters",
+      age: "23",
+      gender: "0"
+    }
+
+    @user_form.submit(params)
+
+    assert_equal "Peters", @user_form.name
+    assert_equal 23, @user_form.age
+    assert_equal 0, @user_form.gender
   end
 end
