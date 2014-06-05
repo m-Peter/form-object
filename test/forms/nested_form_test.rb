@@ -54,10 +54,19 @@ class FormModel
   def to_model
     @model
   end
+
+  class << self
+    def attributes(*names)
+      names.each do |attribute|
+        delegate attribute, to: :model
+        delegate "#{attribute}=", to: :model
+      end
+    end
+  end
 end
 
 class UserFormFixture < FormModel
-  delegate :name, :name=, :age, :age=, :gender, :gender=, to: :model
+  attributes :name, :age, :gender
 
   validates :name, :age, :gender, presence: true
   validates :name, length: { in: 6..20 }
