@@ -21,8 +21,15 @@ class FormModel
   end
 
   def submit(params)
+    #params.each do |key, value|
+      #send("#{key}=", value)
+    #end
+    email_params = params.delete(:email)
     params.each do |key, value|
       send("#{key}=", value)
+    end
+    @forms.each do |form|
+      form.submit(email_params)
     end
   end
 
@@ -96,6 +103,12 @@ class SubForm
     @parent = args[:parent]
     @model = build_model
     self.class.class_eval &args[:proc]
+  end
+
+  def submit(params)
+    params.each do |key, value|
+      send("#{key}=", value)
+    end
   end
 
   def valid?
@@ -205,7 +218,10 @@ class NestedFormTest < ActiveSupport::TestCase
     params = {
       name: "Peters",
       age: "23",
-      gender: "0"
+      gender: "0",
+      email: {
+        address: "petrakos@gmail.com"
+      }
     }
 
     @user_form.submit(params)
@@ -219,7 +235,10 @@ class NestedFormTest < ActiveSupport::TestCase
     params = {
       name: "Peters",
       age: "23",
-      gender: "0"
+      gender: "0",
+      email: {
+        address: "petrakos@gmail.com"
+      }
     }
 
     @user_form.submit(params)
@@ -233,7 +252,10 @@ class NestedFormTest < ActiveSupport::TestCase
     params = {
       name: "m-peter",
       age: "23",
-      gender: "0"
+      gender: "0",
+      email: {
+        address: "markoupetr@gmail.com"
+      }
     }
 
     @user_form.submit(params)
@@ -332,6 +354,24 @@ class NestedFormTest < ActiveSupport::TestCase
     email_form.address = "petrakos@gmail.com"
 
     assert email_form.valid?
+  end
+
+  test "main form syncs models in nested forms" do
+    params = {
+      name: "Petrakos",
+      age: "23",
+      gender: "0",
+      email: {
+        address: "petrakos@gmail.com"
+      }
+    }
+
+    @user_form.submit(params)
+
+    assert_equal "Petrakos", @user_form.name
+    assert_equal 23, @user_form.age
+    assert_equal 0, @user_form.gender
+    assert_equal "petrakos@gmail.com", @user_form.email.address
   end
 
   test "responds to #persisted?" do
