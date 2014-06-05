@@ -21,8 +21,12 @@ class UserFormFixture
   end
 
   def save
-    ActiveRecord::Base.transaction do
-      @model.save
+    if valid?
+      ActiveRecord::Base.transaction do
+        @model.save
+      end
+    else
+      false
     end
   end
 
@@ -118,5 +122,21 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_difference('User.count') do
       @user_form.save
     end
+  end
+
+  test "does not save the model with invalid data" do
+    params = {
+      name: "m-peter",
+      age: "23",
+      gender: "0"
+    }
+
+    @user_form.submit(params)
+
+    assert_not @user_form.valid?
+    assert_difference('User.count', 0) do
+      @user_form.save
+    end
+    assert_includes @user_form.errors.messages[:name], "has already been taken"
   end
 end
