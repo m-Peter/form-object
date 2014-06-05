@@ -20,6 +20,12 @@ class UserFormFixture
     end
   end
 
+  def save
+    ActiveRecord::Base.transaction do
+      @model.save
+    end
+  end
+
   def valid?
     super
     @model.valid?
@@ -98,5 +104,19 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_equal "Peters", @user_form.name
     assert_equal 23, @user_form.age
     assert_equal 0, @user_form.gender
+  end
+
+  test "saves the model" do
+    params = {
+      name: "Peters",
+      age: "23",
+      gender: "0"
+    }
+
+    @user_form.submit(params)
+
+    assert_difference('User.count') do
+      @user_form.save
+    end
   end
 end
