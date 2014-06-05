@@ -87,15 +87,24 @@ class FormModel
 end
 
 class SubForm
-  attr_reader :association_name
-  attr_reader :parent
-  attr_reader :model
+  include ActiveModel::Validations
+
+  attr_reader :association_name, :parent, :model
 
   def initialize(args)
     @association_name = args[:assoc_name]
     @parent = args[:parent]
     @model = build_model
     self.class.class_eval &args[:proc]
+  end
+
+  def valid?
+    super
+    @model.valid?
+    @model.errors.each do |attribute, error|
+      errors.add(attribute, error)
+    end
+    errors.empty?
   end
 
   def build_model
@@ -125,6 +134,8 @@ class UserFormFixture < FormModel
 
   association :email do
     attribute :address
+
+    validates :address, presence: true
   end
 
   validates :name, :age, :gender, presence: true
@@ -296,6 +307,18 @@ class NestedFormTest < ActiveSupport::TestCase
 
     assert_equal "petrakos@gmail.com", email_form.address
     assert_equal "petrakos@gmail.com", email_form.model.address
+  end
+
+  test "sub-form validates itself" do
+    email_form = @user_form.email
+    email_form.address = nil
+
+    assert_not email_form.valid?
+    assert_includes email_form.errors.messages[:address], "can't be blank"
+
+    email_form.address = "petrakos@gmail.com"
+
+    assert email_form.valid?
   end
 
   test "responds to #persisted?" do
