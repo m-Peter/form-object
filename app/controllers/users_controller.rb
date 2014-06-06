@@ -20,8 +20,6 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    user = User.find(params[:id])
-    @main_form = MainForm.new(user)
   end
 
   # POST /users
@@ -41,11 +39,11 @@ class UsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
-    @user_form.submit(user_params)
+    @main_form.submit(params[:user])
 
     respond_to do |format|
-      if @user_form.save
-        format.html { redirect_to @user_form, notice: "User: #{@user_form.name} was successfully updated." }
+      if @main_form.save
+        format.html { redirect_to @main_form, notice: "User: #{@main_form.name} was successfully updated." }
       else
         format.html { render :edit }
       end
@@ -74,7 +72,7 @@ class UsersController < ApplicationController
     end
 
     def create_edit_form
-      @user_form = UserForm.new(@user, @user.email)
+      @main_form = MainForm.new(@user)
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
