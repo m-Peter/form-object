@@ -15,12 +15,24 @@ class FormModel
       send("#{key}=", value)
     end
     nested_params = params.select { |key, value| value.is_a?(Hash) }
-    assoc_name = nested_params.keys.first
-    @forms.each do |form|
-      if form.association_name.to_s == assoc_name.to_s
-        form.submit(nested_params[assoc_name])
+    
+    nested_params.each do |association|
+      assoc_name = association.first
+      @forms.each do |form|
+        if form.association_name.to_s == assoc_name.to_s
+          form.submit(association.last)
+        end
       end
     end
+
+
+
+    #assoc_name = nested_params.keys.first
+    #@forms.each do |form|
+      #if form.association_name.to_s == assoc_name.to_s
+        #form.submit(nested_params[assoc_name])
+      #end
+    #end
   end
 
   def save
