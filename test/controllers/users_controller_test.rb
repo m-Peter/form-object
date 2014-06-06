@@ -24,6 +24,10 @@ class UsersControllerTest < ActionController::TestCase
         name: "petrakos",
         email: {
           address: "petrakos@gmail.com"  
+        },
+        profile: {
+          twitter_name: "t_peter",
+          github_name: "g_peter"
         }
       }
     end
@@ -35,6 +39,8 @@ class UsersControllerTest < ActionController::TestCase
     assert_equal 23, user_form.age
     assert_equal 0, user_form.gender
     assert_equal "petrakos@gmail.com", user_form.email.address
+    assert_equal "t_peter", user_form.profile.twitter_name
+    assert_equal "g_peter", user_form.profile.github_name
     assert_equal "User: #{user_form.name} was successfully created.", flash[:notice]
   end
 
@@ -48,6 +54,10 @@ class UsersControllerTest < ActionController::TestCase
         gender: 0,
         email: {
           address: peter.email.address
+        },
+        profile: {
+          twitter_name: peter.profile.twitter_name,
+          github_name: peter.profile.github_name
         }
       }
     end
@@ -76,6 +86,10 @@ class UsersControllerTest < ActionController::TestCase
       name: "petrakos",
       email: {
         address: "petrakos@gmail.com"
+      },
+      profile: {
+        twitter_name: "t_peter",
+        github_name: "g_peter"
       }
     }
 

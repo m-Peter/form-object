@@ -4,7 +4,11 @@ class UserForm < FormModel
   association :email do
     attribute :address
 
-    validates :address, presence: true
+    #validates :address, presence: true
+  end
+
+  association :profile do
+    attributes :twitter_name, :github_name
   end
 
   validates :name, :age, :gender, presence: true
