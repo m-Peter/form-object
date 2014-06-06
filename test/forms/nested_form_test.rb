@@ -257,12 +257,13 @@ class NestedFormTest < ActiveSupport::TestCase
   end
 
   test "does not save the model with invalid data" do
+    peter = users(:peter)
     params = {
-      name: "m-peter",
+      name: peter.name,
       age: "23",
       gender: "0",
       email: {
-        address: "markoupetr@gmail.com"
+        address: peter.email.address
       }
     }
 
@@ -273,6 +274,7 @@ class NestedFormTest < ActiveSupport::TestCase
       @user_form.save
     end
     assert_includes @user_form.errors.messages[:name], "has already been taken"
+    assert_includes @user_form.errors.messages[:address], "has already been taken"
   end
 
   test "declare association" do
@@ -289,7 +291,7 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_equal :email, email_definition[:assoc_name]
   end
 
-  test "sub-forms contains association name" do
+  test "sub-forms contains association name and parent model" do
     email_form = @user_form.forms.first
 
     assert_equal :email, email_form.association_name
@@ -302,12 +304,10 @@ class NestedFormTest < ActiveSupport::TestCase
   end
 
   test "sub-form initializes model for new parent" do
-    user = User.new
-    user_form = UserFormFixture.new(user)
-    email_form = user_form.email
+    email_form = @user_form.email
 
     assert_instance_of Email, email_form.model
-    assert_equal user_form.model.email, email_form.model
+    assert_equal @user_form.model.email, email_form.model
     assert email_form.model.new_record?
   end
 
@@ -319,6 +319,9 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_instance_of Email, email_form.model
     assert_equal user_form.model.email, email_form.model
     assert email_form.model.persisted?
+    assert_equal "m-peter", user_form.name
+    assert_equal 23, user_form.age
+    assert_equal 0, user_form.gender
     assert_equal "markoupetr@gmail.com", email_form.model.address
   end
 
@@ -407,12 +410,13 @@ class NestedFormTest < ActiveSupport::TestCase
   end
 
   test "main form collects all the errors" do
+    peter = users(:peter)
     params = {
-      name: "m-peter",
+      name: peter.name,
       age: "23",
       gender: "0",
       email: {
-        address: "markoupetr@gmail.com"
+        address: peter.email.address
       }
     }
 
