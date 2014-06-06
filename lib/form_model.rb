@@ -38,7 +38,7 @@ class FormModel
     @forms.each do |form|
       form.valid?
       form.errors.each do |attribute, error|
-        errors.add(attribute, error)
+        #errors.add(attribute, error)
       end
     end
     errors.empty?
