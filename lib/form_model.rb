@@ -10,12 +10,16 @@ class FormModel
   end
   
   def submit(params)
-    email_params = params.delete(:email)
-    params.each do |key, value|
+    current_scope_params = params.reject { |key, value| value.is_a?(Hash) }
+    current_scope_params.each do |key, value|
       send("#{key}=", value)
     end
+    nested_params = params.select { |key, value| value.is_a?(Hash) }
+    assoc_name = nested_params.keys.first
     @forms.each do |form|
-      form.submit(email_params)
+      if form.association_name.to_s == assoc_name.to_s
+        form.submit(nested_params[assoc_name])
+      end
     end
   end
 

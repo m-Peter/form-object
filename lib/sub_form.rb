@@ -1,7 +1,7 @@
 class SubForm
   include ActiveModel::Validations
 
-  attr_reader :association_name, :parent, :model
+  attr_reader :association_name, :parent, :model, :name
 
   def initialize(args)
     @association_name = args[:assoc_name]
