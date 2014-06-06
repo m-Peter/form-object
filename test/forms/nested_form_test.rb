@@ -9,6 +9,10 @@ class UserFormFixture < FormModel
     validates :address, presence: true
   end
 
+  association :profile do
+    attributes :twitter_name, :github_name
+  end
+
   validates :name, :age, :gender, presence: true
   validates :name, length: { in: 6..20 }
   validates :age, numericality: { only_integer: true }
@@ -217,6 +221,20 @@ class NestedFormTest < ActiveSupport::TestCase
     email_form.address = "petrakos@gmail.com"
 
     assert email_form.valid?
+  end
+
+  test "declares multiple sub-forms" do
+    profile_definition = UserFormFixture.forms.last
+
+    assert_equal 2, UserFormFixture.forms.size
+    assert_equal :profile, profile_definition[:assoc_name]
+
+    profile_form = @user_form.forms.last
+
+    assert_equal 2, @user_form.forms.size
+    assert_equal :profile, profile_form.association_name
+    assert_equal @user, profile_form.parent
+    assert_respond_to @user_form, :profile
   end
 
   test "main form syncs models in nested forms" do
