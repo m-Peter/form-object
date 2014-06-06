@@ -229,12 +229,29 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_equal 2, UserFormFixture.forms.size
     assert_equal :profile, profile_definition[:assoc_name]
 
-    profile_form = @user_form.forms.last
+    profile_form = @user_form.profile
 
     assert_equal 2, @user_form.forms.size
     assert_equal :profile, profile_form.association_name
     assert_equal @user, profile_form.parent
-    assert_respond_to @user_form, :profile
+  end
+
+  test "profile form declares attributes" do
+    attributes = [:twitter_name, :twitter_name=, :github_name, :github_name=]
+    profile_form = @user_form.profile
+
+    attributes.each do |attribute|
+      assert_respond_to profile_form, attribute
+    end
+  end
+
+  test "profile form delegates attributes to model" do
+    profile_form = @user_form.profile
+    profile_form.twitter_name = "twitter_peter"
+    profile_form.github_name = "github_peter"
+
+    assert_equal "twitter_peter", profile_form.twitter_name
+    assert_equal "github_peter", profile_form.github_name
   end
 
   test "main form syncs models in nested forms" do
