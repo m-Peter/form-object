@@ -11,6 +11,7 @@
     </div>
   <% end %>
 
+  <h2>User details</h2>
   <div class="field">
     <%= f.label :name %><br>
     <%= f.text_field :name %>
@@ -23,6 +24,7 @@
     <%= f.label :gender %><br>
     <%= f.select :gender, User.get_genders_dropdown %>
   </div>
+  <h2>Email details</h2>
   <%= f.fields_for :email, @user_form.email do |email| %>
     <div class="field">
       <%= email.label :address %><br>
