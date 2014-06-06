@@ -16,8 +16,6 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    user = User.new
-    @main_form = MainForm.new(user)
   end
 
   # GET /users/1/edit
@@ -27,11 +25,11 @@ class UsersController < ApplicationController
   # POST /users
   # POST /users.json
   def create
-    @user_form.submit(user_params)
+    @main_form.submit(params[:user])
 
     respond_to do |format|
-      if @user_form.save
-        format.html { redirect_to @user_form, notice: "User: #{@user_form.name} was successfully created." }
+      if @main_form.save
+        format.html { redirect_to @main_form, notice: "User: #{@main_form.name} was successfully created." }
       else
         format.html { render :new }
       end
@@ -69,7 +67,8 @@ class UsersController < ApplicationController
     end
 
     def create_new_form
-      @user_form = UserForm.new(User.new, Email.new)
+      user = User.new
+      @main_form = MainForm.new(user)
     end
 
     def create_edit_form
