@@ -17,23 +17,25 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should create user" do
-    assert_difference('User.count') do
+    assert_difference(['User.count', 'Email.count']) do
       post :create, user: {
         age: "23",
         gender: "0",
         name: "petrakos",
-        address: "petrakos@gmail.com"
+        email: {
+          address: "petrakos@gmail.com"  
+        }
       }
     end
 
-    user_form = assigns(:user_form)
+    main_form = assigns(:main_form)
 
-    assert_redirected_to user_path(user_form)
-    assert_equal "petrakos", user_form.name
-    assert_equal 23, user_form.age
-    assert_equal 0, user_form.gender
-    assert_equal "petrakos@gmail.com", user_form.address
-    assert_equal "User: #{user_form.name} was successfully created.", flash[:notice]
+    assert_redirected_to user_path(main_form)
+    assert_equal "petrakos", main_form.name
+    assert_equal 23, main_form.age
+    assert_equal 0, main_form.gender
+    assert_equal "petrakos@gmail.com", main_form.email.address
+    assert_equal "User: #{main_form.name} was successfully created.", flash[:notice]
   end
 
   test "should show user" do
@@ -51,15 +53,17 @@ class UsersControllerTest < ActionController::TestCase
       age: @user.age,
       gender: @user.gender,
       name: "petrakos",
-      address: "petrakos@gmail.com"
+      email: {
+        address: "petrakos@gmail.com"
+      }
     }
 
-    user_form = assigns(:user_form)
+    main_form = assigns(:main_form)
 
-    assert_redirected_to user_path(user_form)
-    assert_equal "petrakos", user_form.name
-    assert_equal "petrakos@gmail.com", user_form.address
-    assert_equal "User: #{user_form.name} was successfully updated.", flash[:notice]
+    assert_redirected_to user_path(main_form)
+    assert_equal "petrakos", main_form.name
+    assert_equal "petrakos@gmail.com", main_form.email.address
+    assert_equal "User: #{main_form.name} was successfully updated.", flash[:notice]
   end
 
   test "should destroy user" do
