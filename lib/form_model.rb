@@ -8,16 +8,7 @@ class FormModel
     @forms = []
     populate_forms
   end
-
-  def populate_forms
-    self.class.forms.each do |definition|
-      definition[:parent] = model
-      sub_form = SubForm.new(definition)
-      @forms << sub_form
-      instance_variable_set("@#{definition[:assoc_name]}", sub_form)
-    end
-  end
-
+  
   def submit(params)
     email_params = params.delete(:email)
     params.each do |key, value|
@@ -90,6 +81,17 @@ class FormModel
 
     def forms
       @@forms ||= []
+    end
+  end
+
+  private
+
+  def populate_forms
+    self.class.forms.each do |definition|
+      definition[:parent] = model
+      sub_form = SubForm.new(definition)
+      @forms << sub_form
+      instance_variable_set("@#{definition[:assoc_name]}", sub_form)
     end
   end
 end
