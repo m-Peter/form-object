@@ -28,17 +28,7 @@ class SubForm
   def persisted?
     @model.persisted?
   end
-
-  def build_model
-    if @parent.send("#{@association_name}")
-      @model = @parent.send("#{@association_name}")
-    else
-      model_class = @association_name.to_s.camelize.constantize
-      @model = model_class.new
-      @parent.send("#{@association_name}=", @model)
-    end
-  end
-
+  
   class << self
     def attributes(*names)
       names.each do |attribute|
@@ -48,5 +38,17 @@ class SubForm
     end
 
     alias_method :attribute, :attributes
+  end
+
+  private
+
+  def build_model
+    if @parent.send("#{@association_name}")
+      @model = @parent.send("#{@association_name}")
+    else
+      model_class = @association_name.to_s.camelize.constantize
+      @model = model_class.new
+      @parent.send("#{@association_name}=", @model)
+    end
   end
 end
