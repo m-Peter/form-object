@@ -254,6 +254,29 @@ class NestedFormTest < ActiveSupport::TestCase
     assert_equal "github_peter", profile_form.github_name
   end
 
+  test "profile form initializes model for new parent" do
+    profile_form = @user_form.profile
+
+    assert_instance_of Profile, profile_form.model
+    assert_equal @user_form.model.profile, profile_form.model
+    assert profile_form.model.new_record?
+  end
+
+  test "profile form fetches model for existing parent" do
+    user = users(:peter)
+    user_form = UserFormFixture.new(user)
+    profile_form = user_form.profile
+
+    assert_instance_of Profile, profile_form.model
+    assert_equal user_form.model.profile, profile_form.model
+    assert profile_form.model.persisted?
+    assert_equal "m-peter", user_form.name
+    assert_equal 23, user_form.age
+    assert_equal 0, user_form.gender
+    assert_equal "twitter_peter", profile_form.model.twitter_name
+    assert_equal "github_peter", profile_form.model.github_name
+  end
+
   test "main form syncs models in nested forms" do
     params = {
       name: "Petrakos",
