@@ -21,9 +21,6 @@ class FormModel
   end
 
   def submit(params)
-    #params.each do |key, value|
-      #send("#{key}=", value)
-    #end
     email_params = params.delete(:email)
     params.each do |key, value|
       send("#{key}=", value)
