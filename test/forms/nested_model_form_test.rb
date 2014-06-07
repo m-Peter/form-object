@@ -100,4 +100,70 @@ class NestedModelFormTest < ActiveSupport::TestCase
 
     assert email_form.valid?
   end
+
+  test "main form syncs models in nested forms" do
+    params = {
+      name: "Petrakos",
+      age: "23",
+      gender: "0",
+      email: {
+        address: "petrakos@gmail.com"
+      }
+    }
+
+    @form.submit(params)
+
+    assert_equal "Petrakos", @form.name
+    assert_equal 23, @form.age
+    assert_equal 0, @form.gender
+    assert_equal "petrakos@gmail.com", @form.email.address
+  end
+
+  test "main form saves all the models" do
+    params = {
+      name: "Petrakos",
+      age: "23",
+      gender: "0",
+      email: {
+        address: "petrakos@gmail.com"
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference(['User.count', 'Email.count']) do
+      @form.save
+    end
+
+    assert_equal "Petrakos", @form.name
+    assert_equal 23, @form.age
+    assert_equal 0, @form.gender
+    assert_equal "petrakos@gmail.com", @form.email.address
+    
+    assert @form.persisted?
+    assert @form.email.persisted?
+  end
+
+  test "main form collects all the errors" do
+    peter = users(:peter)
+    params = {
+      name: peter.name,
+      age: "23",
+      gender: "0",
+      email: {
+        address: peter.email.address
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference(['User.count', 'Email.count'], 0) do
+      @form.save
+    end
+
+    assert_includes @form.errors.messages[:name], "has already been taken"
+    assert_includes @form.email.errors.messages[:address], "has already been taken"
+    # TODO: try to resolve this
+    #assert_includes @user_form.errors.messages[:address], "has already been taken"
+  end
 end
