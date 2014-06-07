@@ -2,9 +2,12 @@ require 'test_helper'
 require_relative 'nested_model_form'
 
 class NestedModelFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @user = User.new
     @form = NestedModelForm.new(@user)
+    @model = @form
   end
 
   test "declare association" do

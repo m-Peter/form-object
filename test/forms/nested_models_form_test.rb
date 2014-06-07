@@ -2,9 +2,12 @@ require 'test_helper'
 require_relative 'nested_models_form'
 
 class NestedModelsFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @user = User.new
     @form = NestedModelsForm.new(@user)
+    @model = @form
   end
 
   test "declares both sub-forms" do

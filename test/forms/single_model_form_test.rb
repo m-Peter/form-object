@@ -2,9 +2,12 @@ require 'test_helper'
 require_relative 'single_model_form'
 
 class SingleModelFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @user = User.new
     @form = SingleModelForm.new(@user)
+    @model = @form
   end
 
   test "accepts the model it represents" do
@@ -103,5 +106,46 @@ class SingleModelFormTest < ActiveSupport::TestCase
       @form.save
     end
     assert_includes @form.errors.messages[:name], "has already been taken"
+  end
+
+  test "responds to #persisted?" do
+    assert_respond_to @form, :persisted?
+    assert_not @form.persisted?
+    assert save_user
+    assert @form.persisted?
+  end
+
+  test "responds to #to_key" do
+    assert_respond_to @form, :to_key
+    assert_nil @form.to_key
+    assert save_user
+    assert_equal @user.id, @form.to_key
+  end
+
+  test "responds to #to_param" do
+    assert_respond_to @form, :to_param
+    assert_nil @form.to_param
+    assert save_user
+    assert_equal @user.to_param, @form.to_param
+  end
+
+  test "responds to #to_partial_path" do
+    assert_respond_to @form, :to_partial_path
+    assert_instance_of String, @form.to_partial_path
+  end
+
+  test "responds to #to_model" do
+    assert_respond_to @form, :to_model
+    assert_equal @user, @form.to_model
+  end
+
+  private
+
+  def save_user
+    @form.name = "Peters"
+    @form.age = 23
+    @form.gender = 0
+
+    @form.save
   end
 end
