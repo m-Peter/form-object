@@ -96,7 +96,7 @@ class FormModel
     end
 
     def forms
-      @@forms ||= []
+      @forms ||= []
     end
   end
 
