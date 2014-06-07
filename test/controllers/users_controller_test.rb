@@ -22,9 +22,11 @@ class UsersControllerTest < ActionController::TestCase
         age: "23",
         gender: "0",
         name: "petrakos",
+
         email: {
           address: "petrakos@gmail.com"  
         },
+
         profile: {
           twitter_name: "t_peter",
           github_name: "g_peter"
@@ -50,11 +52,13 @@ class UsersControllerTest < ActionController::TestCase
     assert_difference(['User.count', 'Email.count'], 0) do
       post :create, user: {
         name: peter.name,
-        age: 23,
-        gender: 0,
+        age: "23",
+        gender: "0",
+
         email: {
           address: peter.email.address
         },
+
         profile: {
           twitter_name: peter.profile.twitter_name,
           github_name: peter.profile.github_name
@@ -64,9 +68,10 @@ class UsersControllerTest < ActionController::TestCase
 
     user_form = assigns(:user_form)
 
-    assert_equal 2, user_form.errors.size
-    assert_equal 1, user_form.email.errors.size
-    assert_includes user_form.email.errors.messages[:address], "has already been taken"
+    assert_includes user_form.errors.messages[:name], "has already been taken"
+    assert_includes user_form.errors.messages[:address], "has already been taken"
+    assert_includes user_form.errors.messages[:twitter_name], "has already been taken"
+    assert_includes user_form.errors.messages[:github_name], "has already been taken"
   end
 
   test "should show user" do
@@ -84,9 +89,11 @@ class UsersControllerTest < ActionController::TestCase
       age: @user.age,
       gender: @user.gender,
       name: "petrakos",
+
       email: {
         address: "petrakos@gmail.com"
       },
+
       profile: {
         twitter_name: "t_peter",
         github_name: "g_peter"
@@ -98,6 +105,8 @@ class UsersControllerTest < ActionController::TestCase
     assert_redirected_to user_path(user_form)
     assert_equal "petrakos", user_form.name
     assert_equal "petrakos@gmail.com", user_form.email.address
+    assert_equal "t_peter", user_form.profile.twitter_name
+    assert_equal "g_peter", user_form.profile.github_name
     assert_equal "User: #{user_form.name} was successfully updated.", flash[:notice]
   end
 
