@@ -9,6 +9,9 @@ class NestedModelsForm < FormModel
 
   association :profile do
     attributes :twitter_name, :github_name
+
+    validates :twitter_name, presence: true
+    validates :github_name, presence: true
   end
 
   validates :name, :age, :gender, presence: true

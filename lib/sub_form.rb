@@ -7,7 +7,7 @@ class SubForm
     @association_name = args[:assoc_name]
     @parent = args[:parent]
     @model = build_model
-    self.class.class_eval &args[:proc]
+    self.class_eval &args[:proc]
   end
 
   def submit(params)
