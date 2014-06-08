@@ -24,21 +24,15 @@ class FormModel
         end
       end
     end
-
-
-
-    #assoc_name = nested_params.keys.first
-    #@forms.each do |form|
-      #if form.association_name.to_s == assoc_name.to_s
-        #form.submit(nested_params[assoc_name])
-      #end
-    #end
   end
 
   def save
     if valid?
       ActiveRecord::Base.transaction do
         @model.save
+        @forms.each do |form|
+          form.save
+        end
       end
     else
       false
