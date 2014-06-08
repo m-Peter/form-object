@@ -70,6 +70,11 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     profile_form.github_name = nil
 
     assert_not profile_form.valid?
+
+    profile_form.twitter_name = "t-peter"
+    profile_form.github_name = "g-peter"
+
+    assert profile_form.valid?
   end
 
   test "main form syncs models in nested forms" do
@@ -116,7 +121,7 @@ class NestedModelsFormTest < ActiveSupport::TestCase
 
     @form.submit(params)
 
-    assert_difference(['User.count', 'Email.count']) do
+    assert_difference(['User.count', 'Email.count', 'Profile.count']) do
       @form.save
     end
 

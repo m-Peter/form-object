@@ -14,7 +14,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert_respond_to NestedModelForm, :association
   end
 
-  test "maintains a collection of sub-forms" do
+  test "contains a collection of sub-forms" do
     assert_respond_to NestedModelForm, :forms
   end
 
@@ -91,7 +91,6 @@ class NestedModelFormTest < ActiveSupport::TestCase
     existing_email = emails(:peters)
     email_form = @form.email
     email_form.address = existing_email.address
-
     
     assert_not email_form.valid?
     assert_includes email_form.errors.messages[:address], "has already been taken"
@@ -106,6 +105,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
       name: "Petrakos",
       age: "23",
       gender: "0",
+
       email: {
         address: "petrakos@gmail.com"
       }
@@ -124,6 +124,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
       name: "Petrakos",
       age: "23",
       gender: "0",
+
       email: {
         address: "petrakos@gmail.com"
       }
@@ -150,6 +151,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
       name: peter.name,
       age: "23",
       gender: "0",
+      
       email: {
         address: peter.email.address
       }
@@ -162,8 +164,6 @@ class NestedModelFormTest < ActiveSupport::TestCase
     end
 
     assert_includes @form.errors.messages[:name], "has already been taken"
-    assert_includes @form.email.errors.messages[:address], "has already been taken"
-    # TODO: try to resolve this
-    #assert_includes @user_form.errors.messages[:address], "has already been taken"
+    assert_includes @form.errors.messages[:address], "has already been taken"
   end
 end
