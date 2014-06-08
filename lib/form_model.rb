@@ -10,27 +10,20 @@ class FormModel
   end
   
   def submit(params)
-    current_scope_params = params.reject { |key, value| value.is_a?(Hash) }
-    current_scope_params.each do |key, value|
-      send("#{key}=", value)
-    end
-    nested_params = params.select { |key, value| value.is_a?(Hash) }
+    main_model_params = params_for_main_model(params)
+    model.attributes = main_model_params
+    nested_params = params_for_nested_models(params)
     
     nested_params.each do |association|
-      assoc_name = association.first
-      @forms.each do |form|
-        if form.association_name.to_s == assoc_name.to_s
-          form.submit(association.last)
-        end
-      end
+      assign_to(association)
     end
   end
 
   def save
     if valid?
       ActiveRecord::Base.transaction do
-        @model.save
-        @forms.each do |form|
+        model.save
+        forms.each do |form|
           form.save
         end
       end
@@ -41,31 +34,24 @@ class FormModel
 
   def valid?
     super
-    @model.valid?
-    @model.errors.each do |attribute, error|
-      errors.add(attribute, error)
-    end
-    @forms.each do |form|
-      form.valid?
-      form.errors.each do |attribute, error|
-        errors.add(attribute, error)
-      end
-    end
+    model.valid?
+    collect_errors_from(model)
+    collect_forms_errors
     errors.empty?
   end
 
   def persisted?
-    @model.persisted?
+    model.persisted?
   end
 
   def to_key
     return nil unless persisted?
-    @model.id
+    model.id
   end
 
   def to_param
     return nil unless persisted?
-    @model.id.to_s
+    model.id.to_s
   end
 
   def to_partial_path
@@ -73,7 +59,7 @@ class FormModel
   end
 
   def to_model
-    @model
+    model
   end
 
   class << self
@@ -100,8 +86,40 @@ class FormModel
     self.class.forms.each do |definition|
       definition[:parent] = model
       sub_form = SubForm.new(definition)
-      @forms << sub_form
+      forms << sub_form
       instance_variable_set("@#{definition[:assoc_name]}", sub_form)
+    end
+  end
+
+  def params_for_main_model(params)
+    params.reject { |key, value| value.is_a?(Hash) }
+  end
+
+  def params_for_nested_models(params)
+    params.select { |key, value| value.is_a?(Hash) }
+  end
+
+  def assign_to(association)
+    assoc_name = association.first
+    forms.each do |form|
+      if form.association_name.to_s == assoc_name.to_s
+        form.submit(association.last)
+      end
+    end
+  end
+
+  def collect_errors_from(model)
+    model.errors.each do |attribute, error|
+      errors.add(attribute, error)
+    end
+  end
+
+  def collect_forms_errors
+    forms.each do |form|
+      form.valid?
+      form.errors.each do |attribute, error|
+        errors.add(attribute, error)
+      end
     end
   end
 end

@@ -11,24 +11,20 @@ class SubForm
   end
 
   def submit(params)
-    params.each do |key, value|
-      send("#{key}=", value)
-    end
+    model.attributes = params
   end
 
   def valid?
     super
-    @model.valid?
-    @model.errors.each do |attribute, error|
-      errors.add(attribute, error)
-    end
+    model.valid?
+    collect_errors_from(model)
     errors.empty?
   end
 
   def save
     if valid?
       ActiveRecord::Base.transaction do
-        @model.save
+        model.save
       end
     else
       false
@@ -36,7 +32,7 @@ class SubForm
   end
 
   def persisted?
-    @model.persisted?
+    model.persisted?
   end
   
   class << self
@@ -53,12 +49,18 @@ class SubForm
   private
 
   def build_model
-    if @parent.send("#{@association_name}")
-      @model = @parent.send("#{@association_name}")
+    if parent.send("#{association_name}")
+      model = parent.send("#{association_name}")
     else
-      model_class = @association_name.to_s.camelize.constantize
-      @model = model_class.new
-      @parent.send("#{@association_name}=", @model)
+      model_class = association_name.to_s.camelize.constantize
+      model = model_class.new
+      parent.send("#{association_name}=", model)
+    end
+  end
+
+  def collect_errors_from(model)
+    model.errors.each do |attribute, error|
+      errors.add(attribute, error)
     end
   end
 end
