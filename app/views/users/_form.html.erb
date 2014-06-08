@@ -24,6 +24,7 @@
     <%= f.label :gender %><br>
     <%= f.select :gender, User.get_genders_dropdown %>
   </div>
+
   <h2>Email details</h2>
   <%= f.fields_for :email, @user_form.email do |email| %>
     <div class="field">
@@ -31,6 +32,7 @@
       <%= email.text_field :address %>
     </div>
   <% end %>
+
   <h2>Profile details</h2>
   <%= f.fields_for :profile, @user_form.profile do |profile| %>
     <div class="field">
@@ -42,6 +44,7 @@
       <%= profile.text_field :github_name %>
     </div>
   <% end %>
+  
   <div class="actions">
     <%= f.submit %>
   </div>
