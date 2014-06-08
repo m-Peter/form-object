@@ -10,8 +10,7 @@ class FormModel
   end
   
   def submit(params)
-    main_model_params = params_for_main_model(params)
-    model.attributes = main_model_params
+    model.attributes = params_for_main_model(params)
     nested_params = params_for_nested_models(params)
     
     nested_params.each do |association|
