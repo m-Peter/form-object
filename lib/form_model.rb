@@ -69,6 +69,8 @@ class FormModel
       end
     end
 
+    alias_method :attribute, :attributes
+
     def association(name, &block)
       forms << {assoc_name: name, proc: block}
       attr_reader name
