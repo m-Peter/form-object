@@ -69,4 +69,8 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.model.tasks.size
   end
 
+  test "main form responds to to writer method" do
+    assert_respond_to @form, :tasks_attributes=
+  end
+
 end
