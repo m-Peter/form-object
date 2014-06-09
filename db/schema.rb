@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140609070152) do
+ActiveRecord::Schema.define(version: 20140609071628) do
 
   create_table "emails", force: true do |t|
     t.string   "address"
@@ -42,7 +42,6 @@ ActiveRecord::Schema.define(version: 20140609070152) do
   add_index "profiles", ["user_id"], name: "index_profiles_on_user_id"
 
   create_table "projects", force: true do |t|
-    t.string   "Project"
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
