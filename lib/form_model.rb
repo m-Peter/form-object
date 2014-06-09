@@ -76,6 +76,14 @@ class FormModel
       attr_reader name
     end
 
+    def collection(name, records: 2, &block)
+      collections << {assoc_name: name, records: records, proc: block}
+    end
+
+    def collections
+      @collections ||= []
+    end
+
     def forms
       @forms ||= []
     end
