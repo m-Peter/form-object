@@ -7,6 +7,11 @@ class FormModel
     @model = model
     @forms = []
     populate_forms
+    self.class.collections.each do |definition|
+      definition[:parent] = model
+      collection_form = CollectionForm.new(definition)
+      instance_variable_set("@#{definition[:assoc_name]}", collection_form)
+    end
   end
   
   def submit(params)
@@ -78,6 +83,7 @@ class FormModel
 
     def collection(name, records: 2, &block)
       collections << {assoc_name: name, records: records, proc: block}
+      attr_reader name
     end
 
     def collections

@@ -31,4 +31,23 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_not_nil task_definition[:proc]
   end
 
+  test "contains getter for collection" do
+    project = Project.new
+    form = NestedCollectionForm.new(project)
+    tasks_form = form.tasks
+
+    assert_respond_to form, :tasks
+    assert_instance_of CollectionForm, tasks_form
+  end
+
+  test "collection form contains association name and parent model" do
+    project = Project.new
+    form = NestedCollectionForm.new(project)
+    tasks_form = form.tasks
+
+    assert_equal :tasks, tasks_form.association_name
+    assert_equal 3, tasks_form.records
+    assert_equal project, tasks_form.parent
+  end
+
 end
