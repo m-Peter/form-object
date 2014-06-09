@@ -49,13 +49,22 @@ class SubForm
   private
 
   def build_model
-    if parent.send("#{association_name}")
-      model = parent.send("#{association_name}")
-    else
-      model_class = association_name.to_s.camelize.constantize
-      model = model_class.new
-      parent.send("#{association_name}=", model)
+    association_reflection = parent.class.reflect_on_association(association_name)
+    macro = association_reflection.macro
+
+    case macro
+    when :has_one
+      if parent.send("#{association_name}")
+        model = parent.send("#{association_name}")
+      else
+        model_class = association_name.to_s.camelize.constantize
+        model = model_class.new
+        parent.send("#{association_name}=", model)
+      end
+    when :has_many
+      parent.send(association_name).build
     end
+    
   end
 
   def collect_errors_from(model)

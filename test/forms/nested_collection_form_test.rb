@@ -51,4 +51,16 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal @project, tasks_form.parent
   end
 
+  test "collection form initializes the number of records specified" do
+    tasks_form = @form.tasks
+
+    assert_respond_to tasks_form, :models
+    assert_equal 3, tasks_form.models.size
+    
+    tasks_form.each do |form|
+      assert_instance_of SubForm, form
+      assert_instance_of Task, form.model
+    end
+  end
+
 end
