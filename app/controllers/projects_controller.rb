@@ -14,12 +14,13 @@ class ProjectsController < ApplicationController
 
   # GET /projects/new
   def new
-    @project = Project.new
-    3. times { @project.tasks.build }
+    project = Project.new
+    @project_form = ProjectForm.new(project)
   end
 
   # GET /projects/1/edit
   def edit
+    @project_form = ProjectForm.new(@project)
   end
 
   # POST /projects

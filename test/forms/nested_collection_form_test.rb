@@ -13,10 +13,12 @@ class NestedCollectionForm < FormModel
 end
 
 class NestedCollectionFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
 
   def setup
     @project = Project.new
     @form = NestedCollectionForm.new(@project)
+    @model = @form
   end
 
   test "declare collection" do
@@ -60,7 +62,11 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     tasks_form.each do |form|
       assert_instance_of SubForm, form
       assert_instance_of Task, form.model
+      assert_respond_to form, :name
+      assert_respond_to form, :name=
     end
+
+    assert_equal 3, @form.model.tasks.size
   end
 
 end

@@ -1,4 +1,5 @@
 class CollectionForm
+  include ActiveModel::Model
   include Enumerable
 
   attr_reader :association_name, :records, :parent, :models
@@ -13,8 +14,8 @@ class CollectionForm
   end
 
   def each(&block)
-    @models.each do |model|
-      block.call(model)
+    @models.each do |form|
+      block.call(form)
     end
   end
 
