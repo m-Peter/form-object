@@ -1,0 +1,7 @@
+<h2>Email details</h2>
+  <%= f.fields_for :email, @user_form.email do |email| %>
+    <div class="field">
+      <%= email.label :address %><br>
+      <%= email.text_field :address %>
+    </div>
+  <% end %>
