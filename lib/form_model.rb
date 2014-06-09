@@ -7,11 +7,7 @@ class FormModel
     @model = model
     @forms = []
     populate_forms
-    self.class.collections.each do |definition|
-      definition[:parent] = model
-      collection_form = CollectionForm.new(definition)
-      instance_variable_set("@#{definition[:assoc_name]}", collection_form)
-    end
+    populate_collections
   end
   
   def submit(params)
@@ -103,6 +99,14 @@ class FormModel
       sub_form = SubForm.new(definition)
       forms << sub_form
       instance_variable_set("@#{definition[:assoc_name]}", sub_form)
+    end
+  end
+
+  def populate_collections
+    self.class.collections.each do |definition|
+      definition[:parent] = model
+      collection_form = CollectionForm.new(definition)
+      instance_variable_set("@#{definition[:assoc_name]}", collection_form)
     end
   end
 
