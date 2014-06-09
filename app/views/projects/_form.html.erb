@@ -12,13 +12,18 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :Project %><br>
-    <%= f.text_field :Project %>
-  </div>
-  <div class="field">
     <%= f.label :name %><br>
     <%= f.text_field :name %>
   </div>
+
+  <h2>Tasks</h2>
+  <%= f.fields_for :tasks, @project.tasks do |task_form| %>
+    <div class="field">
+      <%= task_form.label :name, "Task" %><br>
+      <%= task_form.text_field :name %>
+    </div>
+  <% end %>
+
   <div class="actions">
     <%= f.submit %>
   </div>

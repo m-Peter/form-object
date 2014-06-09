@@ -1,14 +1,16 @@
-<p id="notice"><%= notice %></p>
-
-<p>
-  <strong>Project:</strong>
-  <%= @project.Project %>
-</p>
-
+<h2>Project</h2>
 <p>
   <strong>Name:</strong>
   <%= @project.name %>
 </p>
+
+<h2>Tasks</h2>
+<% @project.tasks.each do |task| %>
+  <p>
+    <strong>Name:</strong>
+    <%= task.name %>
+  </p>  
+<% end %>
 
 <%= link_to 'Edit', edit_project_path(@project) %> |
 <%= link_to 'Back', projects_path %>
