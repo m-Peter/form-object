@@ -21,7 +21,7 @@ class CollectionForm
 
   def build_models
     if parent.persisted?
-      parent.send(association_name)
+      @models = parent.send(association_name)
     else
       records.times do
         args = {assoc_name: @association_name, parent: @parent, proc: @proc}
