@@ -69,6 +69,18 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.model.tasks.size
   end
 
+  test "collection form fetches parent and association objects" do
+    project = projects(:yard)
+
+    form = NestedCollectionForm.new(project)
+
+    assert_equal "Yard Work", form.name
+    assert_equal 3, form.tasks.size
+    assert_equal "rake the leaves", form.tasks[0].name
+    assert_equal "paint the fence", form.tasks[1].name
+    assert_equal "clean the gutters", form.tasks[2].name
+  end
+
   test "main form responds to to writer method" do
     assert_respond_to @form, :tasks_attributes=
   end
