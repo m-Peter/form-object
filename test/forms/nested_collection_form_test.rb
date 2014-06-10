@@ -101,6 +101,61 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal "Love", @form.tasks[2].name
   end
 
+  test "collection form saves all the models" do
+    params = {
+      name: "Life",
+      tasks_attributes: {
+        "0" => { name: "Eat" },
+        "1" => { name: "Pray" },
+        "2" => { name: "Love" }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference('Project.count') do
+      @form.save
+    end
+
+    assert_equal "Life", @form.name
+    assert_equal 3, @form.tasks.size
+    
+    assert_equal "Eat", @form.tasks[0].name
+    assert_equal "Pray", @form.tasks[1].name
+    assert_equal "Love", @form.tasks[2].name
+    assert @form.persisted?
+    @form.tasks.each do |task|
+      assert task.persisted?
+    end
+  end
+
+  test "collection form updates all the models" do
+    params = {
+      name: "Life",
+      tasks_attributes: {
+        "0" => { name: "Eat", id: tasks(:rake).id },
+        "1" => { name: "Pray", id: tasks(:paint).id },
+        "2" => { name: "Love", id: tasks(:clean).id }
+      }
+    }
+    yard = projects(:yard)
+    form = NestedCollectionForm.new(yard)
+
+    form.submit(params)
+
+    assert_difference('Project.count', 0) do
+      form.save
+    end
+
+    assert_equal "Life", form.name
+    assert_equal 3, form.tasks.size
+    
+    assert_equal "Eat", form.tasks[0].name
+    assert_equal "Pray", form.tasks[1].name
+    assert_equal "Love", form.tasks[2].name
+    assert form.persisted?
+  end
+
   test "main form responds to to writer method" do
     assert_respond_to @form, :tasks_attributes=
   end

@@ -14,8 +14,15 @@ class CollectionForm
 
   def submit(params)
     params.each do |key, value|
-      i = key.to_i
-      @models[i].submit(value)
+      if parent.persisted?
+        id = value[:id]
+        model = @models.find(id)
+        model.attributes = value
+        model.save
+      else
+        i = key.to_i
+        @models[i].submit(value)
+      end
     end
   end
 

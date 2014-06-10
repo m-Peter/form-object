@@ -44,9 +44,12 @@ class ProjectsController < ApplicationController
   # PATCH/PUT /projects/1
   # PATCH/PUT /projects/1.json
   def update
+    @project_form = ProjectForm.new(@project)
+    @project_form.submit(project_params)
+
     respond_to do |format|
-      if @project.update(project_params)
-        format.html { redirect_to @project, notice: "Project: #{@project.name} was successfully updated." }
+      if @project_form.save
+        format.html { redirect_to @project_form, notice: "Project: #{@project_form.name} was successfully updated." }
       else
         format.html { render :edit }
       end
