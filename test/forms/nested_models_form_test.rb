@@ -83,11 +83,11 @@ class NestedModelsFormTest < ActiveSupport::TestCase
       age: "23",
       gender: "0",
 
-      email: {
+      email_attributes: {
         address: "petrakos@gmail.com"
       },
 
-      profile: {
+      profile_attributes: {
         twitter_name: "t_peter",
         github_name: "g_peter"
       }
@@ -109,11 +109,11 @@ class NestedModelsFormTest < ActiveSupport::TestCase
       age: "23",
       gender: "0",
 
-      email: {
+      email_attributes: {
         address: "petrakos@gmail.com"
       },
 
-      profile: {
+      profile_attributes: {
         twitter_name: "t_peter",
         github_name: "g_peter"
       }

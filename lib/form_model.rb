@@ -12,11 +12,12 @@ class FormModel
   end
   
   def submit(params)
-    model.attributes = params_for_main_model(params)
-    nested_params = params_for_nested_models(params)
-    
-    nested_params.each do |association|
-      assign_to(association)
+    params.each do |key, value|
+      if value.is_a?(Hash)
+        assign_to(key, value)
+      else
+        send("#{key}=", value)
+      end
     end
   end
 
@@ -114,19 +115,17 @@ class FormModel
     end
   end
 
-  def params_for_main_model(params)
-    params.reject { |key, value| value.is_a?(Hash) }
+  ATTRIBUTES_KEY_REGEXP = /^(.+)_attributes$/
+
+  def find_association_name_in(key)
+    ATTRIBUTES_KEY_REGEXP.match(key)[1]
   end
 
-  def params_for_nested_models(params)
-    params.select { |key, value| value.is_a?(Hash) }
-  end
-
-  def assign_to(association)
-    assoc_name = association.first
+  def assign_to(key, values)
+    assoc_name = find_association_name_in(key).to_sym
     forms.each do |form|
       if form.association_name.to_s == assoc_name.to_s
-        form.submit(association.last)
+        form.submit(values)
       end
     end
   end

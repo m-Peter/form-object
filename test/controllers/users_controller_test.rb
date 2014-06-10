@@ -23,11 +23,11 @@ class UsersControllerTest < ActionController::TestCase
         gender: "0",
         name: "petrakos",
 
-        email: {
+        email_attributes: {
           address: "petrakos@gmail.com"  
         },
 
-        profile: {
+        profile_attributes: {
           twitter_name: "t_peter",
           github_name: "g_peter"
         }
@@ -55,11 +55,11 @@ class UsersControllerTest < ActionController::TestCase
         age: "23",
         gender: "0",
 
-        email: {
+        email_attributes: {
           address: peter.email.address
         },
 
-        profile: {
+        profile_attributes: {
           twitter_name: peter.profile.twitter_name,
           github_name: peter.profile.github_name
         }
@@ -90,11 +90,11 @@ class UsersControllerTest < ActionController::TestCase
       gender: @user.gender,
       name: "petrakos",
 
-      email: {
+      email_attributes: {
         address: "petrakos@gmail.com"
       },
 
-      profile: {
+      profile_attributes: {
         twitter_name: "t_peter",
         github_name: "g_peter"
       }

@@ -106,7 +106,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
       age: "23",
       gender: "0",
 
-      email: {
+      email_attributes: {
         address: "petrakos@gmail.com"
       }
     }
@@ -125,7 +125,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
       age: "23",
       gender: "0",
 
-      email: {
+      email_attributes: {
         address: "petrakos@gmail.com"
       }
     }
@@ -152,7 +152,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
       age: "23",
       gender: "0",
       
-      email: {
+      email_attributes: {
         address: peter.email.address
       }
     }
