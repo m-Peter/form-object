@@ -1,6 +1,5 @@
 class CollectionForm
-  #include ActiveModel::Model
-  #include Enumerable
+  include Enumerable
 
   attr_reader :association_name, :records, :parent, :models
 

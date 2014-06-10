@@ -1,11 +1,12 @@
 class FormModel
   include ActiveModel::Model
   
-  attr_reader :model, :forms
+  attr_reader :model, :forms, :collections
 
   def initialize(model)
     @model = model
     @forms = []
+    @collections = []
     populate_forms
     populate_collections
   end
@@ -79,8 +80,7 @@ class FormModel
 
     def collection(name, records: 2, &block)
       collections << {assoc_name: name, records: records, proc: block}
-      #attr_reader name
-      self.class_eval("def #{name}; @#{name}.models;end")
+      self.class_eval("def #{name}; @#{name}.models; end")
       define_method("#{name}_attributes=") {}
     end
 
@@ -108,6 +108,7 @@ class FormModel
     self.class.collections.each do |definition|
       definition[:parent] = model
       collection_form = CollectionForm.new(definition)
+      collections << collection_form
       instance_variable_set("@#{definition[:assoc_name]}", collection_form)
     end
   end
