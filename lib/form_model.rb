@@ -117,15 +117,33 @@ class FormModel
 
   ATTRIBUTES_KEY_REGEXP = /^(.+)_attributes$/
 
+  def macro_for_attribute_key(key)
+    association_name = find_association_name_in(key).to_sym
+    association_reflection = model.class.reflect_on_association(association_name)
+    association_reflection.macro
+  end
+
   def find_association_name_in(key)
     ATTRIBUTES_KEY_REGEXP.match(key)[1]
   end
 
-  def assign_to(key, values)
-    assoc_name = find_association_name_in(key).to_sym
-    forms.each do |form|
-      if form.association_name.to_s == assoc_name.to_s
-        form.submit(values)
+  def assign_to(key, value)
+    macro = macro_for_attribute_key(key)
+
+    case macro
+    when :has_one
+      assoc_name = find_association_name_in(key).to_sym
+      forms.each do |form|
+        if form.association_name.to_s == assoc_name.to_s
+          form.submit(value)
+        end
+      end
+    when :has_many
+      assoc_name = find_association_name_in(key).to_sym
+      collections.each do |collection|
+        if collection.association_name.to_s == assoc_name.to_s
+          collection.submit(value)
+        end
       end
     end
   end

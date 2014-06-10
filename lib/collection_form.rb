@@ -9,9 +9,17 @@ class CollectionForm
     @parent = args[:parent]
     @proc = args[:proc]
     @models = []
+    build_models
   end
 
-  def models
+  def submit(params)
+    params.each do |key, value|
+      i = key.to_i
+      @models[i].submit(value)
+    end
+  end
+
+  def build_models
     if parent.persisted?
       parent.send(association_name)
     else
@@ -19,9 +27,11 @@ class CollectionForm
         args = {assoc_name: @association_name, parent: @parent, proc: @proc}
         @models << SubForm.new(args)
       end
-
-      @models
     end
+  end
+
+  def models
+    @models
   end
 
   def each(&block)

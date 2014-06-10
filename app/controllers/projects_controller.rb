@@ -28,11 +28,13 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.json
   def create
-    @project = Project.new(project_params)
+    project = Project.new
+    @project_form = ProjectForm.new(project)
+    @project_form.submit(project_params)
 
     respond_to do |format|
-      if @project.save
-        format.html { redirect_to @project, notice: "Project: #{@project.name} was successfully created." }
+      if @project_form.save
+        format.html { redirect_to @project_form, notice: "Project: #{@project_form.name} was successfully created." }
       else
         format.html { render :new }
       end

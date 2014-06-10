@@ -18,10 +18,18 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test "should create project" do
     assert_difference('Project.count') do
-      post :create, project: { name: @project.name }
+      post :create, project: {
+        name: "Life",
+        tasks_attributes: {
+          "0" => { name: "Eat" },
+          "1" => { name: "Pray" },
+          "2" => { name: "Love" },
+        }
+      }
     end
 
-    assert_redirected_to project_path(assigns(:project))
+    assert_redirected_to project_path(assigns(:project_form))
+    assert_equal "Project: Life was successfully created.", flash[:notice]
   end
 
   test "should show project" do

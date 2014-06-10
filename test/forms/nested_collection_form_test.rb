@@ -81,6 +81,26 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal "clean the gutters", form.tasks[2].name
   end
 
+  test "collection form sync models with submitted params" do
+    params = {
+      name: "Life",
+      tasks_attributes: {
+        "0" => { name: "Eat" },
+        "1" => { name: "Pray" },
+        "2" => { name: "Love" }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_equal "Life", @form.name
+    assert_equal 3, @form.tasks.size
+    
+    assert_equal "Eat", @form.tasks[0].name
+    assert_equal "Pray", @form.tasks[1].name
+    assert_equal "Love", @form.tasks[2].name
+  end
+
   test "main form responds to to writer method" do
     assert_respond_to @form, :tasks_attributes=
   end
