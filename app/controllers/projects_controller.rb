@@ -16,11 +16,13 @@ class ProjectsController < ApplicationController
   def new
     project = Project.new
     @project_form = ProjectForm.new(project)
+    #@project_form = ProjectTaskForm.new(project)
   end
 
   # GET /projects/1/edit
   def edit
     @project_form = ProjectForm.new(@project)
+    #@project_form = ProjectTaskForm.new(@project)
   end
 
   # POST /projects

@@ -79,7 +79,8 @@ class FormModel
 
     def collection(name, records: 2, &block)
       collections << {assoc_name: name, records: records, proc: block}
-      attr_reader name
+      #attr_reader name
+      self.class_eval("def #{name}; @#{name}.models;end")
       define_method("#{name}_attributes=") {}
     end
 

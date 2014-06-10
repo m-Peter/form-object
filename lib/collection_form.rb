@@ -1,6 +1,6 @@
 class CollectionForm
-  include ActiveModel::Model
-  include Enumerable
+  #include ActiveModel::Model
+  #include Enumerable
 
   attr_reader :association_name, :records, :parent, :models
 
@@ -11,6 +11,10 @@ class CollectionForm
     @proc = args[:proc]
     @models = []
     build_models
+  end
+
+  def persisted?
+    @parent.persisted?
   end
 
   def each(&block)

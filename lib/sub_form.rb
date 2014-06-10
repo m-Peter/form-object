@@ -62,7 +62,11 @@ class SubForm
         parent.send("#{association_name}=", model)
       end
     when :has_many
-      parent.send(association_name).build
+      if parent.persisted?
+        parent.send(association_name)
+      else
+        parent.send(association_name).build
+      end
     end
     
   end
