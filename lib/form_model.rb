@@ -76,6 +76,7 @@ class FormModel
     def association(name, &block)
       forms << {assoc_name: name, proc: block}
       attr_reader name
+      define_method("#{name}_attributes=") {}
     end
 
     def collection(name, records: 2, &block)

@@ -21,6 +21,10 @@ class SubForm
     errors.empty?
   end
 
+  def id
+    model.id
+  end
+
   def save
     if valid?
       ActiveRecord::Base.transaction do
