@@ -1,4 +1,4 @@
-class ProjectForm < FormModel
+class ProjectForm < AbstractForm
   attribute :name
 
   collection :tasks, records: 3 do

@@ -1,4 +1,4 @@
-class FormModel
+class AbstractForm
   include ActiveModel::Model
   
   attr_reader :model, :forms, :collections

@@ -1,4 +1,4 @@
-class NestedModelForm < FormModel
+class NestedModelForm < AbstractForm
   attributes :name, :age, :gender
 
   association :email do

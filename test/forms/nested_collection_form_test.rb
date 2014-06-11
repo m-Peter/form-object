@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class NestedCollectionForm < FormModel
+class NestedCollectionForm < AbstractForm
   attribute :name
 
   collection :tasks, records: 3 do

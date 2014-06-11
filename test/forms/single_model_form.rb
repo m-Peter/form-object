@@ -1,4 +1,4 @@
-class SingleModelForm < FormModel
+class SingleModelForm < AbstractForm
   attributes :name, :age, :gender
 
   validates :name, :age, :gender, presence: true

@@ -1,4 +1,4 @@
-class UserForm < FormModel
+class UserForm < AbstractForm
   attributes :name, :age, :gender
 
   association :email do
