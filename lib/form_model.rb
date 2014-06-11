@@ -14,7 +14,7 @@ class FormModel
   def submit(params)
     params.each do |key, value|
       if value.is_a?(Hash)
-        assign_to(key, value)
+        fill_association_with_attributes(key, value)
       else
         send("#{key}=", value)
       end
@@ -118,8 +118,8 @@ class FormModel
 
   ATTRIBUTES_KEY_REGEXP = /^(.+)_attributes$/
 
-  def macro_for_attribute_key(key)
-    association_name = find_association_name_in(key).to_sym
+  def macro_for_association(association)
+    association_name = find_association_name_in(association).to_sym
     association_reflection = model.class.reflect_on_association(association_name)
     association_reflection.macro
   end
@@ -128,21 +128,20 @@ class FormModel
     ATTRIBUTES_KEY_REGEXP.match(key)[1]
   end
 
-  def assign_to(key, value)
-    case macro_for_attribute_key(key)
+  def fill_association_with_attributes(association, attributes)
+    case macro_for_association(association)
     when :has_one
-      assoc_name = find_association_name_in(key).to_sym
-      forms.each do |form|
-        if form.association_name.to_s == assoc_name.to_s
-          form.submit(value)
-        end
-      end
+      assign(forms, association, attributes)
     when :has_many
-      assoc_name = find_association_name_in(key).to_sym
-      collections.each do |collection|
-        if collection.association_name.to_s == assoc_name.to_s
-          collection.submit(value)
-        end
+      assign(collections, association, attributes)
+    end
+  end
+
+  def assign(container, association, attributes)
+    assoc_name = find_association_name_in(association).to_sym
+    container.each do |form|
+      if form.association_name.to_s == assoc_name.to_s
+        form.submit(attributes)
       end
     end
   end
