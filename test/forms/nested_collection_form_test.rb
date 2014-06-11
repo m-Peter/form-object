@@ -87,9 +87,9 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
 
     assert_equal project.name, form.name
     assert_equal 3, form.tasks.size
-    assert_equal project.tasks[0], form.tasks[0]
-    assert_equal project.tasks[1], form.tasks[1]
-    assert_equal project.tasks[2], form.tasks[2]
+    assert_equal project.tasks[0], form.tasks[0].model
+    assert_equal project.tasks[1], form.tasks[1].model
+    assert_equal project.tasks[2], form.tasks[2].model
   end
 
   test "collection form sync models with submitted params" do

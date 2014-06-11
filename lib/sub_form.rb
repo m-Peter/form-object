@@ -6,7 +6,11 @@ class SubForm
   def initialize(args)
     @association_name = args[:assoc_name]
     @parent = args[:parent]
-    @model = build_model
+    if args[:model]
+      @model = args[:model]
+    else
+      @model = build_model
+    end
     self.class_eval &args[:proc]
   end
 
