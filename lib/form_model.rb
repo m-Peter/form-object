@@ -129,9 +129,7 @@ class FormModel
   end
 
   def assign_to(key, value)
-    macro = macro_for_attribute_key(key)
-
-    case macro
+    case macro_for_attribute_key(key)
     when :has_one
       assoc_name = find_association_name_in(key).to_sym
       forms.each do |form|
