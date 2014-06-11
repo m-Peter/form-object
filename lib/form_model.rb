@@ -39,6 +39,12 @@ class FormModel
     model.valid?
     collect_errors_from(model)
     collect_forms_errors
+    collections.each do |collection|
+      collection.valid?
+      collection.errors.each do |attribute, error|
+        errors.add(attribute, error)
+      end
+    end
     errors.empty?
   end
 

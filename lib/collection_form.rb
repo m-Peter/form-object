@@ -1,4 +1,5 @@
 class CollectionForm
+  include ActiveModel::Validations
   include Enumerable
 
   attr_reader :association_name, :records, :parent
@@ -24,6 +25,16 @@ class CollectionForm
         @models[i].submit(value)
       end
     end
+  end
+
+  def valid?
+    @models.each do |model|
+      model.valid?
+      model.errors.each do |attribute, error|
+        errors.add(attribute, error)
+      end
+    end
+    errors.empty?
   end
 
   def build_models

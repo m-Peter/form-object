@@ -101,6 +101,34 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal "Love", @form.tasks[2].name
   end
 
+  test "collection validates itself" do
+    params = {
+      name: "Life",
+      tasks_attributes: {
+        "0" => { name: "Eat" },
+        "1" => { name: "Pray" },
+        "2" => { name: "Love" }
+      }
+    }
+
+    @form.submit(params)
+
+    assert @form.valid?
+
+    params = {
+      name: "Life",
+      tasks_attributes: {
+        "0" => { name: nil },
+        "1" => { name: nil },
+        "2" => { name: nil }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+  end
+
   test "collection form saves all the models" do
     params = {
       name: "Life",
