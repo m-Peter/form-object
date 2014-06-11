@@ -110,7 +110,7 @@ class AbstractForm
   def populate_collections
     self.class.collections.each do |definition|
       definition[:parent] = model
-      collection_form = CollectionForm.new(definition)
+      collection_form = FormCollection.new(definition)
       collections << collection_form
       instance_variable_set("@#{definition[:assoc_name]}", collection_form)
     end

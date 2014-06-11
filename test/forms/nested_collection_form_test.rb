@@ -42,7 +42,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
   test "provides getter method for collection" do
     tasks_form = @form.collections.first
 
-    assert_instance_of CollectionForm, tasks_form
+    assert_instance_of FormCollection, tasks_form
   end
 
   test "provides getter method for collection objects" do

@@ -1,4 +1,4 @@
-class CollectionForm
+class FormCollection
   include ActiveModel::Validations
   include Enumerable
 
@@ -17,9 +17,6 @@ class CollectionForm
     params.each do |key, value|
       if parent.persisted?
         id = value[:id]
-        #model = @models.find(id)
-        #model.attributes = value
-        #model.save
         model = find_model(id)
         model.submit(value)
         model.save
@@ -50,7 +47,6 @@ class CollectionForm
 
   def build_models
     if parent.persisted?
-      #@models = parent.send(association_name)
       associated_records = parent.send(association_name)
       associated_records.each do |model|
         args = {assoc_name: @association_name, parent: @parent, proc: @proc, model: model}
