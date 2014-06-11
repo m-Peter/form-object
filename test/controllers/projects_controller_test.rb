@@ -28,8 +28,33 @@ class ProjectsControllerTest < ActionController::TestCase
       }
     end
 
-    assert_redirected_to project_path(assigns(:project_form))
+    project_form = assigns(:project_form)
+
+    assert_redirected_to project_path(project_form)
+    assert_equal "Life", project_form.name
+    assert_equal "Eat", project_form.tasks[0].name
+    assert_equal "Pray", project_form.tasks[1].name
+    assert_equal "Love", project_form.tasks[2].name
     assert_equal "Project: Life was successfully created.", flash[:notice]
+  end
+
+  test "should not create project with invalid params" do
+    project = projects(:yard)
+
+    assert_difference('Project.count', 0) do
+      post :create, project: {
+        name: project.name,
+        tasks_attributes: {
+          "0" => { name: project.tasks[0].name },
+          "1" => { name: project.tasks[1].name },
+          "2" => { name: project.tasks[2].name },
+        }
+      }
+    end
+
+    project_form = assigns(:project_form)
+
+    assert_includes project_form.errors.messages[:name], "has already been taken"
   end
 
   test "should show project" do
