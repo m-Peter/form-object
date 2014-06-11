@@ -39,12 +39,7 @@ class FormModel
     model.valid?
     collect_errors_from(model)
     collect_forms_errors
-    collections.each do |collection|
-      collection.valid?
-      collection.errors.each do |attribute, error|
-        errors.add(attribute, error)
-      end
-    end
+    gather_collection_errors
     errors.empty?
   end
 
@@ -86,7 +81,7 @@ class FormModel
       define_method("#{name}_attributes=") {}
     end
 
-    def collection(name, records: 2, &block)
+    def collection(name, records: 1, &block)
       collections << {assoc_name: name, records: records, proc: block}
       self.class_eval("def #{name}; @#{name}.models; end")
       define_method("#{name}_attributes=") {}
@@ -150,6 +145,15 @@ class FormModel
         if collection.association_name.to_s == assoc_name.to_s
           collection.submit(value)
         end
+      end
+    end
+  end
+
+  def gather_collection_errors
+    collections.each do |collection|
+      collection.valid?
+      collection.errors.each do |attribute, error|
+        errors.add(attribute, error)
       end
     end
   end
