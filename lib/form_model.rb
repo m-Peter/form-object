@@ -38,8 +38,8 @@ class FormModel
     super
     model.valid?
     collect_errors_from(model)
-    collect_forms_errors
-    gather_collection_errors
+    aggregate_errors_from(forms)
+    aggregate_errors_from(collections)
     errors.empty?
   end
 
@@ -146,10 +146,10 @@ class FormModel
     end
   end
 
-  def gather_collection_errors
-    collections.each do |collection|
-      collection.valid?
-      collection.errors.each do |attribute, error|
+  def aggregate_errors_from(container)
+    container.each do |form|
+      form.valid?
+      form.errors.each do |attribute, error|
         errors.add(attribute, error)
       end
     end
@@ -158,15 +158,6 @@ class FormModel
   def collect_errors_from(model)
     model.errors.each do |attribute, error|
       errors.add(attribute, error)
-    end
-  end
-
-  def collect_forms_errors
-    forms.each do |form|
-      form.valid?
-      form.errors.each do |attribute, error|
-        errors.add(attribute, error)
-      end
     end
   end
 end
