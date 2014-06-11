@@ -1,5 +1,7 @@
 class ProjectsController < ApplicationController
   before_action :set_project, only: [:show, :edit, :update, :destroy]
+  before_action :create_new_form, only: [:new, :create]
+  before_action :create_edit_form, only: [:edit, :update]
 
   # GET /projects
   # GET /projects.json
@@ -14,22 +16,15 @@ class ProjectsController < ApplicationController
 
   # GET /projects/new
   def new
-    project = Project.new
-    @project_form = ProjectForm.new(project)
-    #@project_form = ProjectTaskForm.new(project)
   end
 
   # GET /projects/1/edit
   def edit
-    @project_form = ProjectForm.new(@project)
-    #@project_form = ProjectTaskForm.new(@project)
   end
 
   # POST /projects
   # POST /projects.json
   def create
-    project = Project.new
-    @project_form = ProjectForm.new(project)
     @project_form.submit(project_params)
 
     respond_to do |format|
@@ -44,7 +39,6 @@ class ProjectsController < ApplicationController
   # PATCH/PUT /projects/1
   # PATCH/PUT /projects/1.json
   def update
-    @project_form = ProjectForm.new(@project)
     @project_form.submit(project_params)
 
     respond_to do |format|
@@ -72,6 +66,15 @@ class ProjectsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_project
       @project = Project.find(params[:id])
+    end
+
+    def create_new_form
+      project = Project.new
+      @project_form = ProjectForm.new(project)
+    end
+
+    def create_edit_form
+      @project_form = ProjectForm.new(@project)
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
