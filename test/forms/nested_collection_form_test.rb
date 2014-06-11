@@ -51,7 +51,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     tasks = @form.tasks
 
     tasks.each do |form|
-      assert_instance_of SubForm, form
+      assert_instance_of Form, form
       assert_instance_of Task, form.model
     end
   end
@@ -71,7 +71,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, tasks_form.models.size
     
     tasks_form.each do |form|
-      assert_instance_of SubForm, form
+      assert_instance_of Form, form
       assert_instance_of Task, form.model
       assert_respond_to form, :name
       assert_respond_to form, :name=

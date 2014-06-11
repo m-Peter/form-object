@@ -33,7 +33,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
 
   test "contains getter for sub-form" do
     assert_respond_to @form, :email
-    assert_instance_of SubForm, @form.email
+    assert_instance_of Form, @form.email
   end
 
   test "sub-form initializes model for new parent" do

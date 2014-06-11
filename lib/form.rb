@@ -1,4 +1,4 @@
-class SubForm
+class Form
   include ActiveModel::Validations
 
   attr_reader :association_name, :parent, :model, :name

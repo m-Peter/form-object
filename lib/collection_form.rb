@@ -54,12 +54,12 @@ class CollectionForm
       associated_records = parent.send(association_name)
       associated_records.each do |model|
         args = {assoc_name: @association_name, parent: @parent, proc: @proc, model: model}
-        @models << SubForm.new(args)
+        @models << Form.new(args)
       end
     else
       records.times do
         args = {assoc_name: @association_name, parent: @parent, proc: @proc}
-        @models << SubForm.new(args)
+        @models << Form.new(args)
       end
     end
   end

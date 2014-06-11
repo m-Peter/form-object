@@ -101,7 +101,7 @@ class AbstractForm
   def populate_forms
     self.class.forms.each do |definition|
       definition[:parent] = model
-      sub_form = SubForm.new(definition)
+      sub_form = Form.new(definition)
       forms << sub_form
       instance_variable_set("@#{definition[:assoc_name]}", sub_form)
     end
