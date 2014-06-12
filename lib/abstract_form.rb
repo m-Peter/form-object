@@ -76,15 +76,19 @@ class AbstractForm
       if is_plural?(name.to_s)
         collection(name, options, &block)
       else  
-        forms << {assoc_name: name, proc: block}
-        attr_reader name
-        define_method("#{name}_attributes=") {}
+        form(name, &block)
       end
     end
 
     def collection(name, options={}, &block)
       collections << {assoc_name: name, records: options[:records], proc: block}
       self.class_eval("def #{name}; @#{name}.models; end")
+      define_method("#{name}_attributes=") {}
+    end
+
+    def form(name, &block)
+      forms << {assoc_name: name, proc: block}
+      attr_reader name
       define_method("#{name}_attributes=") {}
     end
 
