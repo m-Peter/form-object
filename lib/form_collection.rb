@@ -19,7 +19,6 @@ class FormCollection
         id = value[:id]
         model = find_model(id)
         model.submit(value)
-        model.save
       else
         i = key.to_i
         @models[i].submit(value)
