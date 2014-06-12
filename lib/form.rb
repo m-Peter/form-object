@@ -29,16 +29,6 @@ class Form
     model.id
   end
 
-  def save
-    if valid?
-      ActiveRecord::Base.transaction do
-        model.save
-      end
-    else
-      false
-    end
-  end
-
   def persisted?
     model.persisted?
   end
