@@ -75,10 +75,14 @@ class AbstractForm
 
     alias_method :attribute, :attributes
 
-    def association(name, &block)
-      forms << {assoc_name: name, proc: block}
-      attr_reader name
-      define_method("#{name}_attributes=") {}
+    def association(name, options={}, &block)
+      if options[:records]
+        collection(name, options, &block)
+      else  
+        forms << {assoc_name: name, proc: block}
+        attr_reader name
+        define_method("#{name}_attributes=") {}
+      end
     end
 
     def collection(name, options={}, &block)
