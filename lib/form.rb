@@ -58,6 +58,7 @@ class Form
 
   def build_model
     association_reflection = parent.class.reflect_on_association(association_name)
+    association_reflection.autosave = true
     macro = association_reflection.macro
 
     case macro

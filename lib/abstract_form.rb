@@ -25,9 +25,6 @@ class AbstractForm
     if valid?
       ActiveRecord::Base.transaction do
         model.save
-        forms.each do |form|
-          form.save
-        end
       end
     else
       false
