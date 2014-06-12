@@ -111,7 +111,8 @@ class AbstractForm
       definition[:parent] = model
       sub_form = Form.new(definition)
       forms << sub_form
-      instance_variable_set("@#{definition[:assoc_name]}", sub_form)
+      name = definition[:assoc_name]
+      instance_variable_set("@#{name}", sub_form)
     end
   end
 
@@ -120,7 +121,8 @@ class AbstractForm
       definition[:parent] = model
       collection_form = FormCollection.new(definition)
       collections << collection_form
-      instance_variable_set("@#{definition[:assoc_name]}", collection_form)
+      name = definition[:assoc_name]
+      instance_variable_set("@#{name}", collection_form)
     end
   end
 
