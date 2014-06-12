@@ -76,7 +76,7 @@ class AbstractForm
     alias_method :attribute, :attributes
 
     def association(name, options={}, &block)
-      if options[:records]
+      if is_plural?(name.to_s)
         collection(name, options, &block)
       else  
         forms << {assoc_name: name, proc: block}
@@ -97,6 +97,10 @@ class AbstractForm
 
     def forms
       @forms ||= []
+    end
+
+    def is_plural?(str)
+      str.pluralize == str
     end
   end
 
