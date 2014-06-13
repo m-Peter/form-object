@@ -17,6 +17,12 @@ class NestedModelRenderingTest < ActionView::TestCase
       concat f.number_field(:age)
       concat f.label(:gender)
       concat f.select(:gender, User.get_genders_dropdown)
+
+      concat f.fields_for(:email, user_form.email) { |e|
+        concat e.label(:address)
+        concat e.text_field(:address)
+      }
+
       concat f.submit
     end
 
@@ -34,6 +40,10 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<option value="0">Male<\/option>/, output_buffer
     assert_match /<option value="1">Female<\/option>/, output_buffer
     assert_match /<\/select>/, output_buffer
+
+    assert_match /<label for="user_email_attributes_address">Address<\/label>/, output_buffer
+    assert_match /<input id="user_email_attributes_address" name="user\[email_attributes\]\[address\]" type="text" \/>/, output_buffer
+
     assert_match /<input name="commit" type="submit" value="Create User" \/>/, output_buffer
   end
 end
