@@ -1,5 +1,5 @@
 require 'test_helper'
-require_relative 'nested_model_form'
+require_relative 'nested_models_form'
 
 class NestedModelRenderingTest < ActionView::TestCase
   def form_for(*)
@@ -8,7 +8,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for is rendered correctly in the new template" do
     user = User.new
-    user_form = NestedModelForm.new(user)
+    user_form = NestedModelsForm.new(user)
 
     form_for user_form do |f|
       concat f.label(:name)
@@ -21,6 +21,13 @@ class NestedModelRenderingTest < ActionView::TestCase
       concat f.fields_for(:email, user_form.email) { |e|
         concat e.label(:address)
         concat e.text_field(:address)
+      }
+
+      concat f.fields_for(:profile, user_form.profile) { |p|
+        concat p.label(:twitter_name)
+        concat p.text_field(:twitter_name)
+        concat p.label(:github_name)
+        concat p.text_field(:github_name)
       }
 
       concat f.submit
@@ -43,6 +50,11 @@ class NestedModelRenderingTest < ActionView::TestCase
 
     assert_match /<label for="user_email_attributes_address">Address<\/label>/, output_buffer
     assert_match /<input id="user_email_attributes_address" name="user\[email_attributes\]\[address\]" type="text" \/>/, output_buffer
+
+    assert_match /<label for="user_profile_attributes_twitter_name">Twitter name<\/label>/, output_buffer
+    assert_match /<input id="user_profile_attributes_twitter_name" name="user\[profile_attributes\]\[twitter_name\]" type="text" \/>/, output_buffer
+    assert_match /<label for="user_profile_attributes_github_name">Github name<\/label>/, output_buffer
+    assert_match /<input id="user_profile_attributes_github_name" name="user\[profile_attributes\]\[github_name\]" type="text" \/>/, output_buffer
 
     assert_match /<input name="commit" type="submit" value="Create User" \/>/, output_buffer
   end
