@@ -123,6 +123,11 @@ class NestedModelRenderingTest < ActionView::TestCase
       concat f.label(:name)
       concat f.text_field(:name)
 
+      concat f.fields_for(:tasks, project_form.tasks) { |t|
+        concat t.label(:task)
+        concat t.text_field(:name)
+      }
+
       concat f.submit
     end
 
@@ -133,6 +138,11 @@ class NestedModelRenderingTest < ActionView::TestCase
 
     assert_match /<label for="project_name">Name<\/label>/, output_buffer
     assert_match /<input id="project_name" name="project\[name\]" type="text" \/>/, output_buffer
+
+    [0, 1, 2].each do |i|
+      assert_match /<label for="project_tasks_attributes_#{i}_task">Task<\/label>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_name" name="project\[tasks_attributes\]\[#{i}\]\[name\]" type="text" \/>/, output_buffer
+    end
 
     assert_match /<input name="commit" type="submit" value="Create Project" \/>/, output_buffer
   end
