@@ -146,4 +146,38 @@ class NestedModelRenderingTest < ActionView::TestCase
 
     assert_match /<input name="commit" type="submit" value="Create Project" \/>/, output_buffer
   end
+
+  test "form_for renders correctly a existing instance of Form Model containing a nested collection" do
+    project = projects(:yard)
+    project_form = NestedCollectionAssociationForm.new(project)
+
+    form_for project_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.fields_for(:tasks, project_form.tasks) { |t|
+        concat t.label(:task)
+        concat t.text_field(:name)
+      }
+
+      concat f.submit
+    end
+
+    id = project.id
+
+    assert_match /action="\/projects\/#{id}"/, output_buffer
+    assert_match /class="edit_project"/, output_buffer
+    assert_match /id="edit_project_#{id}"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="project_name">Name<\/label>/, output_buffer
+    assert_match /<input id="project_name" name="project\[name\]" type="text" value="#{project_form.name}" \/>/, output_buffer
+
+    [0, 1, 2].each do |i|
+      assert_match /<label for="project_tasks_attributes_#{i}_task">Task<\/label>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_name" name="project\[tasks_attributes\]\[#{i}\]\[name\]" type="text" value="#{project_form.tasks[i].name}" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Update Project" \/>/, output_buffer
+  end
 end
