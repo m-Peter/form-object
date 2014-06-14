@@ -76,6 +76,13 @@ class NestedModelRenderingTest < ActionView::TestCase
         concat e.text_field(:address)
       }
 
+      concat f.fields_for(:profile, user_form.profile) { |p|
+        concat p.label(:twitter_name)
+        concat p.text_field(:twitter_name)
+        concat p.label(:github_name)
+        concat p.text_field(:github_name)
+      }
+
       concat f.submit
     end
 
@@ -98,6 +105,11 @@ class NestedModelRenderingTest < ActionView::TestCase
 
     assert_match /<label for="user_email_attributes_address">Address<\/label>/, output_buffer
     assert_match /<input id="user_email_attributes_address" name="user\[email_attributes\]\[address\]" type="text" value="#{user_form.email.address}" \/>/, output_buffer
+
+    assert_match /<label for="user_profile_attributes_twitter_name">Twitter name<\/label>/, output_buffer
+    assert_match /<input id="user_profile_attributes_twitter_name" name="user\[profile_attributes\]\[twitter_name\]" type="text" value="#{user_form.profile.twitter_name}" \/>/, output_buffer
+    assert_match /<label for="user_profile_attributes_github_name">Github name<\/label>/, output_buffer
+    assert_match /<input id="user_profile_attributes_github_name" name="user\[profile_attributes\]\[github_name\]" type="text" value="#{user_form.profile.github_name}" \/>/, output_buffer
 
     assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
   end
