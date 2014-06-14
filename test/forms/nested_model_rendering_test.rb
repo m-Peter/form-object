@@ -71,6 +71,11 @@ class NestedModelRenderingTest < ActionView::TestCase
       concat f.label(:gender)
       concat f.select(:gender, User.get_genders_dropdown)
 
+      concat f.fields_for(:email, user_form.email) { |e|
+        concat e.label(:address)
+        concat e.text_field(:address)
+      }
+
       concat f.submit
     end
 
@@ -82,14 +87,17 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /method="post"/, output_buffer
 
     assert_match /<label for="user_name">Name<\/label>/, output_buffer
-    assert_match /<input id="user_name" name="user\[name\]" type="text" value="m-peter" \/>/, output_buffer
+    assert_match /<input id="user_name" name="user\[name\]" type="text" value="#{user_form.name}" \/>/, output_buffer
     assert_match /<label for="user_age">Age<\/label>/, output_buffer
-    assert_match /<input id="user_age" name="user\[age\]" type="number" value="23" \/>/, output_buffer
+    assert_match /<input id="user_age" name="user\[age\]" type="number" value="#{user_form.age}" \/>/, output_buffer
     assert_match /<label for="user_gender">Gender<\/label>/, output_buffer
     assert_match /<select id="user_gender" name="user\[gender\]">/, output_buffer
     assert_match /<option selected="selected" value="0">Male<\/option>/, output_buffer
     assert_match /<option value="1">Female<\/option>/, output_buffer
     assert_match /<\/select>/, output_buffer
+
+    assert_match /<label for="user_email_attributes_address">Address<\/label>/, output_buffer
+    assert_match /<input id="user_email_attributes_address" name="user\[email_attributes\]\[address\]" type="text" value="#{user_form.email.address}" \/>/, output_buffer
 
     assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
   end
