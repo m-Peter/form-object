@@ -1,16 +1,5 @@
 require 'test_helper'
-
-class NestedCollectionAssociationForm < AbstractForm
-  attribute :name
-
-  association :tasks, records: 3 do
-    attribute :name
-
-    validates :name, presence: true
-  end
-
-  validates :name, presence: true
-end
+require_relative 'nested_collection_association_form'
 
 class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
   include ActiveModel::Lint::Tests
