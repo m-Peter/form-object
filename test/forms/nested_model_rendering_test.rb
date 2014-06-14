@@ -1,5 +1,6 @@
 require 'test_helper'
 require_relative 'nested_models_form'
+require_relative 'nested_collection_association_form'
 
 class NestedModelRenderingTest < ActionView::TestCase
   def form_for(*)
@@ -112,5 +113,27 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input id="user_profile_attributes_github_name" name="user\[profile_attributes\]\[github_name\]" type="text" value="#{user_form.profile.github_name}" \/>/, output_buffer
 
     assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
+  end
+
+  test "form_for renders correctly a new instance of Form Model containing a nested collection" do
+    project = Project.new
+    project_form = NestedCollectionAssociationForm.new(project)
+
+    form_for project_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.submit
+    end
+
+    assert_match /action="\/projects"/, output_buffer
+    assert_match /class="new_project"/, output_buffer
+    assert_match /id="new_project"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="project_name">Name<\/label>/, output_buffer
+    assert_match /<input id="project_name" name="project\[name\]" type="text" \/>/, output_buffer
+
+    assert_match /<input name="commit" type="submit" value="Create Project" \/>/, output_buffer
   end
 end
