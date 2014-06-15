@@ -34,9 +34,11 @@ class AbstractForm
   def valid?
     super
     model.valid?
+
     collect_errors_from(model)
     aggregate_errors_from(forms)
     aggregate_errors_from(collections)
+    
     errors.empty?
   end
 
@@ -160,9 +162,7 @@ class AbstractForm
   def aggregate_errors_from(container)
     container.each do |form|
       form.valid?
-      form.errors.each do |attribute, error|
-        errors.add(attribute, error)
-      end
+      collect_errors_from(form)
     end
   end
 
