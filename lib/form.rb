@@ -8,6 +8,7 @@ class Form
     @parent = args[:parent]
     @model = assign_model(args)
     self.class_eval &args[:proc]
+    enable_autosave
   end
 
   def submit(params)
@@ -17,7 +18,9 @@ class Form
   def valid?
     super
     model.valid?
+
     collect_errors_from(model)
+    
     errors.empty?
   end
 
@@ -46,9 +49,16 @@ class Form
 
   private
 
+  def association_reflection
+    parent.class.reflect_on_association(association_name)
+  end
+
+  def enable_autosave
+    reflection = association_reflection
+    reflection.autosave = true
+  end
+
   def build_model
-    association_reflection = parent.class.reflect_on_association(association_name)
-    association_reflection.autosave = true
     macro = association_reflection.macro
 
     case macro
