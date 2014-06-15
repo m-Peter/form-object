@@ -151,7 +151,7 @@ class AbstractForm
   def assign(container, association, attributes)
     assoc_name = find_association_name_in(association).to_sym
     container.each do |form|
-      if form.association_name.to_s == assoc_name.to_s
+      if form.represents?(assoc_name)
         form.submit(attributes)
       end
     end

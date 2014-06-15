@@ -44,6 +44,13 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert email_form.model.new_record?
   end
 
+  test "#represents? returns true if the argument matches the Form's association name, false otherwise" do
+    email_form = @form.email
+
+    assert email_form.represents?("email")
+    assert_not email_form.represents?("profile")
+  end
+
   test "sub-form fetches model for existing parent" do
     user = users(:peter)
     user_form = NestedModelForm.new(user)

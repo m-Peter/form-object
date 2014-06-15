@@ -32,6 +32,10 @@ class Form
   def persisted?
     model.persisted?
   end
+
+  def represents?(assoc_name)
+    association_name.to_s == assoc_name.to_s
+  end
   
   class << self
     def attributes(*names)

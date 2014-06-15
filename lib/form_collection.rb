@@ -44,6 +44,10 @@ class FormCollection
     errors.empty?
   end
 
+  def represents?(assoc_name)
+    association_name.to_s == assoc_name.to_s
+  end
+
   def build_models
     if parent.persisted?
       associated_records = parent.send(association_name)

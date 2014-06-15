@@ -34,6 +34,13 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_instance_of FormCollection, tasks_form
   end
 
+  test "#represents? returns true if the argument matches the Form's association name, false otherwise" do
+    tasks_form = @form.collections.first
+
+    assert tasks_form.represents?("tasks")
+    assert_not tasks_form.represents?("task")
+  end
+
   test "provides getter method for collection objects" do
     assert_respond_to @form, :tasks
 
