@@ -1,16 +1,12 @@
 class Form
   include ActiveModel::Validations
 
-  attr_reader :association_name, :parent, :model, :name
+  attr_reader :association_name, :parent, :model
 
   def initialize(args)
     @association_name = args[:assoc_name]
     @parent = args[:parent]
-    if args[:model]
-      @model = args[:model]
-    else
-      @model = build_model
-    end
+    @model = assign_model(args)
     self.class_eval &args[:proc]
   end
 
@@ -67,7 +63,14 @@ class Form
     when :has_many
       parent.send(association_name).build
     end
-    
+  end
+
+  def assign_model(args)
+    if args[:model]
+      args[:model]
+    else
+      build_model
+    end
   end
 
   def collect_errors_from(model)
