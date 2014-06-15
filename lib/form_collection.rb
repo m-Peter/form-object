@@ -10,7 +10,7 @@ class FormCollection
     @parent = args[:parent]
     @proc = args[:proc]
     @models = []
-    build_models
+    assign_models
   end
 
   def submit(params)
@@ -51,18 +51,26 @@ class FormCollection
 
   private
 
-  def build_models
+  def assign_models
     if parent.persisted?
-      associated_records = parent.send(association_name)
-      associated_records.each do |model|
-        args = {assoc_name: @association_name, parent: @parent, proc: @proc, model: model}
-        @models << Form.new(args)
-      end
+      fetch_models
     else
-      records.times do
-        args = {assoc_name: @association_name, parent: @parent, proc: @proc}
-        @models << Form.new(args)
-      end
+      initialize_models
+    end
+  end
+
+  def fetch_models
+    associated_records = parent.send(association_name)
+    associated_records.each do |model|
+      args = {assoc_name: @association_name, parent: @parent, proc: @proc, model: model}
+      @models << Form.new(args)
+    end
+  end
+
+  def initialize_models
+    records.times do
+      args = {assoc_name: @association_name, parent: @parent, proc: @proc}
+      @models << Form.new(args)
     end
   end
 
