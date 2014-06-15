@@ -53,15 +53,19 @@ class Form
 
     case macro
     when :has_one
-      if parent.send("#{association_name}")
-        model = parent.send("#{association_name}")
-      else
-        model_class = association_name.to_s.camelize.constantize
-        model = model_class.new
-        parent.send("#{association_name}=", model)
-      end
+      fetch_or_initialize_model
     when :has_many
       parent.send(association_name).build
+    end
+  end
+
+  def fetch_or_initialize_model
+    if parent.send("#{association_name}")
+      model = parent.send("#{association_name}")
+    else
+      model_class = association_name.to_s.camelize.constantize
+      model = model_class.new
+      parent.send("#{association_name}=", model)
     end
   end
 
