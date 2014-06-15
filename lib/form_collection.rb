@@ -26,14 +26,6 @@ class FormCollection
     end
   end
 
-  def find_model(id)
-    @models.each do |model|
-      if model.id == id.to_i
-        return model
-      end
-    end
-  end
-
   def valid?
     @models.each do |model|
       model.valid?
@@ -47,6 +39,18 @@ class FormCollection
   def represents?(assoc_name)
     association_name.to_s == assoc_name.to_s
   end
+
+  def models
+    @models
+  end
+
+  def each(&block)
+    @models.each do |form|
+      block.call(form)
+    end
+  end
+
+  private
 
   def build_models
     if parent.persisted?
@@ -63,13 +67,11 @@ class FormCollection
     end
   end
 
-  def models
-    @models
-  end
-
-  def each(&block)
-    @models.each do |form|
-      block.call(form)
+  def find_model(id)
+    @models.each do |model|
+      if model.id == id.to_i
+        return model
+      end
     end
   end
 end
