@@ -29,10 +29,9 @@ class FormCollection
   def valid?
     @models.each do |model|
       model.valid?
-      model.errors.each do |attribute, error|
-        errors.add(attribute, error)
-      end
+      collect_errors_from(model)
     end
+
     errors.empty?
   end
 
@@ -64,6 +63,12 @@ class FormCollection
         args = {assoc_name: @association_name, parent: @parent, proc: @proc}
         @models << Form.new(args)
       end
+    end
+  end
+
+  def collect_errors_from(model)
+    model.errors.each do |attribute, error|
+      errors.add(attribute, error)
     end
   end
 
