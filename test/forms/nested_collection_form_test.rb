@@ -21,17 +21,17 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     @model = @form
   end
 
-  test "declare collection" do
+  test "declares collection" do
     assert_respond_to NestedCollectionForm, :collection
   end
 
-  test "contains a collections Array for has_many associations" do
+  test "contains a list of collections for has_many associations" do
     assert_respond_to NestedCollectionForm, :collections
     assert_instance_of Array, NestedCollectionForm.collections
     assert_equal 1, NestedCollectionForm.collections.size
   end
 
-  test "collections Array contains form definitions" do
+  test "collections list contains form definitions" do
     tasks_definition = NestedCollectionForm.collections.first
 
     assert_equal :tasks, tasks_definition[:assoc_name]
@@ -39,13 +39,13 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_not_nil tasks_definition[:proc]
   end
 
-  test "provides getter method for collection" do
+  test "main form provides getter method for collection sub-form" do
     tasks_form = @form.collections.first
 
     assert_instance_of FormCollection, tasks_form
   end
 
-  test "provides getter method for collection objects" do
+  test "main form provides getter method for collection objects" do
     assert_respond_to @form, :tasks
 
     tasks = @form.tasks
@@ -56,7 +56,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection form contains association name and parent model" do
+  test "collection sub-form contains association name and parent model" do
     tasks_form = @form.collections.first
 
     assert_equal :tasks, tasks_form.association_name
@@ -64,7 +64,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal @project, tasks_form.parent
   end
 
-  test "collection form initializes the number of records specified" do
+  test "collection sub-form initializes the number of records specified" do
     tasks_form = @form.collections.first
 
     assert_respond_to tasks_form, :models
@@ -80,7 +80,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.model.tasks.size
   end
 
-  test "collection form fetches parent and association objects" do
+  test "collection sub-form fetches parent and association objects" do
     project = projects(:yard)
 
     form = NestedCollectionForm.new(project)
@@ -92,7 +92,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal project.tasks[2], form.tasks[2].model
   end
 
-  test "collection form sync models with submitted params" do
+  test "collection sub-form syncs models with submitted params" do
     params = {
       name: "Life",
       tasks_attributes: {
@@ -111,7 +111,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.tasks.size
   end
 
-  test "collection validates itself" do
+  test "collection sub-form validates itself" do
     params = {
       name: "Life",
       tasks_attributes: {
@@ -141,7 +141,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.errors.messages[:name].size
   end
 
-  test "collection form saves all the models" do
+  test "collection sub-form saves all the models" do
     params = {
       name: "Life",
       tasks_attributes: {
@@ -169,7 +169,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection form updates all the models" do
+  test "collection sub-form updates all the models" do
     project = projects(:yard)
     form = NestedCollectionForm.new(project)
     params = {
