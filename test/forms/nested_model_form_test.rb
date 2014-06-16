@@ -10,15 +10,15 @@ class NestedModelFormTest < ActiveSupport::TestCase
     @model = @form
   end
 
-  test "declare association" do
+  test "declares association" do
     assert_respond_to NestedModelForm, :association
   end
 
-  test "contains a collection of sub-forms" do
+  test "contains a list of sub-forms" do
     assert_respond_to NestedModelForm, :forms
   end
 
-  test "forms collection contains form definitions" do
+  test "forms list contains form definitions" do
     email_definition = NestedModelForm.forms.first
 
     assert_equal :email, email_definition[:assoc_name]
@@ -44,13 +44,6 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert email_form.model.new_record?
   end
 
-  test "#represents? returns true if the argument matches the Form's association name, false otherwise" do
-    email_form = @form.email
-
-    assert email_form.represents?("email")
-    assert_not email_form.represents?("profile")
-  end
-
   test "sub-form fetches model for existing parent" do
     user = users(:peter)
     user_form = NestedModelForm.new(user)
@@ -63,6 +56,13 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert_equal 23, user_form.age
     assert_equal 0, user_form.gender
     assert_equal "markoupetr@gmail.com", email_form.model.address
+  end
+
+  test "#represents? returns true if the argument matches the Form's association name, false otherwise" do
+    email_form = @form.email
+
+    assert email_form.represents?("email")
+    assert_not email_form.represents?("profile")
   end
 
   test "sub-form declares attributes" do
@@ -107,7 +107,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert email_form.valid?
   end
 
-  test "main form syncs models in nested forms" do
+  test "main form syncs models in sub-forms" do
     params = {
       name: "Petrakos",
       age: "23",
