@@ -106,11 +106,13 @@ class NestedModelRenderingTest < ActionView::TestCase
 
     assert_match /<label for="user_email_attributes_address">Address<\/label>/, output_buffer
     assert_match /<input id="user_email_attributes_address" name="user\[email_attributes\]\[address\]" type="text" value="#{user_form.email.address}" \/>/, output_buffer
+    assert_match /<input id="user_email_attributes_id" name="user\[email_attributes\]\[id\]" type="hidden" value="#{user_form.email.id}" \/>/, output_buffer
 
     assert_match /<label for="user_profile_attributes_twitter_name">Twitter name<\/label>/, output_buffer
     assert_match /<input id="user_profile_attributes_twitter_name" name="user\[profile_attributes\]\[twitter_name\]" type="text" value="#{user_form.profile.twitter_name}" \/>/, output_buffer
     assert_match /<label for="user_profile_attributes_github_name">Github name<\/label>/, output_buffer
     assert_match /<input id="user_profile_attributes_github_name" name="user\[profile_attributes\]\[github_name\]" type="text" value="#{user_form.profile.github_name}" \/>/, output_buffer
+    assert_match /<input id="user_profile_attributes_id" name="user\[profile_attributes\]\[id\]" type="hidden" value="#{user_form.profile.id}" \/>/, output_buffer
 
     assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
   end
