@@ -14,6 +14,9 @@ class FormCollection
   end
 
   def submit(params)
+    if params.size > records
+      raise TooManyRecords, "Maximum #{records} records are allowed. Got #{params.size} records instead."
+    end
     params.each do |key, value|
       if parent.persisted?
         id = value[:id]

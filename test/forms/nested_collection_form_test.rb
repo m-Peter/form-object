@@ -141,6 +141,21 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.errors.messages[:name].size
   end
 
+  test "collection sub-form raises error if records exceed the allowed number" do
+    params = {
+      name: "Life",
+      tasks_attributes: {
+        "0" => { name: "Eat" },
+        "1" => { name: "Pray" },
+        "2" => { name: "Love" },
+        "3" => { name: "Dummy" }
+      }
+    }
+
+    exception = assert_raises(TooManyRecords) { @form.submit(params) }
+    assert_equal "Maximum 3 records are allowed. Got 4 records instead.", exception.message
+  end
+
   test "collection sub-form saves all the models" do
     params = {
       name: "Life",
