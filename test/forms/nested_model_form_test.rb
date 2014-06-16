@@ -24,19 +24,19 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert_equal :email, email_definition[:assoc_name]
   end
 
-  test "sub-forms contains association name and parent model" do
+  test "email sub-form contains association name and parent model" do
     email_form = @form.email
 
     assert_equal :email, email_form.association_name
     assert_equal @user, email_form.parent
   end
 
-  test "contains getter for sub-form" do
+  test "contains getter for email sub-form" do
     assert_respond_to @form, :email
     assert_instance_of Form, @form.email
   end
 
-  test "sub-form initializes model for new parent" do
+  test "email sub-form initializes model for new parent" do
     email_form = @form.email
 
     assert_instance_of Email, email_form.model
@@ -44,7 +44,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert email_form.model.new_record?
   end
 
-  test "sub-form fetches model for existing parent" do
+  test "email sub-form fetches model for existing parent" do
     user = users(:peter)
     user_form = NestedModelForm.new(user)
     email_form = user_form.email
@@ -65,7 +65,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert_not email_form.represents?("profile")
   end
 
-  test "sub-form declares attributes" do
+  test "email sub-form declares attributes" do
     email_form = @form.email
     attributes = [:address, :address=]
 
@@ -74,7 +74,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "sub-form delegates attributes to model" do
+  test "email sub-form delegates attributes to model" do
     email_form = @form.email
     email_form.address = "petrakos@gmail.com"
 
@@ -82,7 +82,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert_equal "petrakos@gmail.com", email_form.model.address
   end
 
-  test "sub-form validates itself" do
+  test "email sub-form validates itself" do
     email_form = @form.email
     email_form.address = nil
 
@@ -94,7 +94,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert email_form.valid?
   end
 
-  test "sub-form validates the model" do
+  test "email sub-form validates the model" do
     existing_email = emails(:peters)
     email_form = @form.email
     email_form.address = existing_email.address
@@ -107,7 +107,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert email_form.valid?
   end
 
-  test "main form syncs models in sub-forms" do
+  test "main form syncs model in email sub-form" do
     params = {
       name: "Petrakos",
       age: "23",
