@@ -14,7 +14,7 @@ class SingleModelFormTest < ActiveSupport::TestCase
     assert_equal @user, @form.model
   end
 
-  test "declares attributes for the model" do
+  test "declares form attributes" do
     attributes = [:name, :name=, :age, :age=, :gender, :gender=]
 
     attributes.each do |attribute|
@@ -38,9 +38,9 @@ class SingleModelFormTest < ActiveSupport::TestCase
     @form.gender = nil
 
     assert_not @form.valid?
-    assert_includes @form.errors.messages[:name], "can't be blank"
-    assert_includes @form.errors.messages[:age], "can't be blank"
-    assert_includes @form.errors.messages[:gender], "can't be blank"
+    [:name, :age, :gender].each do |attribute|
+      assert_includes @form.errors.messages[attribute], "can't be blank"
+    end
 
     @form.name = "Peters"
     @form.age = 23
