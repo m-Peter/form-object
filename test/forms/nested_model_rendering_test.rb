@@ -178,6 +178,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     [0, 1, 2].each do |i|
       assert_match /<label for="project_tasks_attributes_#{i}_task">Task<\/label>/, output_buffer
       assert_match /<input id="project_tasks_attributes_#{i}_name" name="project\[tasks_attributes\]\[#{i}\]\[name\]" type="text" value="#{project_form.tasks[i].name}" \/>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_id" name="project\[tasks_attributes\]\[#{i}\]\[id\]" type="hidden" value="#{project_form.tasks[i].id}" \/>/, output_buffer
     end
 
     assert_match /<input name="commit" type="submit" value="Update Project" \/>/, output_buffer
