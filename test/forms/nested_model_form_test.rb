@@ -152,7 +152,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert @form.email.persisted?
   end
 
-  test "main form collects all the errors" do
+  test "main form collects all the model related errors" do
     peter = users(:peter)
     params = {
       name: peter.name,
@@ -172,5 +172,25 @@ class NestedModelFormTest < ActiveSupport::TestCase
 
     assert_includes @form.errors.messages[:name], "has already been taken"
     assert_includes @form.errors.messages[:address], "has already been taken"
+  end
+
+  test "main form collects all the form specific errors" do
+    params = {
+      name: nil,
+      age: nil,
+      gender: nil,
+
+      email_attributes: {
+        address: nil
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+
+    [:name, :age, :gender, :address].each do |attribute|
+      assert_includes @form.errors.messages[attribute], "can't be blank"
+    end
   end
 end

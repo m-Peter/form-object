@@ -142,4 +142,58 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     assert @form.email.persisted?
     assert @form.profile.persisted?
   end
+
+  test "main form collects all the model related errors" do
+    peter = users(:peter)
+    params = {
+      name: peter.name,
+      age: "23",
+      gender: "0",
+      
+      email_attributes: {
+        address: peter.email.address
+      },
+
+      profile_attributes: {
+        twitter_name: peter.profile.twitter_name,
+        github_name: peter.profile.github_name
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference(['User.count', 'Email.count', 'Profile.count'], 0) do
+      @form.save
+    end
+
+    assert_includes @form.errors.messages[:name], "has already been taken"
+    assert_includes @form.errors.messages[:address], "has already been taken"
+    assert_includes @form.errors.messages[:twitter_name], "has already been taken"
+    assert_includes @form.errors.messages[:github_name], "has already been taken"
+  end
+
+  test "main form collects all the form specific errors" do
+    params = {
+      name: nil,
+      age: nil,
+      gender: nil,
+
+      email_attributes: {
+        address: nil
+      },
+
+      profile_attributes: {
+        twitter_name: nil,
+        github_name: nil
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+
+    [:name, :age, :gender, :address, :twitter_name, :github_name].each do |attribute|
+      assert_includes @form.errors.messages[attribute], "can't be blank"
+    end
+  end
 end
