@@ -7,8 +7,10 @@ class Form
     @association_name = assoc_name
     @parent = parent
     @model = assign_model(model)
+    @forms = []
     self.class_eval &proc
     enable_autosave
+    populate_forms
   end
 
   def submit(params)
@@ -44,13 +46,30 @@ class Form
       end
     end
 
-    def association(name)
+    def association(name, &block)
+      forms << FormDefinition.new({assoc_name: name, proc: block})
+      attr_reader name
+      define_method("#{name}_attributes=") {}
+    end
+
+    def forms
+      @@forms ||= []
     end
 
     alias_method :attribute, :attributes
   end
 
   private
+
+  def populate_forms
+    self.class.forms.each do |definition|
+      definition.parent = model
+      form = definition.to_form
+      forms << form
+      name = definition.assoc_name
+      instance_variable_set("@#{name}", form)
+    end
+  end
 
   def association_reflection
     parent.class.reflect_on_association(association_name)

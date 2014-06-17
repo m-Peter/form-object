@@ -6,6 +6,10 @@ class FormDefinition
   end
 
   def to_form
+    if !association_reflection
+      return nil
+    end
+    
     macro = association_reflection.macro
 
     case macro
