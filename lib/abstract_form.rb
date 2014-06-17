@@ -89,14 +89,9 @@ class AbstractForm
     end
 
     def form(name, &block)
-      definitions << FormDefinition.new({assoc_name: name, proc: block})
-      forms << {assoc_name: name, proc: block}
+      forms << FormDefinition.new({assoc_name: name, proc: block})
       attr_reader name
       define_method("#{name}_attributes=") {}
-    end
-
-    def definitions
-      @definitions ||= []
     end
 
     def collections
@@ -116,11 +111,11 @@ class AbstractForm
 
   def populate_forms
     self.class.forms.each do |definition|
-      definition[:parent] = model
-      sub_form = Form.new(definition)
-      forms << sub_form
-      name = definition[:assoc_name]
-      instance_variable_set("@#{name}", sub_form)
+      definition.parent = model
+      form = definition.to_form
+      forms << form
+      name = definition.assoc_name
+      instance_variable_set("@#{name}", form)
     end
   end
 

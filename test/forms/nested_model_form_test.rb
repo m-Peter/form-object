@@ -18,22 +18,10 @@ class NestedModelFormTest < ActiveSupport::TestCase
     assert_respond_to NestedModelForm, :forms
   end
 
-  test "contains a list of sub-form definitions" do
-    assert_respond_to NestedModelForm, :definitions
-  end
-
-  test "definitions list contains sub-form definitions" do
-    email_definition = NestedModelForm.definitions.first
-
-    assert_instance_of FormDefinition, email_definition
-    assert_equal :email, email_definition.assoc_name
-    assert_not_nil email_definition.proc
-  end
-
   test "forms list contains form definitions" do
     email_definition = NestedModelForm.forms.first
 
-    assert_equal :email, email_definition[:assoc_name]
+    assert_equal :email, email_definition.assoc_name
   end
 
   test "email sub-form contains association name and parent model" do

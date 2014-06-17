@@ -14,11 +14,12 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     assert_equal 2, NestedModelsForm.forms.size
     
     profile_definition = NestedModelsForm.forms.last
-    assert_equal :profile, profile_definition[:assoc_name]
+    assert_equal :profile, profile_definition.assoc_name
 
     profile_form = @form.profile
 
     assert_equal 2, @form.forms.size
+
     assert_equal :profile, profile_form.association_name
     assert_equal @user, profile_form.parent
   end
