@@ -1,7 +1,7 @@
 class Form
   include ActiveModel::Validations
 
-  attr_reader :association_name, :parent, :model
+  attr_reader :association_name, :parent, :model, :forms
 
   def initialize(assoc_name, parent, proc, model=nil)
     @association_name = assoc_name
@@ -42,6 +42,9 @@ class Form
         delegate attribute, to: :model
         delegate "#{attribute}=", to: :model
       end
+    end
+
+    def association(name)
     end
 
     alias_method :attribute, :attributes
