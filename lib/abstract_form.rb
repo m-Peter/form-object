@@ -6,8 +6,6 @@ class AbstractForm
   def initialize(model)
     @model = model
     @forms = []
-    @collections = []
-    @definitions ||= []
     populate_forms
   end
   
@@ -36,7 +34,7 @@ class AbstractForm
     model.valid?
 
     collect_errors_from(model)
-    aggregate_errors_from(forms)
+    aggregate_form_errors
     
     errors.empty?
   end
@@ -127,20 +125,17 @@ class AbstractForm
   end
 
   def fill_association_with_attributes(association, attributes)
-    assign(forms, association, attributes)
-  end
-
-  def assign(container, association, attributes)
     assoc_name = find_association_name_in(association).to_sym
-    container.each do |form|
+
+    forms.each do |form|
       if form.represents?(assoc_name)
         form.submit(attributes)
       end
     end
   end
 
-  def aggregate_errors_from(container)
-    container.each do |form|
+  def aggregate_form_errors
+    forms.each do |form|
       form.valid?
       collect_errors_from(form)
     end
