@@ -1,21 +1,30 @@
 class FormDefinition
   attr_accessor :assoc_name, :proc, :parent, :records
   
-  def initialize(args)
-    args.each do |key, value|
-      send("#{key}=", value)
-    end
+  def initialize(args={})
+    assign_arguments(args)
   end
 
   def to_form
-    if is_plural?(assoc_name.to_s)
-      FormCollection.new({assoc_name: assoc_name, proc: proc, parent: parent, records: records})
-    else
+    macro = association_reflection.macro
+
+    case macro
+    when :has_one
       Form.new({assoc_name: assoc_name, proc: proc, parent: parent})
+    when :has_many
+      FormCollection.new({assoc_name: assoc_name, proc: proc, parent: parent, records: records})
     end
   end
 
-  def is_plural?(str)
-    str.pluralize == str
+  private
+
+  def assign_arguments(args={})
+    args.each do |key, value|
+      send("#{key}=", value) if respond_to?(key)
+    end
+  end
+
+  def association_reflection
+    parent.class.reflect_on_association(@assoc_name)
   end
 end
