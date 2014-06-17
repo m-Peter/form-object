@@ -14,9 +14,8 @@ class FormCollection
   end
 
   def submit(params)
-    if params.size > records
-      raise TooManyRecords, "Maximum #{records} records are allowed. Got #{params.size} records instead."
-    end
+    check_record_limit!(records, params)
+
     params.each do |key, value|
       if parent.persisted?
         id = value[:id]
@@ -80,6 +79,12 @@ class FormCollection
   def collect_errors_from(model)
     model.errors.each do |attribute, error|
       errors.add(attribute, error)
+    end
+  end
+
+  def check_record_limit!(limit, attributes_collection)
+    if attributes_collection.size > limit
+      raise TooManyRecords, "Maximum #{limit} records are allowed. Got #{attributes_collection.size} records instead."
     end
   end
 
