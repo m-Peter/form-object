@@ -1,22 +1,14 @@
 class AbstractForm
   include ActiveModel::Model
   
-  attr_reader :model, :forms, :collections, :definitions
+  attr_reader :model, :forms
 
   def initialize(model)
     @model = model
     @forms = []
     @collections = []
-    populate_forms
-    populate_collections
-  end
-
-  def init_definitions
     @definitions ||= []
-    self.class.definitions.each do |definition|
-      definition.parent = model
-      definitions << definition.to_form
-    end
+    populate_forms
   end
   
   def submit(params)
@@ -45,7 +37,6 @@ class AbstractForm
 
     collect_errors_from(model)
     aggregate_errors_from(forms)
-    aggregate_errors_from(collections)
     
     errors.empty?
   end
@@ -91,8 +82,7 @@ class AbstractForm
     end
 
     def collection(name, options={}, &block)
-      collections << {assoc_name: name, records: options[:records], proc: block}
-      definitions << FormDefinition.new({assoc_name: name, records: options[:records], proc: block})
+      forms << FormDefinition.new({assoc_name: name, records: options[:records], proc: block})
       self.class_eval("def #{name}; @#{name}.models; end")
       define_method("#{name}_attributes=") {}
     end
@@ -101,14 +91,6 @@ class AbstractForm
       forms << FormDefinition.new({assoc_name: name, proc: block})
       attr_reader name
       define_method("#{name}_attributes=") {}
-    end
-
-    def definitions
-      @definitions ||= []
-    end
-
-    def collections
-      @collections ||= []
     end
 
     def forms
@@ -132,16 +114,6 @@ class AbstractForm
     end
   end
 
-  def populate_collections
-    self.class.collections.each do |definition|
-      definition[:parent] = model
-      collection_form = FormCollection.new(definition)
-      collections << collection_form
-      name = definition[:assoc_name]
-      instance_variable_set("@#{name}", collection_form)
-    end
-  end
-
   ATTRIBUTES_KEY_REGEXP = /^(.+)_attributes$/
 
   def macro_for_association(association)
@@ -155,12 +127,7 @@ class AbstractForm
   end
 
   def fill_association_with_attributes(association, attributes)
-    case macro_for_association(association)
-    when :has_one
-      assign(forms, association, attributes)
-    when :has_many
-      assign(collections, association, attributes)
-    end
+    assign(forms, association, attributes)
   end
 
   def assign(container, association, attributes)

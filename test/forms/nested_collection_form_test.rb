@@ -25,22 +25,20 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
     assert_respond_to NestedCollectionForm, :collection
   end
 
-  test "contains a list of collections for has_many associations" do
-    assert_respond_to NestedCollectionForm, :collections
-    assert_instance_of Array, NestedCollectionForm.collections
-    assert_equal 1, NestedCollectionForm.collections.size
+  test "contains a list of forms for has_many associations" do
+    assert_equal 1, NestedCollectionForm.forms.size
   end
 
-  test "collections list contains form definitions" do
-    tasks_definition = NestedCollectionForm.collections.first
+  test "forms list contains form definitions" do
+    tasks_definition = NestedCollectionForm.forms.first
 
-    assert_equal :tasks, tasks_definition[:assoc_name]
-    assert_equal 3, tasks_definition[:records]
-    assert_not_nil tasks_definition[:proc]
+    assert_equal :tasks, tasks_definition.assoc_name
+    assert_equal 3, tasks_definition.records
+    assert_not_nil tasks_definition.proc
   end
 
   test "main form provides getter method for collection sub-form" do
-    tasks_form = @form.collections.first
+    tasks_form = @form.forms.first
 
     assert_instance_of FormCollection, tasks_form
   end
@@ -57,7 +55,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
   end
 
   test "collection sub-form contains association name and parent model" do
-    tasks_form = @form.collections.first
+    tasks_form = @form.forms.first
 
     assert_equal :tasks, tasks_form.association_name
     assert_equal 3, tasks_form.records
@@ -65,7 +63,7 @@ class NestedCollectionFormTest < ActiveSupport::TestCase
   end
 
   test "collection sub-form initializes the number of records specified" do
-    tasks_form = @form.collections.first
+    tasks_form = @form.forms.first
 
     assert_respond_to tasks_form, :models
     assert_equal 3, tasks_form.models.size
