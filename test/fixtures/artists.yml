@@ -1,9 +1,5 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  string: 
-  song_id: 
-
-two:
-  string: 
-  song_id: 
+kanye:
+  name: Kanye West 
+  song: lockdown

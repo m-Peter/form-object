@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SongsControllerTest < ActionController::TestCase
   setup do
-    @song = songs(:one)
+    @song = songs(:lockdown)
   end
 
   test "should get index" do
@@ -18,7 +18,7 @@ class SongsControllerTest < ActionController::TestCase
 
   test "should create song" do
     assert_difference('Song.count') do
-      post :create, song: { string: @song.string, string: @song.string }
+      post :create, song: { title: @song.title, length: @song.length }
     end
 
     assert_redirected_to song_path(assigns(:song))
@@ -35,7 +35,7 @@ class SongsControllerTest < ActionController::TestCase
   end
 
   test "should update song" do
-    patch :update, id: @song, song: { string: @song.string, string: @song.string }
+    patch :update, id: @song, song: { title: @song.title, length: @song.length }
     assert_redirected_to song_path(assigns(:song))
   end
 

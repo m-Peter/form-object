@@ -1,11 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  string: 
-  string: 
-  artist_id: 
-
-two:
-  string: 
-  string: 
-  artist_id: 
+jayz:
+  name: Jay-Z 
+  studio: Ztudio 
+  artist: kanye 
