@@ -72,4 +72,28 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "MADog", producer_form.model.studio
   end
 
+  test "main form syncs model in producer sub-form" do
+    params = {
+      title: "Diamonds",
+      length: "360",
+
+      artist_attributes: {
+        name: "Karras",
+
+        producer_attributes: {
+          name: "Phoebos",
+          studio: "MADog"
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_equal "Diamonds", @form.title
+    assert_equal "360", @form.length
+    assert_equal "Karras", @form.artist.name
+    assert_equal "Phoebos", @form.artist.producer.name
+    assert_equal "MADog", @form.artist.producer.studio
+  end
+
 end

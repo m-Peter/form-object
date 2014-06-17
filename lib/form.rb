@@ -14,7 +14,13 @@ class Form
   end
 
   def submit(params)
-    model.attributes = params
+    params.each do |key, value|
+      if value.is_a?(Hash)
+        fill_association_with_attributes(key, value)
+      else
+        model.send("#{key}=", value)
+      end
+    end
   end
 
   def valid?
@@ -60,6 +66,22 @@ class Form
   end
 
   private
+
+  ATTRIBUTES_KEY_REGEXP = /^(.+)_attributes$/
+
+  def fill_association_with_attributes(association, attributes)
+    assoc_name = find_association_name_in(association).to_sym
+
+    forms.each do |form|
+      if form.represents?(assoc_name)
+        form.submit(attributes)
+      end
+    end
+  end
+
+  def find_association_name_in(key)
+    ATTRIBUTES_KEY_REGEXP.match(key)[1]
+  end
 
   def populate_forms
     self.class.forms.each do |definition|
