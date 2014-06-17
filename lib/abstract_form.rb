@@ -89,9 +89,14 @@ class AbstractForm
     end
 
     def form(name, &block)
+      definitions << FormDefinition.new({assoc_name: name, proc: block})
       forms << {assoc_name: name, proc: block}
       attr_reader name
       define_method("#{name}_attributes=") {}
+    end
+
+    def definitions
+      @definitions ||= []
     end
 
     def collections
