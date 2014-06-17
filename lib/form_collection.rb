@@ -2,13 +2,13 @@ class FormCollection
   include ActiveModel::Validations
   include Enumerable
 
-  attr_reader :association_name, :records, :parent
+  attr_reader :association_name, :records, :parent, :proc
 
-  def initialize(args)
-    @association_name = args[:assoc_name]
-    @records = args[:records]
-    @parent = args[:parent]
-    @proc = args[:proc]
+  def initialize(assoc_name, parent, proc, records)
+    @association_name = assoc_name
+    @parent = parent
+    @proc = proc
+    @records = records
     @models = []
     assign_models
   end
@@ -63,16 +63,15 @@ class FormCollection
 
   def fetch_models
     associated_records = parent.send(association_name)
+    
     associated_records.each do |model|
-      args = {assoc_name: @association_name, parent: @parent, proc: @proc, model: model}
-      @models << Form.new(args)
+      @models << Form.new(association_name, parent, proc, model)
     end
   end
 
   def initialize_models
     records.times do
-      args = {assoc_name: @association_name, parent: @parent, proc: @proc}
-      @models << Form.new(args)
+      @models << Form.new(association_name, parent, proc)
     end
   end
 

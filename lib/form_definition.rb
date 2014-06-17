@@ -10,9 +10,9 @@ class FormDefinition
 
     case macro
     when :has_one
-      Form.new({assoc_name: assoc_name, proc: proc, parent: parent})
+      Form.new(assoc_name, parent, proc)
     when :has_many
-      FormCollection.new({assoc_name: assoc_name, proc: proc, parent: parent, records: records})
+      FormCollection.new(assoc_name, parent, proc, records)
     end
   end
 

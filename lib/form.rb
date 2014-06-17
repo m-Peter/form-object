@@ -3,11 +3,11 @@ class Form
 
   attr_reader :association_name, :parent, :model
 
-  def initialize(args)
-    @association_name = args[:assoc_name]
-    @parent = args[:parent]
-    @model = assign_model(args)
-    self.class_eval &args[:proc]
+  def initialize(assoc_name, parent, proc, model=nil)
+    @association_name = assoc_name
+    @parent = parent
+    @model = assign_model(model)
+    self.class_eval &proc
     enable_autosave
   end
 
@@ -79,9 +79,9 @@ class Form
     end
   end
 
-  def assign_model(args)
-    if args[:model]
-      args[:model]
+  def assign_model(model)
+    if model
+      model
     else
       build_model
     end
