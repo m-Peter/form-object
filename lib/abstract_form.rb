@@ -1,7 +1,7 @@
 class AbstractForm
   include ActiveModel::Model
   
-  attr_reader :model, :forms, :collections
+  attr_reader :model, :forms, :collections, :definitions
 
   def initialize(model)
     @model = model
@@ -9,6 +9,14 @@ class AbstractForm
     @collections = []
     populate_forms
     populate_collections
+  end
+
+  def init_definitions
+    @definitions ||= []
+    self.class.definitions.each do |definition|
+      definition.parent = model
+      definitions << definition.to_form
+    end
   end
   
   def submit(params)
@@ -84,6 +92,7 @@ class AbstractForm
 
     def collection(name, options={}, &block)
       collections << {assoc_name: name, records: options[:records], proc: block}
+      definitions << FormDefinition.new({assoc_name: name, records: options[:records], proc: block})
       self.class_eval("def #{name}; @#{name}.models; end")
       define_method("#{name}_attributes=") {}
     end
@@ -92,6 +101,10 @@ class AbstractForm
       forms << FormDefinition.new({assoc_name: name, proc: block})
       attr_reader name
       define_method("#{name}_attributes=") {}
+    end
+
+    def definitions
+      @definitions ||= []
     end
 
     def collections

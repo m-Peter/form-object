@@ -20,6 +20,43 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal 1, NestedCollectionAssociationForm.collections.size
   end
 
+  test "contains a definitions list for has_many associations" do
+    assert_respond_to NestedCollectionAssociationForm, :definitions
+  end
+
+  test "definitions list contains form definitions for has_many associations" do
+    tasks_definition = NestedCollectionAssociationForm.definitions.first
+    tasks_definition.parent = @project
+
+    assert_equal :tasks, tasks_definition.assoc_name
+    assert_equal @project, tasks_definition.parent
+    assert_equal 3, tasks_definition.records
+    assert_not_nil tasks_definition.proc
+  end
+
+  test "FormDefinition creates FormCollection from arguments" do
+    tasks_definition = NestedCollectionAssociationForm.definitions.first
+    tasks_definition.parent = @project
+    tasks_form = tasks_definition.to_form
+
+    assert_instance_of FormCollection, tasks_form
+    assert_equal :tasks, tasks_form.association_name
+    assert_equal @project, tasks_form.parent
+    assert_equal 3, tasks_form.records
+  end
+
+  test "main form initializes FormCollections from definitions list" do
+    @form.init_definitions
+
+    assert_equal 1, @form.definitions.size
+
+    tasks_form = @form.definitions.first
+
+    assert_instance_of FormCollection, tasks_form
+    assert_equal :tasks, tasks_form.association_name
+    assert_equal @project, tasks_form.parent
+  end
+
   test "collections list contains form definitions" do
     tasks_definition = NestedCollectionAssociationForm.collections.first
 
