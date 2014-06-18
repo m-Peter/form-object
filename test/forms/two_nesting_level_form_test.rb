@@ -1,21 +1,10 @@
 require 'test_helper'
-
-class SongForm < AbstractForm
-  attributes :title, :length
-
-  association :artist do
-    attribute :name
-
-    association :producer do
-      attributes :name, :studio
-    end
-  end
-end
+require_relative 'two_nesting_level_form'
 
 class TwoNestingLevelFormTest < ActiveSupport::TestCase
   def setup
     @song = Song.new
-    @form = SongForm.new(@song)
+    @form = TwoNestingLevelForm.new(@song)
   end
 
   test "Form declares association" do
