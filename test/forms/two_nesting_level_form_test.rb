@@ -135,4 +135,38 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert @form.artist.producer.model.persisted?
   end
 
+  test "main form updates all the models" do
+    song = songs(:lockdown)
+    params = {
+      title: "Diamonds",
+      length: "360",
+
+      artist_attributes: {
+        name: "Karras",
+
+        producer_attributes: {
+          name: "Phoebos",
+          studio: "MADog"
+        }
+      }
+    }
+    form = TwoNestingLevelForm.new(song)
+
+    form.submit(params)
+
+    assert_difference(['Song.count', 'Artist.count', 'Producer.count'], 0) do
+      form.save
+    end
+
+    assert_equal "Diamonds", form.title
+    assert_equal "360", form.length
+    assert_equal "Karras", form.artist.name
+    assert_equal "Phoebos", form.artist.producer.name
+    assert_equal "MADog", form.artist.producer.studio
+
+    assert form.persisted?
+    assert form.artist.model.persisted?
+    assert form.artist.producer.model.persisted?
+  end
+
 end
