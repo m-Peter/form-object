@@ -1,3 +1,3 @@
 class Producer < ActiveRecord::Base
-  belongs_to :artist
+  belongs_to :artist, dependent: :destroy
 end

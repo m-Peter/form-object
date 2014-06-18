@@ -1,5 +1,7 @@
 class SongsController < ApplicationController
   before_action :set_song, only: [:show, :edit, :update, :destroy]
+  before_action :create_new_form, only: [:new, :create]
+  before_action :create_edit_form, only: [:edit, :update]
 
   # GET /songs
   # GET /songs.json
@@ -14,21 +16,15 @@ class SongsController < ApplicationController
 
   # GET /songs/new
   def new
-    song = Song.new
-    @song_form = SongForm.new(song)
   end
 
   # GET /songs/1/edit
   def edit
-    song = Song.find(params[:id])
-    @song_form = SongForm.new(song)
   end
 
   # POST /songs
   # POST /songs.json
   def create
-    song = Song.new
-    @song_form = SongForm.new(song)
     @song_form.submit(song_params)
 
     respond_to do |format|
@@ -43,7 +39,6 @@ class SongsController < ApplicationController
   # PATCH/PUT /songs/1
   # PATCH/PUT /songs/1.json
   def update
-    @song_form = SongForm.new(@song)
     @song_form.submit(song_params)
 
     respond_to do |format|
@@ -71,6 +66,15 @@ class SongsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_song
       @song = Song.find(params[:id])
+    end
+
+    def create_new_form
+      song = Song.new
+      @song_form = SongForm.new(song)
+    end
+
+    def create_edit_form
+      @song_form = SongForm.new(@song)
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

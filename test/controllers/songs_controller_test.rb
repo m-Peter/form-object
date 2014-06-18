@@ -17,11 +17,31 @@ class SongsControllerTest < ActionController::TestCase
   end
 
   test "should create song" do
-    assert_difference('Song.count') do
-      post :create, song: { title: @song.title, length: @song.length }
+    assert_difference(['Song.count', 'Artist.count', 'Producer.count']) do
+      post :create, song: {
+        title: "Diamonds",
+        length: "360",
+
+        artist_attributes: {
+          name: "Karras",
+
+          producer_attributes: {
+            name: "Phoebos",
+            studio: "MADog"
+          }
+        }
+      }
     end
 
-    assert_redirected_to song_path(assigns(:song_form))
+    song_form = assigns(:song_form)
+
+    assert_redirected_to song_path(song_form)
+    assert_equal "Diamonds", song_form.title
+    assert_equal "360", song_form.length
+    assert_equal "Karras", song_form.artist.name
+    assert_equal "Phoebos", song_form.artist.producer.name
+    assert_equal "MADog", song_form.artist.producer.studio
+    assert_equal "Song: Diamonds was successfully created.", flash[:notice]
   end
 
   test "should show song" do
@@ -35,8 +55,29 @@ class SongsControllerTest < ActionController::TestCase
   end
 
   test "should update song" do
-    patch :update, id: @song, song: { title: @song.title, length: @song.length }
-    assert_redirected_to song_path(assigns(:song))
+    patch :update, id: @song, song: {
+      title: "Run this town",
+      length: "355",
+
+      artist_attributes: {
+        name: "Rihanna",
+
+        producer_attributes: {
+          name: "Eminem",
+          studio: "Marshall"
+        }
+      }
+    }
+    
+    song_form = assigns(:song_form)
+
+    assert_redirected_to song_path(song_form)
+    assert_equal "Run this town", song_form.title
+    assert_equal "355", song_form.length
+    assert_equal "Rihanna", song_form.artist.name
+    assert_equal "Eminem", song_form.artist.producer.name
+    assert_equal "Marshall", song_form.artist.producer.studio
+    assert_equal "Song: Run this town was successfully updated.", flash[:notice]
   end
 
   test "should destroy song" do
