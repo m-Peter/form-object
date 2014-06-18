@@ -34,11 +34,29 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_instance_of Artist, producer_form.parent
   end
 
-  test "producer sub-form initializes model for new parent" do
+  test "producer sub-form initializes models for new parent" do
     producer_form = @form.artist.producer
 
     assert_equal @form.artist.model.producer, @form.artist.producer.model
     assert @form.artist.producer.model.new_record?
+  end
+
+  test "producer sub-form fetches models for existing parent" do
+    song = songs(:lockdown)
+    form = TwoNestingLevelForm.new(song)
+    artist_form = form.artist
+    producer_form = artist_form.producer
+
+    assert_equal "Love Lockdown", form.title
+    assert_equal "350", form.length
+    assert form.persisted?
+
+    assert_equal "Kanye West", artist_form.name
+    assert artist_form.model.persisted?
+
+    assert_equal "Jay-Z", producer_form.name
+    assert_equal "Ztudio", producer_form.studio
+    assert producer_form.model.persisted?
   end
 
   test "producer sub-form declares attributes" do
