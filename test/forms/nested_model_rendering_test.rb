@@ -228,4 +228,50 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<label for="song_artist_attributes_producer_attributes_studio">Studio<\/label>/, output_buffer
     assert_match /<input id="song_artist_attributes_producer_attributes_studio" name="song\[artist_attributes\]\[producer_attributes\]\[studio\]" type="text" \/>/, output_buffer
   end
+
+  test "form_for renders correctly a existing instance of Form Model with two nesting level" do
+    song = songs(:lockdown)
+    song_form = TwoNestingLevelForm.new(song)
+    artist = song_form.artist
+    producer = artist.producer
+
+    form_for song_form do |f|
+      concat f.label(:title)
+      concat f.text_field(:title)
+      concat f.label(:length)
+      concat f.text_field(:length)
+
+      concat f.fields_for(:artist, artist) { |a|
+        concat a.label(:name)
+        concat a.text_field(:name)
+
+        concat a.fields_for(:producer, producer) { |p| 
+          concat p.label(:name)
+          concat p.text_field(:name)
+          concat p.label(:studio)
+          concat p.text_field(:studio)
+        }
+      }
+    end
+
+    id = song.id
+
+    assert_match /action="\/songs\/#{id}"/, output_buffer
+    assert_match /class="edit_song"/, output_buffer
+    assert_match /id="edit_song_#{id}"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="song_title">Title<\/label>/, output_buffer
+    assert_match /<input id="song_title" name="song\[title\]" type="text" value="#{song_form.title}" \/>/, output_buffer
+    assert_match /<label for="song_length">Length<\/label>/, output_buffer
+    assert_match /input id="song_length" name="song\[length\]" type="text" value="#{song_form.length}" \/>/, output_buffer
+
+    assert_match /<label for="song_artist_attributes_name">Name<\/label>/, output_buffer
+    assert_match /<input id="song_artist_attributes_name" name="song\[artist_attributes\]\[name\]" type="text" value="#{artist.name}" \/>/, output_buffer
+
+    assert_match /<label for="song_artist_attributes_producer_attributes_name">Name<\/label>/, output_buffer
+    assert_match /<input id="song_artist_attributes_producer_attributes_name" name="song\[artist_attributes\]\[producer_attributes\]\[name\]" type="text" value="#{producer.name}" \/>/, output_buffer
+    assert_match /<label for="song_artist_attributes_producer_attributes_studio">Studio<\/label>/, output_buffer
+    assert_match /<input id="song_artist_attributes_producer_attributes_studio" name="song\[artist_attributes\]\[producer_attributes\]\[studio\]" type="text" value="#{producer.studio}" \/>/, output_buffer
+  end
 end

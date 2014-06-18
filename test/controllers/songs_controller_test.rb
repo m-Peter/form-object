@@ -21,7 +21,7 @@ class SongsControllerTest < ActionController::TestCase
       post :create, song: { title: @song.title, length: @song.length }
     end
 
-    assert_redirected_to song_path(assigns(:song))
+    assert_redirected_to song_path(assigns(:song_form))
   end
 
   test "should show song" do
