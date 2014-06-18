@@ -103,4 +103,36 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "MADog", @form.artist.producer.studio
   end
 
+  test "main form saves all the models" do
+    params = {
+      title: "Diamonds",
+      length: "360",
+
+      artist_attributes: {
+        name: "Karras",
+
+        producer_attributes: {
+          name: "Phoebos",
+          studio: "MADog"
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference(['Song.count', 'Artist.count', 'Producer.count']) do
+      @form.save
+    end
+
+    assert_equal "Diamonds", @form.title
+    assert_equal "360", @form.length
+    assert_equal "Karras", @form.artist.name
+    assert_equal "Phoebos", @form.artist.producer.name
+    assert_equal "MADog", @form.artist.producer.studio
+
+    assert @form.persisted?
+    assert @form.artist.model.persisted?
+    assert @form.artist.producer.model.persisted?
+  end
+
 end

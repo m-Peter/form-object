@@ -27,15 +27,15 @@ class SongsController < ApplicationController
   # POST /songs
   # POST /songs.json
   def create
-    @song = Song.new(song_params)
+    song = Song.new
+    @song_form = SongForm.new(song)
+    @song_form.submit(song_params)
 
     respond_to do |format|
-      if @song.save
-        format.html { redirect_to @song, notice: 'Song was successfully created.' }
-        format.json { render :show, status: :created, location: @song }
+      if @song_form.save
+        format.html { redirect_to @song_form, notice: "Song: #{@song_form.title} was successfully created." }
       else
         format.html { render :new }
-        format.json { render json: @song.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -72,6 +72,6 @@ class SongsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def song_params
-      params.require(:song).permit(:string, :string)
+      params.require(:song).permit(:title, :length, artist_attributes: [ :name, producer_attributes: [ :name, :studio ] ] )
     end
 end
