@@ -108,11 +108,21 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     @form.length = nil
 
     assert_not @form.valid?
+    assert_includes @form.errors.messages[:title], "can't be blank"
+    assert_includes @form.errors.messages[:length], "can't be blank"
 
     @form.title = "Diamonds"
     @form.length = "355"
 
     assert @form.valid?
+  end
+
+  test "main form validates the model" do
+    song = songs(:lockdown)
+    @form.title = song.title
+
+    assert_not @form.valid?
+    assert_includes @form.errors.messages[:title], "has already been taken"
   end
 
   test "main form saves all the models" do
