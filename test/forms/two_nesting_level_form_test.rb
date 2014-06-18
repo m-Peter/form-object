@@ -103,6 +103,18 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "MADog", @form.artist.producer.studio
   end
 
+  test "main form validates itself" do
+    @form.title = nil
+    @form.length = nil
+
+    assert_not @form.valid?
+
+    @form.title = "Diamonds"
+    @form.length = "355"
+
+    assert @form.valid?
+  end
+
   test "main form saves all the models" do
     params = {
       title: "Diamonds",

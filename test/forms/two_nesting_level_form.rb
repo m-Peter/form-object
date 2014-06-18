@@ -8,4 +8,6 @@ class TwoNestingLevelForm < AbstractForm
       attributes :name, :studio
     end
   end
+
+  validates :title, :length, presence: true
 end
