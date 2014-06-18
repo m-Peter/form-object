@@ -52,11 +52,11 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert form.persisted?
 
     assert_equal "Kanye West", artist_form.name
-    assert artist_form.model.persisted?
+    assert artist_form.persisted?
 
     assert_equal "Jay-Z", producer_form.name
     assert_equal "Ztudio", producer_form.studio
-    assert producer_form.model.persisted?
+    assert producer_form.persisted?
   end
 
   test "producer sub-form declares attributes" do
@@ -131,8 +131,8 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "MADog", @form.artist.producer.studio
 
     assert @form.persisted?
-    assert @form.artist.model.persisted?
-    assert @form.artist.producer.model.persisted?
+    assert @form.artist.persisted?
+    assert @form.artist.producer.persisted?
   end
 
   test "main form updates all the models" do
@@ -165,8 +165,8 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "MADog", form.artist.producer.studio
 
     assert form.persisted?
-    assert form.artist.model.persisted?
-    assert form.artist.producer.model.persisted?
+    assert form.artist.persisted?
+    assert form.artist.producer.persisted?
   end
 
 end
