@@ -1,10 +1,10 @@
-<%= form_for(@song) do |f| %>
-  <% if @song.errors.any? %>
+<%= form_for @song_form do |f| %>
+  <% if @song_form.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@song.errors.count, "error") %> prohibited this song from being saved:</h2>
+      <h2><%= pluralize(@song_form.errors.count, "error") %> prohibited this song from being saved:</h2>
 
       <ul>
-      <% @song.errors.full_messages.each do |message| %>
+      <% @song_form.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>
@@ -19,6 +19,24 @@
     <%= f.label :length %><br>
     <%= f.text_field :length %>
   </div>
+
+  <%= f.fields_for :artist, @song_form.artist do |artist| %>
+    <div class="field">
+      <%= artist.label :name, "Artist Name" %><br>
+      <%= artist.text_field :name %>
+    </div>
+    
+    <%= artist.fields_for :producer, @song_form.artist.producer do |producer| %>
+      <div class="field">
+        <%= producer.label :name, "Producer Name" %><br>
+        <%= producer.text_field :name %>
+      </div>
+      <div class="field">
+        <%= producer.label :studio %><br>
+        <%= producer.text_field :studio %>
+      </div>
+    <% end %>
+  <% end %>
   <div class="actions">
     <%= f.submit %>
   </div>

@@ -14,11 +14,14 @@ class SongsController < ApplicationController
 
   # GET /songs/new
   def new
-    @song = Song.new
+    song = Song.new
+    @song_form = SongForm.new(song)
   end
 
   # GET /songs/1/edit
   def edit
+    song = Song.find(params[:id])
+    @song_form = SongForm.new(song)
   end
 
   # POST /songs
