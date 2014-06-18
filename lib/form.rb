@@ -28,6 +28,7 @@ class Form
     model.valid?
 
     collect_errors_from(model)
+    aggregate_form_errors
     
     errors.empty?
   end
@@ -128,6 +129,15 @@ class Form
       model
     else
       build_model
+    end
+  end
+
+  def aggregate_form_errors
+    forms.each do |form|
+      if form
+        form.valid?
+        collect_errors_from(form)
+      end
     end
   end
 

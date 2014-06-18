@@ -6,7 +6,11 @@ class TwoNestingLevelForm < AbstractForm
 
     association :producer do
       attributes :name, :studio
+
+      validates :name, :studio, presence: true
     end
+
+    validates :name, presence: true
   end
 
   validates :title, :length, presence: true

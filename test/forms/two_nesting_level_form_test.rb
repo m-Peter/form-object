@@ -106,13 +106,21 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
   test "main form validates itself" do
     @form.title = nil
     @form.length = nil
+    @form.artist.name = nil
+    @form.artist.producer.name = nil
+    @form.artist.producer.studio = nil
 
     assert_not @form.valid?
     assert_includes @form.errors.messages[:title], "can't be blank"
     assert_includes @form.errors.messages[:length], "can't be blank"
+    assert_includes @form.errors.messages[:name], "can't be blank"
+    assert_includes @form.errors.messages[:studio], "can't be blank"
 
     @form.title = "Diamonds"
     @form.length = "355"
+    @form.artist.name = "Karras"
+    @form.artist.producer.name = "Phoebos"
+    @form.artist.producer.studio = "MADog"
 
     assert @form.valid?
   end
