@@ -88,6 +88,7 @@ class Form
     self.class.forms.each do |definition|
       definition.parent = model
       form = definition.to_form
+      return unless form
       forms << form
       name = definition.assoc_name
       instance_variable_set("@#{name}", form)
@@ -134,10 +135,8 @@ class Form
 
   def aggregate_form_errors
     forms.each do |form|
-      if form
-        form.valid?
-        collect_errors_from(form)
-      end
+      form.valid?
+      collect_errors_from(form)
     end
   end
 

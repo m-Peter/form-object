@@ -13,6 +13,7 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
 
   test "Form contains a list of sub-forms" do
     assert_respond_to Form, :forms
+    assert_equal 1, Form.forms.size
   end
 
   test "forms list contains form definitions" do
