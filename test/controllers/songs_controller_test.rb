@@ -44,6 +44,33 @@ class SongsControllerTest < ActionController::TestCase
     assert_equal "Song: Diamonds was successfully created.", flash[:notice]
   end
 
+  test "should not create song with invalid params" do
+    assert_difference(['Song.count', 'Artist.count', 'Producer.count'], 0) do
+      post :create, song: {
+        title: nil,
+        length: nil,
+
+        artist_attributes: {
+          name: nil,
+
+          producer_attributes: {
+            name: nil,
+            studio: nil
+          }
+        }
+      }
+    end
+
+    song_form = assigns(:song_form)
+    
+    assert_not song_form.valid?
+    assert_includes song_form.errors.messages[:title], "can't be blank"
+    assert_includes song_form.errors.messages[:length], "can't be blank"
+    assert_includes song_form.errors.messages[:name], "can't be blank"
+    assert_equal 2, song_form.errors.messages[:name].size
+    assert_includes song_form.errors.messages[:studio], "can't be blank"
+  end
+
   test "should show song" do
     get :show, id: @song
     assert_response :success
