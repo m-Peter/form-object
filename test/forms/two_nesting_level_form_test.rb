@@ -126,12 +126,18 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert @form.valid?
   end
 
-  test "main form validates the model" do
+  test "main form validates the models" do
     song = songs(:lockdown)
     @form.title = song.title
+    @form.artist.name = song.artist.name
+    @form.artist.producer.name = song.artist.producer.name
+    @form.artist.producer.studio = song.artist.producer.studio
 
     assert_not @form.valid?
     assert_includes @form.errors.messages[:title], "has already been taken"
+    assert_includes @form.errors.messages[:name], "has already been taken"
+    assert_equal 2, @form.errors.messages[:name].size
+    assert_includes @form.errors.messages[:studio], "has already been taken"
   end
 
   test "main form saves all the models" do
