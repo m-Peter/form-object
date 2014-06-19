@@ -46,6 +46,8 @@ class Form
   end
   
   class << self
+    attr_reader :forms
+
     def attributes(*names)
       names.each do |attribute|
         delegate attribute, to: :model
@@ -54,13 +56,15 @@ class Form
     end
 
     def association(name, &block)
-      forms << FormDefinition.new({assoc_name: name, proc: block})
+      Form.instance_variable_set(:@forms, forms)
+      #forms << FormDefinition.new({assoc_name: name, proc: block})
+      Form.forms << FormDefinition.new({assoc_name: name, proc: block})
       attr_reader name
       define_method("#{name}_attributes=") {}
     end
 
     def forms
-      @@forms ||= []
+      @forms ||= []
     end
 
     alias_method :attribute, :attributes
