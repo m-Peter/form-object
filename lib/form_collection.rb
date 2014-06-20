@@ -2,15 +2,15 @@ class FormCollection
   include ActiveModel::Validations
   include Enumerable
 
-  attr_reader :association_name, :records, :parent, :proc
+  attr_reader :association_name, :records, :parent, :proc, :forms
 
   def initialize(assoc_name, parent, proc, records)
     @association_name = assoc_name
     @parent = parent
     @proc = proc
     @records = records
-    @models = []
-    assign_models
+    @forms = []
+    assign_forms
   end
 
   def submit(params)
@@ -19,19 +19,19 @@ class FormCollection
     params.each do |key, value|
       if parent.persisted?
         id = value[:id]
-        model = find_model(id)
-        model.submit(value)
+        form = find_form_by_model_id(id)
+        form.submit(value)
       else
         i = key.to_i
-        @models[i].submit(value)
+        forms[i].submit(value)
       end
     end
   end
 
   def valid?
-    @models.each do |model|
-      model.valid?
-      collect_errors_from(model)
+    forms.each do |form|
+      form.valid?
+      collect_errors_from(form)
     end
 
     errors.empty?
@@ -42,18 +42,18 @@ class FormCollection
   end
 
   def models
-    @models
+    forms
   end
 
   def each(&block)
-    @models.each do |form|
+    forms.each do |form|
       block.call(form)
     end
   end
 
   private
 
-  def assign_models
+  def assign_forms
     if parent.persisted?
       fetch_models
     else
@@ -65,13 +65,13 @@ class FormCollection
     associated_records = parent.send(association_name)
     
     associated_records.each do |model|
-      @models << Form.new(association_name, parent, proc, model)
+      forms << Form.new(association_name, parent, proc, model)
     end
   end
 
   def initialize_models
     records.times do
-      @models << Form.new(association_name, parent, proc)
+      forms << Form.new(association_name, parent, proc)
     end
   end
 
@@ -87,10 +87,10 @@ class FormCollection
     end
   end
 
-  def find_model(id)
-    @models.each do |model|
-      if model.id == id.to_i
-        return model
+  def find_form_by_model_id(id)
+    forms.each do |form|
+      if form.id == id.to_i
+        return form
       end
     end
   end
