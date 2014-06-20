@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :surveys
+
   resources :songs
 
   resources :projects
