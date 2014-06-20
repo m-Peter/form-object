@@ -55,7 +55,24 @@ class Form
       end
     end
 
-    def association(name, &block)
+    alias_method :attribute, :attributes
+
+    def association(name, options={}, &block)
+      if is_plural?(name.to_s)
+        collection(name, options, &block)
+      else  
+        form(name, &block)
+      end
+    end
+
+    def collection(name, options={}, &block)
+      Form.instance_variable_set(:@forms, forms)
+      Form.forms << FormDefinition.new({assoc_name: name, records: options[:records], proc: block})
+      self.class_eval("def #{name}; @#{name}.models; end")
+      define_method("#{name}_attributes=") {}
+    end
+
+    def form(name, &block)
       Form.instance_variable_set(:@forms, forms)
       Form.forms << FormDefinition.new({assoc_name: name, proc: block})
       attr_reader name
@@ -66,7 +83,9 @@ class Form
       @forms ||= []
     end
 
-    alias_method :attribute, :attributes
+    def is_plural?(str)
+      str.pluralize == str
+    end
   end
 
   private
