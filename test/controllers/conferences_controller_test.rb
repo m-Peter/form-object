@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ConferencesControllerTest < ActionController::TestCase
   setup do
-    @conference = conferences(:one)
+    @conference = conferences(:ruby)
   end
 
   test "should get index" do

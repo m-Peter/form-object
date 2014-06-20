@@ -83,4 +83,44 @@ class ConferenceFormTest < ActiveSupport::TestCase
 
     assert_equal 2, @form.speaker.model.presentations.size
   end
+
+  test "collection sub-form fetches parent and association objects" do
+    conference = conferences(:ruby)
+
+    form = ConferenceForm.new(conference)
+
+    assert_equal conference.name, form.name
+    assert_equal 2, form.speaker.presentations.size
+    assert_equal conference.speaker.presentations[0], form.speaker.presentations[0].model
+    assert_equal conference.speaker.presentations[1], form.speaker.presentations[1].model
+  end
+
+  test "collection sub-form syncs models with submitted params" do
+    params = {
+      name: "Euruco",
+      city: "Athens",
+
+      speaker_attributes: {
+        name: "Peter Markou",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Ruby OOP", duration: "1h" },
+          "1" => { topic: "Ruby Closures", duration: "1h" },
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_equal "Euruco", @form.name
+    assert_equal "Athens", @form.city
+    assert_equal "Peter Markou", @form.speaker.name
+    assert_equal "Developer", @form.speaker.occupation
+    assert_equal "Ruby OOP", @form.speaker.presentations[0].topic
+    assert_equal "1h", @form.speaker.presentations[0].duration
+    assert_equal "Ruby Closures", @form.speaker.presentations[1].topic
+    assert_equal "1h", @form.speaker.presentations[1].duration
+    assert_equal 2, @form.speaker.presentations.size
+  end
 end
