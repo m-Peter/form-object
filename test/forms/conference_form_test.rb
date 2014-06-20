@@ -32,4 +32,55 @@ class ConferenceFormTest < ActiveSupport::TestCase
 
     assert_equal :presentations, producer_definition.assoc_name
   end
+
+  test "contains getter for presentations sub-form" do
+    assert_respond_to @form.speaker, :presentations
+
+    presentations_form = @form.speaker.forms.first
+    assert_instance_of FormCollection, presentations_form
+  end
+
+  test "#represents? returns true if the argument matches the Form's association name, false otherwise" do
+    presentations_form = @form.speaker.forms.first
+
+    assert presentations_form.represents?("presentations")
+    assert_not presentations_form.represents?("presentation")
+  end
+
+  test "main provides getter method for collection objects" do
+    assert_respond_to @form.speaker, :presentations
+
+    presentations = @form.speaker.presentations
+
+    presentations.each do |form|
+      assert_instance_of Form, form
+      assert_instance_of Presentation, form.model
+    end
+  end
+
+  test "collection sub-form contains association name and parent model" do
+    presentations_form = @form.speaker.forms.first
+
+    assert_equal :presentations, presentations_form.association_name
+    assert_equal 2, presentations_form.records
+    assert_equal @form.speaker.model, presentations_form.parent
+  end
+
+  test "collection sub-form initializes the number of records specified" do
+    presentations_form = @form.speaker.forms.first
+
+    assert_respond_to presentations_form, :models
+    assert_equal 2, presentations_form.models.size
+    
+    presentations_form.each do |form|
+      assert_instance_of Form, form
+      assert_instance_of Presentation, form.model
+      assert_respond_to form, :topic
+      assert_respond_to form, :topic=
+      assert_respond_to form, :duration
+      assert_respond_to form, :duration=
+    end
+
+    assert_equal 2, @form.speaker.model.presentations.size
+  end
 end
