@@ -14,11 +14,14 @@ class ConferencesController < ApplicationController
 
   # GET /conferences/new
   def new
-    @conference = Conference.new
+    conference = Conference.new
+    @conference_form = ConferenceForm.new(conference)
   end
 
   # GET /conferences/1/edit
   def edit
+    conference = Conference.find(params[:id])
+    @conference_form = ConferenceForm.new(conference)
   end
 
   # POST /conferences

@@ -1,10 +1,10 @@
-<%= form_for(@conference) do |f| %>
-  <% if @conference.errors.any? %>
+<%= form_for @conference_form do |f| %>
+  <% if @conference_form.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@conference.errors.count, "error") %> prohibited this conference from being saved:</h2>
+      <h2><%= pluralize(@conference_form.errors.count, "error") %> prohibited this conference from being saved:</h2>
 
       <ul>
-      <% @conference.errors.full_messages.each do |message| %>
+      <% @conference_form.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>
@@ -19,6 +19,29 @@
     <%= f.label :city %><br>
     <%= f.text_field :city %>
   </div>
+
+  <%= f.fields_for :speaker, @conference_form.speaker do |speaker| %>
+    <div class="field">
+      <%= speaker.label :name %><br>
+      <%= speaker.text_field :name %>
+    </div>
+    <div class="field">
+      <%= speaker.label :occupation %><br>
+      <%= speaker.text_field :occupation %>
+    </div>
+
+    <%= speaker.fields_for :presentations, @conference_form.speaker.presentations do |presentations| %>
+      <div class="field">
+        <%= presentations.label :topic %><br>
+        <%= presentations.text_field :topic %>
+      </div>
+      <div class="field">
+        <%= presentations.label :duration %><br>
+        <%= presentations.text_field :duration %>
+      </div>
+    <% end %>
+  <% end %>
+
   <div class="actions">
     <%= f.submit %>
   </div>
