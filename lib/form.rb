@@ -57,7 +57,6 @@ class Form
 
     def association(name, &block)
       Form.instance_variable_set(:@forms, forms)
-      #forms << FormDefinition.new({assoc_name: name, proc: block})
       Form.forms << FormDefinition.new({assoc_name: name, proc: block})
       attr_reader name
       define_method("#{name}_attributes=") {}

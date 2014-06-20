@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SurveysControllerTest < ActionController::TestCase
   setup do
-    @survey = surveys(:one)
+    @survey = surveys(:programming)
   end
 
   test "should get index" do
