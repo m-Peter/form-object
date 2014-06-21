@@ -3,8 +3,12 @@ require 'test_helper'
 class SurveyForm < AbstractForm
   attribute :name
 
-  association :questions, records: 2 do
+  association :questions, records: 1 do
     attribute :content
+
+    association :answers, records: 2 do
+      attribute :content
+    end
   end
 end
 
@@ -50,15 +54,34 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     questions_form = @form.forms.first
 
     assert_equal :questions, questions_form.association_name
-    assert_equal 2, questions_form.records
+    assert_equal 1, questions_form.records
     assert_equal @survey, questions_form.parent
+  end
+
+  test "each questions_form declares a answers FormCollection" do
+    questions_form = @form.forms.first
+
+    assert_equal 1, questions_form.forms.size
+    
+    @form.questions.each do |question_form|
+      assert_instance_of Form, question_form
+      assert_instance_of Question, question_form.model
+      assert_equal 1, questions_form.forms.size
+
+      answers = question_form.answers
+
+      answers.each do |answer_form|
+        assert_instance_of Form, answer_form
+        assert_instance_of Answer, answer_form.model
+      end
+    end
   end
 
   test "collection sub-form initializes the number of records specified" do
     questions_form = @form.forms.first
 
     assert_respond_to questions_form, :models
-    assert_equal 2, questions_form.models.size
+    assert_equal 1, questions_form.models.size
     
     questions_form.each do |form|
       assert_instance_of Form, form
@@ -67,7 +90,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
       assert_respond_to form, :content=
     end
 
-    assert_equal 2, @form.model.questions.size
+    assert_equal 1, @form.model.questions.size
   end
 
   test "collection sub-form fetches parent and association objects" do
@@ -86,7 +109,6 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
       name: "Programming languages",
       questions_attributes: {
         "0" => { content: "Which language allows closures?" },
-        "1" => { content: "Which language allows objects?" },
       }
     }
 
@@ -94,8 +116,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
 
     assert_equal "Programming languages", @form.name
     assert_equal "Which language allows closures?", @form.questions[0].content
-    assert_equal "Which language allows objects?", @form.questions[1].content
-    assert_equal 2, @form.questions.size
+    assert_equal 1, @form.questions.size
   end
 
   test "main form responds to writer method" do
