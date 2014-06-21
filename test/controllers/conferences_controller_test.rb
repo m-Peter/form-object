@@ -18,7 +18,7 @@ class ConferencesControllerTest < ActionController::TestCase
 
   test "should create conference" do
     assert_difference('Conference.count') do
-      post :create, conference: { city: @conference.city, name: @conference.name }
+      post :create, conference: { city: @conference.city, name: "Euruco" }
     end
 
     assert_redirected_to conference_path(assigns(:conference))
