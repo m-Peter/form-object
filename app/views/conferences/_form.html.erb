@@ -11,8 +11,9 @@
     </div>
   <% end %>
 
+  <h2>Conference Details</h2>
   <div class="field">
-    <%= f.label :name %><br>
+    <%= f.label :name, "Conference Name" %><br>
     <%= f.text_field :name %>
   </div>
   <div class="field">
@@ -20,27 +21,7 @@
     <%= f.text_field :city %>
   </div>
 
-  <%= f.fields_for :speaker, @conference_form.speaker do |speaker| %>
-    <div class="field">
-      <%= speaker.label :name %><br>
-      <%= speaker.text_field :name %>
-    </div>
-    <div class="field">
-      <%= speaker.label :occupation %><br>
-      <%= speaker.text_field :occupation %>
-    </div>
-
-    <%= speaker.fields_for :presentations, @conference_form.speaker.presentations do |presentations| %>
-      <div class="field">
-        <%= presentations.label :topic %><br>
-        <%= presentations.text_field :topic %>
-      </div>
-      <div class="field">
-        <%= presentations.label :duration %><br>
-        <%= presentations.text_field :duration %>
-      </div>
-    <% end %>
-  <% end %>
+  <%= render :partial => 'speaker', :locals => { :f => f } %>
 
   <div class="actions">
     <%= f.submit %>
