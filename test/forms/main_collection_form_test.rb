@@ -63,11 +63,13 @@ class MainCollectionFormTest < ActiveSupport::TestCase
 
     assert_equal 1, task_form.forms.size
 
-    deliverable_form = task_form.deliverable
+    @form.tasks.each do |task_form|
+      deliverable_form = task_form.deliverable
 
-    assert_instance_of Form, deliverable_form
-    assert_equal :deliverable, deliverable_form.association_name
-    assert_equal task_form.model, deliverable_form.parent
-    assert_instance_of Deliverable, deliverable_form.model
+      assert_instance_of Form, deliverable_form
+      assert_equal :deliverable, deliverable_form.association_name
+      assert_equal task_form.model, deliverable_form.parent
+      assert_instance_of Deliverable, deliverable_form.model
+    end
   end
 end
