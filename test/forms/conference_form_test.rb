@@ -261,4 +261,41 @@ class ConferenceFormTest < ActiveSupport::TestCase
       assert presentation.persisted?
     end
   end
+
+  test "collection sub-form updates all the models" do
+    conference = conferences(:ruby)
+    form = ConferenceForm.new(conference)
+    params = {
+      name: "GoGaruco",
+      city: "Golden State",
+
+      speaker_attributes: {
+        name: "John Doe",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Rails OOP", duration: "1h", id: presentations(:ruby_oop).id },
+          "1" => { topic: "Rails Patterns", duration: "1h", id: presentations(:ruby_closures).id },
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference(['Conference.count', 'Speaker.count', 'Presentation.count'], 0) do
+      form.save
+    end
+
+    assert_equal "GoGaruco", form.name
+    assert_equal "Golden State", form.city
+    assert_equal "John Doe", form.speaker.name
+    assert_equal "Developer", form.speaker.occupation
+    assert_equal "Rails Patterns", form.speaker.presentations[0].topic
+    assert_equal "1h", form.speaker.presentations[0].duration
+    assert_equal "Rails OOP", form.speaker.presentations[1].topic
+    assert_equal "1h", form.speaker.presentations[1].duration
+    assert_equal 2, form.speaker.presentations.size
+    
+    assert form.persisted?
+  end
 end
