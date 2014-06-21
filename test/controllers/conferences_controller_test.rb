@@ -48,6 +48,34 @@ class ConferencesControllerTest < ActionController::TestCase
     assert_equal "Conference: #{conference_form.name} was successfully created.", flash[:notice]
   end
 
+  test "should not create conference with invalid params" do
+    conference = conferences(:ruby)
+
+    assert_difference(['Conference.count', 'Speaker.count'], 0) do
+      post :create, conference: {
+        name: conference.name,
+        city: nil,
+
+        speaker_attributes: {
+          name: conference.speaker.name,
+          occupation: "Developer",
+
+          presentations_attributes: {
+            "0" => { topic: nil, duration: "1h" },
+            "1" => { topic: "Ruby Closures", duration: "1h" },
+          }
+        }
+      }
+    end
+
+    conference_form = assigns(:conference_form)
+
+    assert_includes conference_form.errors.messages[:name], "has already been taken"
+    assert_equal 2, conference_form.errors.messages[:name].size
+    assert_includes conference_form.errors.messages[:city], "can't be blank"
+    assert_includes conference_form.errors.messages[:topic], "can't be blank"
+  end
+
   test "should show conference" do
     get :show, id: @conference
     assert_response :success
