@@ -8,8 +8,14 @@ class ConferenceForm < AbstractForm
 
     association :presentations, records: 2 do
       attribute :topic, :duration
+
+      validates :topic, :duration, presence: true
     end
+
+    validates :name, :occupation, presence: true
   end
+
+  validates :name, :city, presence: true
 end
 
 class ConferenceFormTest < ActiveSupport::TestCase
@@ -122,6 +128,54 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal "Ruby Closures", @form.speaker.presentations[1].topic
     assert_equal "1h", @form.speaker.presentations[1].duration
     assert_equal 2, @form.speaker.presentations.size
+  end
+
+  test "collection sub-form validates itself" do
+    params = {
+      name: "Euruco",
+      city: "Athens",
+
+      speaker_attributes: {
+        name: "Peter Markou",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Ruby OOP", duration: "1h" },
+          "1" => { topic: "Ruby Closures", duration: "1h" },
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert @form.valid?
+
+    params = {
+      name: nil,
+      city: nil,
+
+      speaker_attributes: {
+        name: nil,
+        occupation: nil,
+
+        presentations_attributes: {
+          "0" => { topic: nil, duration: nil },
+          "1" => { topic: nil, duration: nil },
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+    assert_includes @form.errors.messages[:name], "can't be blank"
+    assert_includes @form.errors.messages[:city], "can't be blank"
+    assert_equal 2, @form.errors.messages[:name].size
+    assert_includes @form.errors.messages[:occupation], "can't be blank"
+    assert_includes @form.errors.messages[:topic], "can't be blank"
+    assert_equal 2, @form.errors.messages[:topic].size
+    assert_includes @form.errors.messages[:duration], "can't be blank"
+    assert_equal 2, @form.errors.messages[:duration].size
   end
 
   test "collection sub-form saves all the models" do
