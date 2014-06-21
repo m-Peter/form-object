@@ -136,4 +136,47 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal "Pray", @form.tasks[1].name
     assert_equal "You will have a clean soul.", @form.tasks[1].deliverable.description
   end
+
+  test "collection sub-form saves all the models" do
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => {
+          name: "Eat",
+
+          deliverable_attributes: {
+            description: "You will be stuffed."
+          }
+        },
+        "1" => {
+          name: "Pray",
+
+          deliverable_attributes: {
+            description: "You will have a clean soul."
+          }
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference('Project.count') do
+      @form.save
+    end
+
+    assert_equal "Life", @form.name
+    assert_equal "Eat", @form.tasks[0].name
+    assert_equal "You will be stuffed.", @form.tasks[0].deliverable.description
+    assert_equal "Pray", @form.tasks[1].name
+    assert_equal "You will have a clean soul.", @form.tasks[1].deliverable.description
+    assert_equal 2, @form.tasks.size
+
+    assert @form.persisted?
+
+    @form.tasks.each do |task|
+      assert task.persisted?
+      assert task.deliverable.persisted?
+    end
+  end
 end
