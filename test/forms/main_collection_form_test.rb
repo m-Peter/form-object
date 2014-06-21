@@ -72,4 +72,25 @@ class MainCollectionFormTest < ActiveSupport::TestCase
       assert_instance_of Deliverable, deliverable_form.model
     end
   end
+
+  test "tasks sub-form initializes the number of records specified" do
+    tasks_form = @form.forms.first
+
+    assert_respond_to tasks_form, :models
+    assert_equal 2, tasks_form.models.size
+
+    tasks_form.each do |form|
+      assert_instance_of Form, form
+      assert_instance_of Task, form.model
+      assert_respond_to form, :name
+      assert_respond_to form, :name=
+
+      deliverable_form = form.deliverable
+      assert_instance_of Deliverable, deliverable_form.model
+      assert_respond_to deliverable_form, :description
+      assert_respond_to deliverable_form, :description=
+    end
+
+    assert_equal 2, @form.model.tasks.size
+  end
 end
