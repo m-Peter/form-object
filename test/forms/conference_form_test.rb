@@ -202,6 +202,27 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal 2, @form.errors.messages[:name].size
   end
 
+  test "collection sub-form raises error if records exceed the allowed number" do
+    params = {
+      name: "Euruco",
+      city: "Athens",
+
+      speaker_attributes: {
+        name: "Petros Markou",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Ruby OOP", duration: "1h" },
+          "1" => { topic: "Ruby Closures", duration: "1h" },
+          "2" => { topic: "Ruby Blocks", duration: "1h" },
+        }
+      }
+    }
+
+    exception = assert_raises(TooManyRecords) { @form.submit(params) }
+    assert_equal "Maximum 2 records are allowed. Got 3 records instead.", exception.message
+  end
+
   test "collection sub-form saves all the models" do
     params = {
       name: "Euruco",
