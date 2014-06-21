@@ -105,4 +105,35 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal project.tasks[1], form.tasks[1].model
     assert_equal project.tasks[1].deliverable, form.tasks[1].deliverable.model
   end
+
+  test "collection sub-form syncs models with submitted params" do
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => {
+          name: "Eat",
+
+          deliverable_attributes: {
+            description: "You will be stuffed."
+          }
+        },
+        "1" => {
+          name: "Pray",
+
+          deliverable_attributes: {
+            description: "You will have a clean soul."
+          }
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_equal "Life", @form.name
+    assert_equal "Eat", @form.tasks[0].name
+    assert_equal "You will be stuffed.", @form.tasks[0].deliverable.description
+    assert_equal "Pray", @form.tasks[1].name
+    assert_equal "You will have a clean soul.", @form.tasks[1].deliverable.description
+  end
 end
