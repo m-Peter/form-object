@@ -93,4 +93,16 @@ class MainCollectionFormTest < ActiveSupport::TestCase
 
     assert_equal 2, @form.model.tasks.size
   end
+
+  test "tasks sub-form fetches parent and association objects" do
+    project = projects(:yard)
+
+    form = ProjectFormFixture.new(project)
+
+    assert_equal project.name, form.name
+    assert_equal project.tasks[0], form.tasks[0].model
+    assert_equal project.tasks[0].deliverable, form.tasks[0].deliverable.model
+    assert_equal project.tasks[1], form.tasks[1].model
+    assert_equal project.tasks[1].deliverable, form.tasks[1].deliverable.model
+  end
 end

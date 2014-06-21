@@ -1,9 +1,9 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  description: MyText
-  task_id: 
+leaves:
+  description: Yard will have no leaves
+  task: rake 
 
-two:
-  description: MyText
-  task_id: 
+fence:
+  description: Yard's fence will be fresh painted
+  task: paint
