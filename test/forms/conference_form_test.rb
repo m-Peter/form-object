@@ -298,4 +298,12 @@ class ConferenceFormTest < ActiveSupport::TestCase
     
     assert form.persisted?
   end
+
+  test "main form responds to writer method" do
+    assert_respond_to @form, :speaker_attributes=
+  end
+
+  test "speaker sub-form responds to writer method" do
+    assert_respond_to @form.speaker, :presentations_attributes=
+  end
 end

@@ -220,4 +220,14 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal "Pray", form.tasks[1].name
     assert_equal "You will have a clean soul.", form.tasks[1].deliverable.description
   end
+
+  test "main form responds to writer method" do
+    assert_respond_to @form, :tasks_attributes=
+  end
+
+  test "tasks form responds to writer method" do
+    @form.tasks.each do |task_form|
+      assert_respond_to task_form, :deliverable_attributes=
+    end
+  end
 end
