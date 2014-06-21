@@ -179,4 +179,45 @@ class MainCollectionFormTest < ActiveSupport::TestCase
       assert task.deliverable.persisted?
     end
   end
+
+  test "collection sub-form updates all the models" do
+    project = projects(:yard)
+    form = ProjectFormFixture.new(project)
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => {
+          name: "Eat",
+          id: tasks(:rake).id,
+
+          deliverable_attributes: {
+            description: "You will be stuffed.",
+            id: deliverables(:leaves).id
+          }
+        },
+        "1" => {
+          name: "Pray",
+          id: tasks(:paint).id,
+
+          deliverable_attributes: {
+            description: "You will have a clean soul.",
+            id: deliverables(:fence).id
+          }
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Project.count', 0) do
+      form.save
+    end
+
+    assert_equal "Life", form.name
+    assert_equal "Eat", form.tasks[0].name
+    assert_equal "You will be stuffed.", form.tasks[0].deliverable.description
+    assert_equal "Pray", form.tasks[1].name
+    assert_equal "You will have a clean soul.", form.tasks[1].deliverable.description
+  end
 end
