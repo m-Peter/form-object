@@ -9,7 +9,11 @@ class ProjectFormFixture < AbstractForm
     association :deliverable do
       attribute :description
     end
+
+    validates :name, presence: true
   end
+
+  validates :name, presence: true
 end
 
 class MainCollectionFormTest < ActiveSupport::TestCase
@@ -135,6 +139,61 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal "You will be stuffed.", @form.tasks[0].deliverable.description
     assert_equal "Pray", @form.tasks[1].name
     assert_equal "You will have a clean soul.", @form.tasks[1].deliverable.description
+  end
+
+  test "collection sub-form validates itself" do
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => {
+          name: "Eat",
+
+          deliverable_attributes: {
+            description: "You will be stuffed."
+          }
+        },
+        "1" => {
+          name: "Pray",
+
+          deliverable_attributes: {
+            description: "You will have a clean soul."
+          }
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert @form.valid?
+
+    params = {
+      name: nil,
+      
+      tasks_attributes: {
+        "0" => {
+          name: nil,
+
+          deliverable_attributes: {
+            description: nil
+          }
+        },
+        "1" => {
+          name: nil,
+
+          deliverable_attributes: {
+            description: nil
+          }
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+    assert_not @form.valid?
+    assert_includes @form.errors.messages[:name], "can't be blank"
+    assert_equal 5, @form.errors.messages[:name].size
   end
 
   test "collection sub-form saves all the models" do
