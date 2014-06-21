@@ -42,7 +42,7 @@ class ConferencesController < ApplicationController
     @conference_form.submit(conference_params)
 
     respond_to do |format|
-      if @conference.update(conference_params)
+      if @conference_form.save
         format.html { redirect_to @conference_form, notice: "Conference: #{@conference_form.name} was successfully updated." }
       else
         format.html { render :edit }

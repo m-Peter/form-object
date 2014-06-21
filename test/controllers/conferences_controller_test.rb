@@ -87,8 +87,34 @@ class ConferencesControllerTest < ActionController::TestCase
   end
 
   test "should update conference" do
-    patch :update, id: @conference, conference: { city: @conference.city, name: @conference.name }
-    assert_redirected_to conference_path(assigns(:conference))
+    patch :update, id: @conference, conference: {
+      name: "GoGaruco",
+      city: "Golden State",
+
+      speaker_attributes: {
+        name: "John Doe",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Rails OOP", duration: "1h", id: presentations(:ruby_oop).id },
+          "1" => { topic: "Rails Patterns", duration: "1h", id: presentations(:ruby_closures).id },
+        }
+      }
+    }
+
+    conference_form = assigns(:conference_form)
+
+    assert_redirected_to conference_path(conference_form)
+    assert_equal "GoGaruco", conference_form.name
+    assert_equal "Golden State", conference_form.city
+    assert_equal "John Doe", conference_form.speaker.name
+    assert_equal "Developer", conference_form.speaker.occupation
+    assert_equal "Rails Patterns", conference_form.speaker.presentations[0].topic
+    assert_equal "1h", conference_form.speaker.presentations[0].duration
+    assert_equal "Rails OOP", conference_form.speaker.presentations[1].topic
+    assert_equal "1h", conference_form.speaker.presentations[1].duration
+    assert_equal 2, conference_form.speaker.presentations.size
+    assert_equal "Conference: #{conference_form.name} was successfully updated.", flash[:notice]
   end
 
   test "should destroy conference" do
