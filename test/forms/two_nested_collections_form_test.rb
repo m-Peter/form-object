@@ -117,11 +117,18 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal survey.questions[0].answers[1], form.questions[0].answers[1].model
   end
 
-  test "collection sub-form syncs models with submitted params" do
+  test "questions sub-form syncs models with submitted params" do
     params = {
       name: "Programming languages",
       questions_attributes: {
-        "0" => { content: "Which language allows closures?" },
+        "0" => {
+          content: "Which language allows closures?",
+
+          answers_attributes: {
+            "0" => { content: "Ruby Programming Language" },
+            "1" => { content: "CSharp Programming Language" },
+          }
+        },
       }
     }
 
@@ -129,6 +136,8 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
 
     assert_equal "Programming languages", @form.name
     assert_equal "Which language allows closures?", @form.questions[0].content
+    assert_equal "Ruby Programming Language", @form.questions[0].answers[0].content
+    assert_equal "CSharp Programming Language", @form.questions[0].answers[1].content
     assert_equal 1, @form.questions.size
   end
 
