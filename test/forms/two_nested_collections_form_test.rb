@@ -215,4 +215,10 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
   test "main form responds to writer method" do
     assert_respond_to @form, :questions_attributes=
   end
+
+  test "questions form responds to writer method" do
+    @form.questions.each do |question_form|
+      assert_respond_to question_form, :answers_attributes=
+    end
+  end
 end
