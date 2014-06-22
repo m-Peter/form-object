@@ -190,6 +190,28 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_includes @form.errors.messages[:content], "can't be blank"
   end
 
+  test "questions sub-form validates the model" do
+    params = {
+      name: surveys(:programming).name,
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language allows closures?",
+
+          answers_attributes: {
+            "0" => { content: "Ruby Programming Language" },
+            "1" => { content: "CSharp Programming Language" },
+          }
+        },
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+    assert_includes @form.errors.messages[:name], "has already been taken"
+  end
+
   test "questions sub-form saves all the models" do
     params = {
       name: "Programming languages",
