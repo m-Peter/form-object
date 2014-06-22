@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SurveyForm < AbstractForm
+class SurveyFormFixture < AbstractForm
   attribute :name
 
   association :questions, records: 1 do
@@ -15,15 +15,15 @@ end
 class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
   def setup
     @survey = Survey.new
-    @form = SurveyForm.new(@survey)
+    @form = SurveyFormFixture.new(@survey)
   end
 
   test "declares collection association" do
-    assert_respond_to SurveyForm, :association
+    assert_respond_to SurveyFormFixture, :association
   end
 
   test "contains a forms list for has_many associations" do
-    assert_equal 1, SurveyForm.forms.size
+    assert_equal 1, SurveyFormFixture.forms.size
   end
 
   test "main provides getter method for collection form" do
@@ -108,7 +108,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
   test "questions sub-form fetches parent and association objects" do
     survey = surveys(:programming)
 
-    form = SurveyForm.new(survey)
+    form = SurveyFormFixture.new(survey)
 
     assert_equal survey.name, form.name
     assert_equal 1, form.questions.size
@@ -182,7 +182,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
 
   test "questions sub-form updates all the models" do
     survey = surveys(:programming)
-    form = SurveyForm.new(survey)
+    form = SurveyFormFixture.new(survey)
     params = {
       name: "Native languages",
 
