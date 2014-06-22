@@ -141,6 +141,43 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal 1, @form.questions.size
   end
 
+  test "questions sub-form saves all the models" do
+    params = {
+      name: "Programming languages",
+      questions_attributes: {
+        "0" => {
+          content: "Which language allows closures?",
+
+          answers_attributes: {
+            "0" => { content: "Ruby Programming Language" },
+            "1" => { content: "CSharp Programming Language" },
+          }
+        },
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference('Survey.count') do
+      @form.save
+    end
+
+    assert_equal "Programming languages", @form.name
+    assert_equal "Which language allows closures?", @form.questions[0].content
+    assert_equal "Ruby Programming Language", @form.questions[0].answers[0].content
+    assert_equal "CSharp Programming Language", @form.questions[0].answers[1].content
+    assert_equal 1, @form.questions.size
+
+    assert @form.persisted?
+    @form.questions.each do |question|
+      assert question.persisted?
+
+      question.answers.each do |answer|
+        assert answer.persisted?
+      end
+    end
+  end
+
   test "main form responds to writer method" do
     assert_respond_to @form, :questions_attributes=
   end
