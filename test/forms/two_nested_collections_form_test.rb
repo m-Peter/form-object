@@ -105,15 +105,16 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal 1, @form.model.questions.size
   end
 
-  test "collection sub-form fetches parent and association objects" do
+  test "questions sub-form fetches parent and association objects" do
     survey = surveys(:programming)
 
     form = SurveyForm.new(survey)
 
     assert_equal survey.name, form.name
-    assert_equal 2, form.questions.size
+    assert_equal 1, form.questions.size
     assert_equal survey.questions[0], form.questions[0].model
-    assert_equal survey.questions[1], form.questions[1].model
+    assert_equal survey.questions[0].answers[0], form.questions[0].answers[0].model
+    assert_equal survey.questions[0].answers[1], form.questions[0].answers[1].model
   end
 
   test "collection sub-form syncs models with submitted params" do
