@@ -77,7 +77,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form initializes the number of records specified" do
+  test "questions sub-form initializes the number of records specified" do
     questions_form = @form.forms.first
 
     assert_respond_to questions_form, :models
@@ -88,6 +88,18 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
       assert_instance_of Question, form.model
       assert_respond_to form, :content
       assert_respond_to form, :content=
+
+      answers_form = form.forms.first
+
+      assert_respond_to answers_form, :models
+      assert_equal 2, answers_form.models.size
+
+      answers_form.each do |answer_form|
+        assert_instance_of Form, answer_form
+        assert_instance_of Answer, answer_form.model
+        assert_respond_to answer_form, :content
+        assert_respond_to answer_form, :content=
+      end
     end
 
     assert_equal 1, @form.model.questions.size
