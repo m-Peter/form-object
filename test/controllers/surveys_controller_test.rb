@@ -18,10 +18,30 @@ class SurveysControllerTest < ActionController::TestCase
 
   test "should create survey" do
     assert_difference('Survey.count') do
-      post :create, survey: { name: @survey.name }
+      post :create, survey: {
+        name: "Programming languages",
+
+        questions_attributes: {
+          "0" => {
+            content: "Which language allows closures?",
+
+            answers_attributes: {
+              "0" => { content: "Ruby Programming Language" },
+              "1" => { content: "CSharp Programming Language" },
+            }
+          }
+        }
+      }
     end
 
+    survey_form = assigns(:survey_form)
+
     assert_redirected_to survey_path(assigns(:survey_form))
+    assert_equal "Programming languages", survey_form.name
+    assert_equal "Which language allows closures?", survey_form.questions[0].content
+    assert_equal "Ruby Programming Language", survey_form.questions[0].answers[0].content
+    assert_equal "CSharp Programming Language", survey_form.questions[0].answers[1].content
+    assert_equal "Survey: #{survey_form.name} was successfully created.", flash[:notice]
   end
 
   test "should show survey" do
