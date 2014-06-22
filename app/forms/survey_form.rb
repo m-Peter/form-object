@@ -6,6 +6,12 @@ class SurveyForm < AbstractForm
 
     association :answers, records: 2 do
       attribute :content
+
+      validates :content, presence: true
     end
+
+    validates :content, presence: true
   end
+
+  validates :name, presence: true
 end

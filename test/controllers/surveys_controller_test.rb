@@ -44,6 +44,29 @@ class SurveysControllerTest < ActionController::TestCase
     assert_equal "Survey: #{survey_form.name} was successfully created.", flash[:notice]
   end
 
+  test "should not create survey with invalid params" do
+    assert_difference('Survey.count', 0) do
+      post :create, survey: {
+        name: surveys(:programming).name,
+
+        questions_attributes: {
+          "0" => {
+            content: nil,
+
+            answers_attributes: {
+              "0" => { content: "Ruby Programming Language" },
+              "1" => { content: nil },
+            }
+          }
+        }
+      }
+    end
+
+    survey_form = assigns(:survey_form)
+
+    assert_not survey_form.valid?
+  end
+
   test "should show survey" do
     get :show, id: @survey
     assert_response :success
