@@ -16,7 +16,10 @@
     <%= f.text_field :name %>
   </div>
 
-  <%= render :partial => 'tasks', :locals => { :f => f } %>
+  <h2>Tasks Details</h2>
+  <%= f.fields_for :tasks, @project_form.tasks do |task_fields| %>
+    <%= render "tasks", :task => task_fields %>
+  <% end %>
 
   <div class="actions">
     <%= f.submit %>
