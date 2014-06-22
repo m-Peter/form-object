@@ -120,6 +120,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
   test "questions sub-form syncs models with submitted params" do
     params = {
       name: "Programming languages",
+
       questions_attributes: {
         "0" => {
           content: "Which language allows closures?",
@@ -144,6 +145,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
   test "questions sub-form saves all the models" do
     params = {
       name: "Programming languages",
+
       questions_attributes: {
         "0" => {
           content: "Which language allows closures?",
@@ -176,6 +178,38 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
         assert answer.persisted?
       end
     end
+  end
+
+  test "questions sub-form updates all the models" do
+    survey = surveys(:programming)
+    form = SurveyForm.new(survey)
+    params = {
+      name: "Native languages",
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language is spoken in England?",
+          id: questions(:one).id,
+
+          answers_attributes: {
+            "0" => { content: "The English Language", id: answers(:ruby).id },
+            "1" => { content: "The Latin Language", id: answers(:cs).id },
+          }
+        },
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Survey.count', 0) do
+      form.save
+    end
+
+    assert_equal "Native languages", form.name
+    assert_equal "Which language is spoken in England?", form.questions[0].content
+    assert_equal "The Latin Language", form.questions[0].answers[0].content
+    assert_equal "The English Language", form.questions[0].answers[1].content
+    assert_equal 1, form.questions.size
   end
 
   test "main form responds to writer method" do
