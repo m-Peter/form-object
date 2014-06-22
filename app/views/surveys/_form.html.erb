@@ -13,10 +13,13 @@
 
   <div class="field">
     <%= f.label :name %><br>
-    <%= f.text_field :name %>
+    <%= f.text_field :name, :size => 40 %>
   </div>
 
-  <%= render :partial => 'questions', :locals => { :f => f } %>
+  <h2>Questions</h2>
+  <%= f.fields_for :questions, @survey_form.questions do |question_fields| %>
+    <%= render "questions", :question => question_fields %>
+  <% end %>
 
   <div class="actions">
     <%= f.submit %>
