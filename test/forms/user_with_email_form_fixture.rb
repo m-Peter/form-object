@@ -1,4 +1,4 @@
-class NestedModelForm < AbstractForm
+class UserWithEmailFormFixture < AbstractForm
   attributes :name, :age, :gender
 
   association :email do

@@ -1,12 +1,12 @@
 require 'test_helper'
-require_relative 'single_model_form'
+require_relative 'user_form_fixture'
 
 class SingleModelFormTest < ActiveSupport::TestCase
   include ActiveModel::Lint::Tests
 
   def setup
     @user = User.new
-    @form = SingleModelForm.new(@user)
+    @form = UserFormFixture.new(@user)
     @model = @form
   end
 

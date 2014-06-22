@@ -1,10 +1,13 @@
 require 'test_helper'
-require_relative 'two_nesting_level_form'
+require_relative 'songs_form_fixture'
 
 class TwoNestingLevelFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @song = Song.new
-    @form = TwoNestingLevelForm.new(@song)
+    @form = SongsFormFixture.new(@song)
+    @model = @form
   end
 
   test "Form declares association" do
@@ -44,7 +47,7 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
 
   test "producer sub-form fetches models for existing parent" do
     song = songs(:lockdown)
-    form = TwoNestingLevelForm.new(song)
+    form = SongsFormFixture.new(song)
     artist_form = form.artist
     producer_form = artist_form.producer
 
@@ -187,7 +190,7 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
         }
       }
     }
-    form = TwoNestingLevelForm.new(song)
+    form = SongsFormFixture.new(song)
 
     form.submit(params)
 

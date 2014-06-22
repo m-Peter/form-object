@@ -1,27 +1,13 @@
 require 'test_helper'
-
-class ConferenceForm < AbstractForm
-  attributes :name, :city
-
-  association :speaker do
-    attribute :name, :occupation
-
-    association :presentations, records: 2 do
-      attribute :topic, :duration
-
-      validates :topic, :duration, presence: true
-    end
-
-    validates :name, :occupation, presence: true
-  end
-
-  validates :name, :city, presence: true
-end
+require_relative 'conference_form_fixture'
 
 class ConferenceFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @conference = Conference.new
-    @form = ConferenceForm.new(@conference)
+    @form = ConferenceFormFixture.new(@conference)
+    @model = @form
   end
 
   test "Form declares association" do
@@ -93,7 +79,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
   test "collection sub-form fetches parent and association objects" do
     conference = conferences(:ruby)
 
-    form = ConferenceForm.new(conference)
+    form = ConferenceFormFixture.new(conference)
 
     assert_equal conference.name, form.name
     assert_equal 2, form.speaker.presentations.size
@@ -264,7 +250,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
 
   test "collection sub-form updates all the models" do
     conference = conferences(:ruby)
-    form = ConferenceForm.new(conference)
+    form = ConferenceFormFixture.new(conference)
     params = {
       name: "GoGaruco",
       city: "Golden State",

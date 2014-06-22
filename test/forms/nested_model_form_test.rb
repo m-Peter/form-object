@@ -1,25 +1,25 @@
 require 'test_helper'
-require_relative 'nested_model_form'
+require_relative 'user_with_email_form_fixture'
 
 class NestedModelFormTest < ActiveSupport::TestCase
   include ActiveModel::Lint::Tests
 
   def setup
     @user = User.new
-    @form = NestedModelForm.new(@user)
+    @form = UserWithEmailFormFixture.new(@user)
     @model = @form
   end
 
   test "declares association" do
-    assert_respond_to NestedModelForm, :association
+    assert_respond_to UserWithEmailFormFixture, :association
   end
 
   test "contains a list of sub-forms" do
-    assert_respond_to NestedModelForm, :forms
+    assert_respond_to UserWithEmailFormFixture, :forms
   end
 
   test "forms list contains form definitions" do
-    email_definition = NestedModelForm.forms.first
+    email_definition = UserWithEmailFormFixture.forms.first
 
     assert_equal :email, email_definition.assoc_name
   end
@@ -46,7 +46,7 @@ class NestedModelFormTest < ActiveSupport::TestCase
 
   test "email sub-form fetches model for existing parent" do
     user = users(:peter)
-    user_form = NestedModelForm.new(user)
+    user_form = UserWithEmailFormFixture.new(user)
     email_form = user_form.email
 
     assert_instance_of Email, email_form.model

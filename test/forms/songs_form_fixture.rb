@@ -1,4 +1,4 @@
-class TwoNestingLevelForm < AbstractForm
+class SongsFormFixture < AbstractForm
   attributes :title, :length
 
   association :artist do

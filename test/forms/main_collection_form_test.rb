@@ -1,33 +1,21 @@
 require 'test_helper'
-
-class ProjectFormFixture < AbstractForm
-  attribute :name
-
-  association :tasks, records: 2 do
-    attribute :name
-
-    association :deliverable do
-      attribute :description
-    end
-
-    validates :name, presence: true
-  end
-
-  validates :name, presence: true
-end
+require_relative 'project_with_tasks_containing_deliverable_form_fixture'
 
 class MainCollectionFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @project = Project.new
-    @form = ProjectFormFixture.new(@project)
+    @form = ProjectWithTasksContainingDeliverableFormFixture.new(@project)
+    @model = @form
   end
 
   test "declares collection association" do
-    assert_respond_to ProjectFormFixture, :association
+    assert_respond_to ProjectWithTasksContainingDeliverableFormFixture, :association
   end
 
   test "contains a forms list for has_many associations" do
-    assert_equal 1, ProjectFormFixture.forms.size
+    assert_equal 1, ProjectWithTasksContainingDeliverableFormFixture.forms.size
   end
 
   test "main provides getter method for tasks collection form" do
@@ -101,7 +89,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
   test "tasks sub-form fetches parent and association objects" do
     project = projects(:yard)
 
-    form = ProjectFormFixture.new(project)
+    form = ProjectWithTasksContainingDeliverableFormFixture.new(project)
 
     assert_equal project.name, form.name
     assert_equal project.tasks[0], form.tasks[0].model
@@ -241,7 +229,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
 
   test "collection sub-form updates all the models" do
     project = projects(:yard)
-    form = ProjectFormFixture.new(project)
+    form = ProjectWithTasksContainingDeliverableFormFixture.new(project)
     params = {
       name: "Life",
       

@@ -1,27 +1,13 @@
 require 'test_helper'
-
-class SurveyFormFixture < AbstractForm
-  attribute :name
-
-  association :questions, records: 1 do
-    attribute :content
-
-    association :answers, records: 2 do
-      attribute :content
-
-      validates :content, presence: true
-    end
-
-    validates :content, presence: true
-  end
-
-  validates :name, presence: true
-end
+require_relative 'survey_form_fixture'
 
 class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
+  include ActiveModel::Lint::Tests
+
   def setup
     @survey = Survey.new
     @form = SurveyFormFixture.new(@survey)
+    @model = @form
   end
 
   test "declares collection association" do

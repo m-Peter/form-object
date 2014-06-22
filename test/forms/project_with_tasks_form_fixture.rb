@@ -1,4 +1,4 @@
-class NestedCollectionAssociationForm < AbstractForm
+class ProjectWithTasksFormFixture < AbstractForm
   attribute :name
 
   association :tasks, records: 3 do

@@ -1,21 +1,21 @@
 require 'test_helper'
-require_relative 'nested_collection_association_form'
+require_relative 'project_with_tasks_form_fixture'
 
 class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
   include ActiveModel::Lint::Tests
 
   def setup
     @project = Project.new
-    @form = NestedCollectionAssociationForm.new(@project)
+    @form = ProjectWithTasksFormFixture.new(@project)
     @model = @form
   end
 
   test "declares collection association" do
-    assert_respond_to NestedCollectionAssociationForm, :association
+    assert_respond_to ProjectWithTasksFormFixture, :association
   end
 
   test "contains a forms list for has_many associations" do
-    assert_equal 1, NestedCollectionAssociationForm.forms.size
+    assert_equal 1, ProjectWithTasksFormFixture.forms.size
   end
 
   test "main provides getter method for collection form" do
@@ -69,7 +69,7 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
   test "collection sub-form fetches parent and association objects" do
     project = projects(:yard)
 
-    form = NestedCollectionAssociationForm.new(project)
+    form = ProjectWithTasksFormFixture.new(project)
 
     assert_equal project.name, form.name
     assert_equal 3, form.tasks.size
@@ -172,7 +172,7 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
 
   test "collection sub-form updates all the models" do
     project = projects(:yard)
-    form = NestedCollectionAssociationForm.new(project)
+    form = ProjectWithTasksFormFixture.new(project)
     params = {
       name: "Life",
       tasks_attributes: {

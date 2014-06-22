@@ -1,7 +1,7 @@
 require 'test_helper'
-require_relative 'nested_models_form'
-require_relative 'nested_collection_association_form'
-require_relative 'two_nesting_level_form'
+require_relative 'user_with_email_and_profile_form_fixture'
+require_relative 'project_with_tasks_form_fixture'
+require_relative 'songs_form_fixture'
 
 class NestedModelRenderingTest < ActionView::TestCase
   def form_for(*)
@@ -10,7 +10,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly a new instance of Form Model" do
     user = User.new
-    user_form = NestedModelsForm.new(user)
+    user_form = UserWithEmailAndProfileFormFixture.new(user)
 
     form_for user_form do |f|
       concat f.label(:name)
@@ -63,7 +63,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly an existing instance of Form Model" do
     user = users(:peter)
-    user_form = NestedModelsForm.new(user)
+    user_form = UserWithEmailAndProfileFormFixture.new(user)
 
     form_for user_form do |f|
       concat f.label(:name)
@@ -120,7 +120,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly a new instance of Form Model containing a nested collection" do
     project = Project.new
-    project_form = NestedCollectionAssociationForm.new(project)
+    project_form = ProjectWithTasksFormFixture.new(project)
 
     form_for project_form do |f|
       concat f.label(:name)
@@ -152,7 +152,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly a existing instance of Form Model containing a nested collection" do
     project = projects(:yard)
-    project_form = NestedCollectionAssociationForm.new(project)
+    project_form = ProjectWithTasksFormFixture.new(project)
 
     form_for project_form do |f|
       concat f.label(:name)
@@ -187,7 +187,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly a new instance of Form Model with two nesting level" do
     song = Song.new
-    song_form = TwoNestingLevelForm.new(song)
+    song_form = SongsFormFixture.new(song)
     artist = song_form.artist
     producer = artist.producer
 
@@ -231,7 +231,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly a existing instance of Form Model with two nesting level" do
     song = songs(:lockdown)
-    song_form = TwoNestingLevelForm.new(song)
+    song_form = SongsFormFixture.new(song)
     artist = song_form.artist
     producer = artist.producer
 
