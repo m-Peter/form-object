@@ -8,8 +8,14 @@ class SurveyFormFixture < AbstractForm
 
     association :answers, records: 2 do
       attribute :content
+
+      validates :content, presence: true
     end
+
+    validates :content, presence: true
   end
+
+  validates :name, presence: true
 end
 
 class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
@@ -140,6 +146,48 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal "Ruby Programming Language", @form.questions[0].answers[0].content
     assert_equal "CSharp Programming Language", @form.questions[0].answers[1].content
     assert_equal 1, @form.questions.size
+  end
+
+  test "questions sub-form validates itself" do
+    params = {
+      name: "Programming languages",
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language allows closures?",
+
+          answers_attributes: {
+            "0" => { content: "Ruby Programming Language" },
+            "1" => { content: "CSharp Programming Language" },
+          }
+        },
+      }
+    }
+
+    @form.submit(params)
+
+    assert @form.valid?
+
+    params = {
+      name: nil,
+
+      questions_attributes: {
+        "0" => {
+          content: nil,
+
+          answers_attributes: {
+            "0" => { content: nil },
+            "1" => { content: nil },
+          }
+        },
+      }
+    }
+
+    @form.submit(params)
+
+    assert_not @form.valid?
+    assert_includes @form.errors.messages[:name], "can't be blank"
+    assert_includes @form.errors.messages[:content], "can't be blank"
   end
 
   test "questions sub-form saves all the models" do
