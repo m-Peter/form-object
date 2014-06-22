@@ -12,22 +12,31 @@
   <% end %>
 
   <h2>User details</h2>
+  
   <div class="field">
     <%= f.label :name %><br>
     <%= f.text_field :name %>
   </div>
+
   <div class="field">
     <%= f.label :age %><br>
     <%= f.number_field :age %>
   </div>
+  
   <div class="field">
     <%= f.label :gender %><br>
     <%= f.select :gender, User.get_genders_dropdown %>
   </div>
 
-  <%= render :partial => 'email', :locals => { :f => f } %>
+  <h2>Email details</h2>
+  <%= f.fields_for :email, @user_form.email do |email_fields| %>
+    <%= render "email", :email => email_fields %>
+  <% end %>
 
-  <%= render :partial => 'profile', :locals => { :f => f } %>
+  <h2>Profile details</h2>
+  <%= f.fields_for :profile, @user_form.profile do |profile_fields| %>
+    <% render "profile", :profile => profile_fields %>
+  <% end %>
   
   <div class="actions">
     <%= f.submit %>
