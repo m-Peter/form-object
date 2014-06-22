@@ -20,23 +20,12 @@
     <%= f.text_field :length %>
   </div>
 
-  <%= f.fields_for :artist, @song_form.artist do |artist| %>
-    <div class="field">
-      <%= artist.label :name, "Artist Name" %><br>
-      <%= artist.text_field :name %>
-    </div>
-    
-    <%= artist.fields_for :producer, @song_form.artist.producer do |producer| %>
-      <div class="field">
-        <%= producer.label :name, "Producer Name" %><br>
-        <%= producer.text_field :name %>
-      </div>
-      <div class="field">
-        <%= producer.label :studio %><br>
-        <%= producer.text_field :studio %>
-      </div>
-    <% end %>
+  <h2>Artist Details</h2>
+
+  <%= f.fields_for :artist, @song_form.artist do |artist_fields| %>
+    <%= render "artist", :artist => artist_fields %>
   <% end %>
+  
   <div class="actions">
     <%= f.submit %>
   </div>
