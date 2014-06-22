@@ -1,11 +1,8 @@
-<h2>Presentations Details</h2>
-<%= speaker.fields_for :presentations, @conference_form.speaker.presentations do |presentations| %>
-  <div class="field">
-    <%= presentations.label :topic %><br>
-    <%= presentations.text_field :topic %>
-  </div>
-  <div class="field">
-    <%= presentations.label :duration %><br>
-    <%= presentations.text_field :duration %>
-  </div>
-<% end %>
+<div class="field">
+  <%= presentation.label :topic %><br>
+  <%= presentation.text_field :topic %>
+</div>
+<div class="field">
+  <%= presentation.label :duration %><br>
+  <%= presentation.text_field :duration %>
+</div>
