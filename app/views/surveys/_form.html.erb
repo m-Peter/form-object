@@ -1,10 +1,10 @@
-<%= form_for(@survey) do |f| %>
-  <% if @survey.errors.any? %>
+<%= form_for @survey_form do |f| %>
+  <% if @survey_form.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@survey.errors.count, "error") %> prohibited this survey from being saved:</h2>
+      <h2><%= pluralize(@survey_form.errors.count, "error") %> prohibited this survey from being saved:</h2>
 
       <ul>
-      <% @survey.errors.full_messages.each do |message| %>
+      <% @survey_form.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>
@@ -15,6 +15,9 @@
     <%= f.label :name %><br>
     <%= f.text_field :name %>
   </div>
+
+  <%= render :partial => 'questions', :locals => { :f => f } %>
+
   <div class="actions">
     <%= f.submit %>
   </div>

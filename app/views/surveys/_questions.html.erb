@@ -1,0 +1,9 @@
+<h2>Questions</h2>
+<%= f.fields_for :questions, @survey_form.questions do |question| %>
+  <div class="field">
+    <%= question.label :content, "Question" %><br>
+    <%= question.text_field :content %>
+  </div>
+
+  <%= render :partial => 'answers', :locals => { :question => question } %>
+<% end %>

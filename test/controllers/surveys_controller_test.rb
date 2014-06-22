@@ -21,7 +21,7 @@ class SurveysControllerTest < ActionController::TestCase
       post :create, survey: { name: @survey.name }
     end
 
-    assert_redirected_to survey_path(assigns(:survey))
+    assert_redirected_to survey_path(assigns(:survey_form))
   end
 
   test "should show survey" do
