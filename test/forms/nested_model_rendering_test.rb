@@ -2,10 +2,83 @@ require 'test_helper'
 require_relative 'user_with_email_and_profile_form_fixture'
 require_relative 'project_with_tasks_form_fixture'
 require_relative 'songs_form_fixture'
+require_relative 'user_form_fixture'
 
 class NestedModelRenderingTest < ActionView::TestCase
   def form_for(*)
     @output_buffer = super
+  end
+
+  test "form_for renders correctly a new instance of UserFormFixture" do
+    user = User.new
+    user_form = UserFormFixture.new(user)
+
+    form_for user_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.label(:age)
+      concat f.number_field(:age)
+
+      concat f.label(:gender)
+      concat f.select(:gender, User.get_genders_dropdown)
+
+      concat f.submit
+    end
+
+    assert_match /action="\/users"/, output_buffer
+    assert_match /class="new_user"/, output_buffer
+    assert_match /id="new_user"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="user_name">Name<\/label>/, output_buffer
+    assert_match /<input id="user_name" name="user\[name\]" type="text" \/>/, output_buffer
+    assert_match /<label for="user_age">Age<\/label>/, output_buffer
+    assert_match /input id="user_age" name="user\[age\]" type="number" \/>/, output_buffer
+    assert_match /<label for="user_gender">Gender<\/label>/, output_buffer
+    assert_match /<select id="user_gender" name="user\[gender\]">/, output_buffer
+    assert_match /<option value="0">Male<\/option>/, output_buffer
+    assert_match /<option value="1">Female<\/option>/, output_buffer
+    assert_match /<\/select>/, output_buffer
+
+    assert_match /<input name="commit" type="submit" value="Create User" \/>/, output_buffer
+  end
+
+  test "form_for renders correctly a existing instance of UserFormFixture" do
+    user = users(:peter)
+    user_form = UserFormFixture.new(user)
+
+    form_for user_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.label(:age)
+      concat f.number_field(:age)
+
+      concat f.label(:gender)
+      concat f.select(:gender, User.get_genders_dropdown)
+
+      concat f.submit
+    end
+
+    id = user.id
+
+    assert_match /action="\/users\/#{id}"/, output_buffer
+    assert_match /class="edit_user"/, output_buffer
+    assert_match /id="edit_user_#{id}"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="user_name">Name<\/label>/, output_buffer
+    assert_match /<input id="user_name" name="user\[name\]" type="text" value="#{user_form.name}" \/>/, output_buffer
+    assert_match /<label for="user_age">Age<\/label>/, output_buffer
+    assert_match /<input id="user_age" name="user\[age\]" type="number" value="#{user_form.age}" \/>/, output_buffer
+    assert_match /<label for="user_gender">Gender<\/label>/, output_buffer
+    assert_match /<select id="user_gender" name="user\[gender\]">/, output_buffer
+    assert_match /<option selected="selected" value="0">Male<\/option>/, output_buffer
+    assert_match /<option value="1">Female<\/option>/, output_buffer
+    assert_match /<\/select>/, output_buffer
+
+    assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
   end
 
   test "form_for renders correctly a new instance of Form Model" do
