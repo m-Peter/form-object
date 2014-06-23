@@ -143,6 +143,38 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     assert @profile_form.persisted?
   end
 
+  test "main form updates its model and the models in nested sub-forms" do
+    user = users(:peter)
+    form = UserWithEmailAndProfileFormFixture.new(user)
+    params = {
+      name: "Petrakos",
+      age: 24,
+      gender: 0,
+
+      email_attributes: {
+        address: "cs3199@teilar.gr"
+      },
+
+      profile_attributes: {
+        twitter_name: "peter_t",
+        github_name: "peter_g"
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference(['User.count', 'Email.count'], 0) do
+      form.save
+    end
+
+    assert_equal "Petrakos", form.name
+    assert_equal 24, form.age
+    assert_equal 0, form.gender
+    assert_equal "cs3199@teilar.gr", form.email.address
+    assert_equal "peter_t", form.profile.twitter_name
+    assert_equal "peter_g", form.profile.github_name
+  end
+
   test "main form collects all the model related errors" do
     peter = users(:peter)
     params = {

@@ -134,7 +134,6 @@ class SingleModelFormTest < ActiveSupport::TestCase
       form.save
     end
 
-    assert form.persisted?
     assert_equal "Petrakos", form.name
   end
 

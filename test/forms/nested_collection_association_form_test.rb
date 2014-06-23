@@ -7,6 +7,7 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
   def setup
     @project = Project.new
     @form = ProjectWithTasksFormFixture.new(@project)
+    @tasks_form = @form.forms.first
     @model = @form
   end
 
@@ -14,24 +15,30 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_respond_to ProjectWithTasksFormFixture, :association
   end
 
-  test "contains a forms list for has_many associations" do
+  test "forms list contains tasks sub-form definition" do
     assert_equal 1, ProjectWithTasksFormFixture.forms.size
+
+    tasks_definition = ProjectWithTasksFormFixture.forms[0]
+
+    assert_equal :tasks, tasks_definition.assoc_name
   end
 
-  test "main provides getter method for collection form" do
-    tasks_form = @form.forms.first
+  test "main form provides getter method for tasks sub-form" do
+    assert_instance_of FormCollection, @tasks_form
+  end
 
-    assert_instance_of FormCollection, tasks_form
+  test "tasks sub-form contains association name and parent" do
+    assert_equal :tasks, @tasks_form.association_name
+    assert_equal 3, @tasks_form.records
+    assert_equal @project, @tasks_form.parent
   end
 
   test "#represents? returns true if the argument matches the Form's association name, false otherwise" do
-    tasks_form = @form.forms.first
-
-    assert tasks_form.represents?("tasks")
-    assert_not tasks_form.represents?("task")
+    assert @tasks_form.represents?("tasks")
+    assert_not @tasks_form.represents?("task")
   end
 
-  test "main provides getter method for collection objects" do
+  test "main form provides getter method for task objects" do
     assert_respond_to @form, :tasks
 
     tasks = @form.tasks
@@ -42,23 +49,15 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form contains association name and parent model" do
-    tasks_form = @form.forms.first
-
-    assert_equal :tasks, tasks_form.association_name
-    assert_equal 3, tasks_form.records
-    assert_equal @project, tasks_form.parent
-  end
-
-  test "collection sub-form initializes the number of records specified" do
-    tasks_form = @form.forms.first
-
-    assert_respond_to tasks_form, :models
-    assert_equal 3, tasks_form.models.size
+  test "main form initializes the number of records specified" do
+    assert_respond_to @tasks_form, :models
+    assert_equal 3, @tasks_form.models.size
     
-    tasks_form.each do |form|
+    @tasks_form.each do |form|
       assert_instance_of Form, form
       assert_instance_of Task, form.model
+      assert form.model.new_record?
+
       assert_respond_to form, :name
       assert_respond_to form, :name=
     end
@@ -66,7 +65,7 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.model.tasks.size
   end
 
-  test "collection sub-form fetches parent and association objects" do
+  test "main form fetches models for existing parent" do
     project = projects(:yard)
 
     form = ProjectWithTasksFormFixture.new(project)
@@ -78,9 +77,10 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal project.tasks[2], form.tasks[2].model
   end
 
-  test "collection sub-form syncs models with submitted params" do
+  test "main form syncs its model and the models in nested sub-forms" do
     params = {
       name: "Life",
+
       tasks_attributes: {
         "0" => { name: "Eat" },
         "1" => { name: "Pray" },
@@ -97,9 +97,10 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.tasks.size
   end
 
-  test "collection sub-form validates itself" do
+  test "main form validates itself" do
     params = {
       name: "Life",
+
       tasks_attributes: {
         "0" => { name: "Eat" },
         "1" => { name: "Pray" },
@@ -113,6 +114,7 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
 
     params = {
       name: "Life",
+
       tasks_attributes: {
         "0" => { name: nil },
         "1" => { name: nil },
@@ -127,9 +129,10 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal 3, @form.errors.messages[:name].size
   end
 
-  test "collection sub-form raises error if records exceed the allowed number" do
+  test "tasks sub-form raises error if records exceed the allowed number" do
     params = {
       name: "Life",
+
       tasks_attributes: {
         "0" => { name: "Eat" },
         "1" => { name: "Pray" },
@@ -142,9 +145,10 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal "Maximum 3 records are allowed. Got 4 records instead.", exception.message
   end
 
-  test "collection sub-form saves all the models" do
+  test "main form saves its model and the models in nested sub-forms" do
     params = {
       name: "Life",
+
       tasks_attributes: {
         "0" => { name: "Eat" },
         "1" => { name: "Pray" },
@@ -170,11 +174,12 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form updates all the models" do
+  test "main form updates its model and the models in nested sub-forms" do
     project = projects(:yard)
     form = ProjectWithTasksFormFixture.new(project)
     params = {
       name: "Life",
+      
       tasks_attributes: {
         "0" => { name: "Eat", id: tasks(:rake).id },
         "1" => { name: "Pray", id: tasks(:paint).id },
