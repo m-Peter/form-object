@@ -39,7 +39,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_not presentations_form.represents?("presentation")
   end
 
-  test "main provides getter method for collection objects" do
+  test "main form provides getter method for collection objects" do
     assert_respond_to @form.speaker, :presentations
 
     presentations = @form.speaker.presentations
@@ -50,7 +50,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form contains association name and parent model" do
+  test "presentations sub-form contains association name and parent model" do
     presentations_form = @form.speaker.forms.first
 
     assert_equal :presentations, presentations_form.association_name
@@ -58,7 +58,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal @form.speaker.model, presentations_form.parent
   end
 
-  test "collection sub-form initializes the number of records specified" do
+  test "presentations sub-form initializes the number of records specified" do
     presentations_form = @form.speaker.forms.first
 
     assert_respond_to presentations_form, :models
@@ -67,6 +67,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     presentations_form.each do |form|
       assert_instance_of Form, form
       assert_instance_of Presentation, form.model
+
       assert_respond_to form, :topic
       assert_respond_to form, :topic=
       assert_respond_to form, :duration
@@ -76,7 +77,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal 2, @form.speaker.model.presentations.size
   end
 
-  test "collection sub-form fetches parent and association objects" do
+  test "presentations sub-form fetches parent and association objects" do
     conference = conferences(:ruby)
 
     form = ConferenceFormFixture.new(conference)
@@ -87,7 +88,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal conference.speaker.presentations[1], form.speaker.presentations[1].model
   end
 
-  test "collection sub-form syncs models with submitted params" do
+  test "main form syncs its model and the models in nested sub-forms" do
     params = {
       name: "Euruco",
       city: "Athens",
@@ -116,7 +117,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal 2, @form.speaker.presentations.size
   end
 
-  test "collection sub-form validates itself" do
+  test "main form validates itself" do
     params = {
       name: "Euruco",
       city: "Athens",
@@ -164,7 +165,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal 2, @form.errors.messages[:duration].size
   end
 
-  test "collection sub-form validates the models" do
+  test "main form validates the models" do
     conference = conferences(:ruby)
     params = {
       name: conference.name,
@@ -188,7 +189,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal 2, @form.errors.messages[:name].size
   end
 
-  test "collection sub-form raises error if records exceed the allowed number" do
+  test "presentations sub-form raises error if records exceed the allowed number" do
     params = {
       name: "Euruco",
       city: "Athens",
@@ -209,7 +210,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal "Maximum 2 records are allowed. Got 3 records instead.", exception.message
   end
 
-  test "collection sub-form saves all the models" do
+  test "main form saves its model and the models in nested sub-forms" do
     params = {
       name: "Euruco",
       city: "Athens",
@@ -248,7 +249,7 @@ class ConferenceFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form updates all the models" do
+  test "main form updates its model and the models in nested sub-forms" do
     conference = conferences(:ruby)
     form = ConferenceFormFixture.new(conference)
     params = {

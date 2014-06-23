@@ -4,6 +4,7 @@ require_relative 'project_with_tasks_form_fixture'
 require_relative 'songs_form_fixture'
 require_relative 'user_form_fixture'
 require_relative 'user_with_email_form_fixture'
+require_relative 'conference_form_fixture'
 
 class NestedModelRenderingTest < ActionView::TestCase
   def form_for(*)
@@ -379,6 +380,8 @@ class NestedModelRenderingTest < ActionView::TestCase
           concat producer_fields.text_field(:studio)
         }
       }
+
+      concat f.submit
     end
 
     assert_match /action="\/songs"/, output_buffer
@@ -398,6 +401,8 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input id="song_artist_attributes_producer_attributes_name" name="song\[artist_attributes\]\[producer_attributes\]\[name\]" type="text" \/>/, output_buffer
     assert_match /<label for="song_artist_attributes_producer_attributes_studio">Studio<\/label>/, output_buffer
     assert_match /<input id="song_artist_attributes_producer_attributes_studio" name="song\[artist_attributes\]\[producer_attributes\]\[studio\]" type="text" \/>/, output_buffer
+
+    assert_match /<input name="commit" type="submit" value="Create Song" \/>/, output_buffer
   end
 
   test "form_for renders correctly a existing instance of SongsFormFixture" do
@@ -425,6 +430,8 @@ class NestedModelRenderingTest < ActionView::TestCase
           concat producer_fields.text_field(:studio)
         }
       }
+
+      concat f.submit
     end
 
     id = song.id
@@ -441,10 +448,131 @@ class NestedModelRenderingTest < ActionView::TestCase
 
     assert_match /<label for="song_artist_attributes_name">Name<\/label>/, output_buffer
     assert_match /<input id="song_artist_attributes_name" name="song\[artist_attributes\]\[name\]" type="text" value="#{artist.name}" \/>/, output_buffer
+    assert_match /<input id="song_artist_attributes_id" name="song\[artist_attributes\]\[id\]" type="hidden" value="#{artist.id}" \/>/, output_buffer
 
     assert_match /<label for="song_artist_attributes_producer_attributes_name">Name<\/label>/, output_buffer
     assert_match /<input id="song_artist_attributes_producer_attributes_name" name="song\[artist_attributes\]\[producer_attributes\]\[name\]" type="text" value="#{producer.name}" \/>/, output_buffer
     assert_match /<label for="song_artist_attributes_producer_attributes_studio">Studio<\/label>/, output_buffer
     assert_match /<input id="song_artist_attributes_producer_attributes_studio" name="song\[artist_attributes\]\[producer_attributes\]\[studio\]" type="text" value="#{producer.studio}" \/>/, output_buffer
+    assert_match /<input id="song_artist_attributes_producer_attributes_id" name="song\[artist_attributes\]\[producer_attributes\]\[id\]" type="hidden" value="#{producer.id}" \/>/, output_buffer
+
+    assert_match /<input name="commit" type="submit" value="Update Song" \/>/, output_buffer
+  end
+
+  test "form_for renders correctly a new instance of ConferenceFormFixture" do
+    conference = Conference.new
+    conference_form = ConferenceFormFixture.new(conference)
+    speaker = conference_form.speaker
+    presentations = speaker.presentations
+
+    form_for conference_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.label(:city)
+      concat f.text_field(:city)
+
+      concat f.fields_for(:speaker, speaker) { |speaker_fields|
+        concat speaker_fields.label(:name)
+        concat speaker_fields.text_field(:name)
+
+        concat speaker_fields.label(:occupation)
+        concat speaker_fields.text_field(:occupation)
+
+        concat speaker_fields.fields_for(:presentations, presentations) { |presentation_fields|
+          concat presentation_fields.label(:topic)
+          concat presentation_fields.text_field(:topic)
+
+          concat presentation_fields.label(:duration)
+          concat presentation_fields.text_field(:duration)
+        }
+      }
+
+      concat f.submit
+    end
+
+    assert_match /action="\/conferences"/, output_buffer
+    assert_match /class="new_conference"/, output_buffer
+    assert_match /id="new_conference"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="conference_name">Name<\/label>/, output_buffer
+    assert_match /<input id="conference_name" name="conference\[name\]" type="text" \/>/, output_buffer
+    assert_match /<label for="conference_city">City<\/label>/, output_buffer
+    assert_match /<input id="conference_city" name="conference\[city\]" type="text" \/>/, output_buffer
+
+    assert_match /<label for="conference_speaker_attributes_name">Name<\/label>/, output_buffer
+    assert_match /<input id="conference_speaker_attributes_name" name="conference\[speaker_attributes\]\[name\]" type="text" \/>/, output_buffer
+    assert_match /<label for="conference_speaker_attributes_occupation">Occupation<\/label>/, output_buffer
+    assert_match /<input id="conference_speaker_attributes_occupation" name="conference\[speaker_attributes\]\[occupation\]" type="text" \/>/, output_buffer
+
+    [0, 1].each do |i|
+      assert_match /<label for="conference_speaker_attributes_presentations_attributes_#{i}_topic">Topic<\/label>/, output_buffer
+      assert_match /<input id="conference_speaker_attributes_presentations_attributes_#{i}_topic" name="conference\[speaker_attributes\]\[presentations_attributes\]\[#{i}\]\[topic\]" type="text" \/>/, output_buffer
+      assert_match /<label for="conference_speaker_attributes_presentations_attributes_#{i}_duration">Duration<\/label>/, output_buffer
+      assert_match /<input id="conference_speaker_attributes_presentations_attributes_#{i}_duration" name="conference\[speaker_attributes\]\[presentations_attributes\]\[#{i}\]\[duration\]" type="text" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Create Conference" \/>/, output_buffer
+  end
+
+  test "form_for renders correct a existing instance of ConferenceFormFixture" do
+    conference = conferences(:ruby)
+    conference_form = ConferenceFormFixture.new(conference)
+    speaker = conference_form.speaker
+    presentations = speaker.presentations
+
+    form_for conference_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.label(:city)
+      concat f.text_field(:city)
+
+      concat f.fields_for(:speaker, speaker) { |speaker_fields|
+        concat speaker_fields.label(:name)
+        concat speaker_fields.text_field(:name)
+
+        concat speaker_fields.label(:occupation)
+        concat speaker_fields.text_field(:occupation)
+
+        concat speaker_fields.fields_for(:presentations, presentations) { |presentation_fields|
+          concat presentation_fields.label(:topic)
+          concat presentation_fields.text_field(:topic)
+
+          concat presentation_fields.label(:duration)
+          concat presentation_fields.text_field(:duration)
+        }
+      }
+
+      concat f.submit
+    end
+
+    id = conference.id
+
+    assert_match /action="\/conferences\/#{id}"/, output_buffer
+    assert_match /class="edit_conference"/, output_buffer
+    assert_match /id="edit_conference_#{id}"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="conference_name">Name<\/label>/, output_buffer
+    assert_match /<input id="conference_name" name="conference\[name\]" type="text" value="#{conference_form.name}" \/>/, output_buffer
+    assert_match /<label for="conference_city">City<\/label>/, output_buffer
+    assert_match /<input id="conference_city" name="conference\[city\]" type="text" value="#{conference_form.city}" \/>/, output_buffer
+    
+    assert_match /<label for="conference_speaker_attributes_name">Name<\/label>/, output_buffer
+    assert_match /<input id="conference_speaker_attributes_name" name="conference\[speaker_attributes\]\[name\]" type="text" value="#{speaker.name}" \/>/, output_buffer
+    assert_match /<label for="conference_speaker_attributes_occupation">Occupation<\/label>/, output_buffer
+    assert_match /<input id="conference_speaker_attributes_occupation" name="conference\[speaker_attributes\]\[occupation\]" type="text" value="#{speaker.occupation}" \/>/, output_buffer
+    assert_match /<input id="conference_speaker_attributes_id" name="conference\[speaker_attributes\]\[id\]" type="hidden" value="#{speaker.id}" \/>/, output_buffer
+
+    [0, 1].each do |i|
+      assert_match /<label for="conference_speaker_attributes_presentations_attributes_#{i}_topic">Topic<\/label>/, output_buffer
+      assert_match /<input id="conference_speaker_attributes_presentations_attributes_#{i}_topic" name="conference\[speaker_attributes\]\[presentations_attributes\]\[#{i}\]\[topic\]" type="text" value="#{presentations[i].topic}" \/>/, output_buffer
+      assert_match /<label for="conference_speaker_attributes_presentations_attributes_#{i}_duration">Duration<\/label>/, output_buffer
+      assert_match /<input id="conference_speaker_attributes_presentations_attributes_#{i}_duration" name="conference\[speaker_attributes\]\[presentations_attributes\]\[#{i}\]\[duration\]" type="text" value="#{presentations[i].duration}" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Update Conference" \/>/, output_buffer
   end
 end
