@@ -171,7 +171,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
   end
 
-  test "form_for renders correctly a new instance of Form Model" do
+  test "form_for renders correctly a new instance of UserWithEmailAndProfileFormFixture" do
     user = User.new
     user_form = UserWithEmailAndProfileFormFixture.new(user)
 
@@ -224,7 +224,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input name="commit" type="submit" value="Create User" \/>/, output_buffer
   end
 
-  test "form_for renders correctly an existing instance of Form Model" do
+  test "form_for renders correctly an existing instance of UserWithEmailAndProfileFormFixture" do
     user = users(:peter)
     user_form = UserWithEmailAndProfileFormFixture.new(user)
 

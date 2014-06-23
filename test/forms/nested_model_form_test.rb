@@ -183,4 +183,8 @@ class NestedModelFormTest < ActiveSupport::TestCase
       assert_includes @form.errors.messages[attribute], "can't be blank"
     end
   end
+
+  test "main form responds to writer method" do
+    assert_respond_to @form, :email_attributes=
+  end
 end

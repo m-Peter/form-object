@@ -49,7 +49,7 @@ class UsersControllerTest < ActionController::TestCase
   test "should not create user with invalid params" do
     peter = users(:peter)
 
-    assert_difference(['User.count', 'Email.count'], 0) do
+    assert_difference(['User.count', 'Email.count', 'Profile.count'], 0) do
       post :create, user: {
         name: peter.name,
         age: "23",

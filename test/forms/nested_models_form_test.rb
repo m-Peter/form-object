@@ -7,50 +7,49 @@ class NestedModelsFormTest < ActiveSupport::TestCase
   def setup
     @user = User.new
     @form = UserWithEmailAndProfileFormFixture.new(@user)
+    @profile_form = @form.profile
     @model = @form
   end
 
   test "declares both sub-forms" do
     assert_equal 2, UserWithEmailAndProfileFormFixture.forms.size
-    
-    profile_definition = UserWithEmailAndProfileFormFixture.forms.last
-    assert_equal :profile, profile_definition.assoc_name
-
-    profile_form = @form.profile
-
     assert_equal 2, @form.forms.size
+  end
 
-    assert_equal :profile, profile_form.association_name
-    assert_equal @user, profile_form.parent
+  test "forms list contains profile sub-form definition" do
+    profile_definition = UserWithEmailAndProfileFormFixture.forms.last
+
+    assert_equal :profile, profile_definition.assoc_name
+  end
+
+  test "profile sub-form contains association name and parent" do
+    assert_equal :profile, @profile_form.association_name
+    assert_equal @user, @profile_form.parent
   end
 
   test "profile sub-form declares attributes" do
     attributes = [:twitter_name, :twitter_name=, :github_name, :github_name=]
-    profile_form = @form.profile
-
+    
     attributes.each do |attribute|
-      assert_respond_to profile_form, attribute
+      assert_respond_to @profile_form, attribute
     end
   end
 
   test "profile sub-form delegates attributes to model" do
-    profile_form = @form.profile
-    profile_form.twitter_name = "twitter_peter"
-    profile_form.github_name = "github_peter"
+    @profile_form.twitter_name = "twitter_peter"
+    @profile_form.github_name = "github_peter"
 
-    assert_equal "twitter_peter", profile_form.twitter_name
-    assert_equal "twitter_peter", profile_form.model.twitter_name
+    assert_equal "twitter_peter", @profile_form.twitter_name
+    assert_equal "twitter_peter", @profile_form.model.twitter_name
     
-    assert_equal "github_peter", profile_form.github_name
-    assert_equal "github_peter", profile_form.model.github_name
+    assert_equal "github_peter", @profile_form.github_name
+    assert_equal "github_peter", @profile_form.model.github_name
   end
 
   test "profile sub-form initializes model for new parent" do
-    profile_form = @form.profile
-
-    assert_instance_of Profile, profile_form.model
-    assert_equal @form.model.profile, profile_form.model
-    assert profile_form.model.new_record?
+    assert_instance_of Profile, @profile_form.model
+    assert_equal @form.model.profile, @profile_form.model
+    assert @profile_form.model.new_record?
   end
 
   test "profile sub-form fetches model for existing parent" do
@@ -60,7 +59,8 @@ class NestedModelsFormTest < ActiveSupport::TestCase
 
     assert_instance_of Profile, profile_form.model
     assert_equal user_form.model.profile, profile_form.model
-    assert profile_form.model.persisted?
+    assert profile_form.persisted?
+
     assert_equal "m-peter", user_form.name
     assert_equal 23, user_form.age
     assert_equal 0, user_form.gender
@@ -69,22 +69,21 @@ class NestedModelsFormTest < ActiveSupport::TestCase
   end
 
   test "profile sub-form validates itself" do
-    profile_form = @form.profile
-    profile_form.twitter_name = nil
-    profile_form.github_name = nil
+    @profile_form.twitter_name = nil
+    @profile_form.github_name = nil
 
-    assert_not profile_form.valid?
+    assert_not @profile_form.valid?
     [:twitter_name, :github_name].each do |attribute|
-      assert_includes profile_form.errors.messages[attribute], "can't be blank"
+      assert_includes @profile_form.errors.messages[attribute], "can't be blank"
     end
 
-    profile_form.twitter_name = "t-peter"
-    profile_form.github_name = "g-peter"
+    @profile_form.twitter_name = "t-peter"
+    @profile_form.github_name = "g-peter"
 
-    assert profile_form.valid?
+    assert @profile_form.valid?
   end
 
-  test "main form syncs models in both sub-forms" do
+  test "main form syncs its model and the models in nested sub-forms" do
     params = {
       name: "Petrakos",
       age: "23",
@@ -106,11 +105,11 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     assert_equal 23, @form.age
     assert_equal 0, @form.gender
     assert_equal "petrakos@gmail.com", @form.email.address
-    assert_equal "t_peter", @form.profile.twitter_name
-    assert_equal "g_peter", @form.profile.github_name
+    assert_equal "t_peter", @profile_form.twitter_name
+    assert_equal "g_peter", @profile_form.github_name
   end
 
-  test "main form saves all the models" do
+  test "main form saves its model and the models in nested sub-forms" do
     params = {
       name: "Petrakos",
       age: "23",
@@ -136,12 +135,12 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     assert_equal 23, @form.age
     assert_equal 0, @form.gender
     assert_equal "petrakos@gmail.com", @form.email.address
-    assert_equal "t_peter", @form.profile.twitter_name
-    assert_equal "g_peter", @form.profile.github_name
+    assert_equal "t_peter", @profile_form.twitter_name
+    assert_equal "g_peter", @profile_form.github_name
     
     assert @form.persisted?
     assert @form.email.persisted?
-    assert @form.profile.persisted?
+    assert @profile_form.persisted?
   end
 
   test "main form collects all the model related errors" do
@@ -196,5 +195,10 @@ class NestedModelsFormTest < ActiveSupport::TestCase
     [:name, :age, :gender, :address, :twitter_name, :github_name].each do |attribute|
       assert_includes @form.errors.messages[attribute], "can't be blank"
     end
+  end
+
+  test "main form responds to writer method" do
+    assert_respond_to @form, :email_attributes=
+    assert_respond_to @form, :profile_attributes=
   end
 end
