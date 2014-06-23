@@ -73,6 +73,15 @@ class SingleModelFormTest < ActiveSupport::TestCase
     assert_equal 0, @form.gender
   end
 
+  test "sync the form with existing model" do
+    peter = users(:peter)
+    form = UserFormFixture.new(peter)
+
+    assert_equal "m-peter", form.name
+    assert_equal 23, form.age
+    assert_equal 0, form.gender
+  end
+
   test "saves the model" do
     params = {
       name: "Peters",
@@ -96,21 +105,43 @@ class SingleModelFormTest < ActiveSupport::TestCase
     params = {
       name: peter.name,
       age: "23",
-      gender: "0"
+      gender: nil
     }
 
     @form.submit(params)
 
-    assert_not @form.valid?
     assert_difference('User.count', 0) do
       @form.save
     end
+
+    assert_not @form.valid?
     assert_includes @form.errors.messages[:name], "has already been taken"
+    assert_includes @form.errors.messages[:gender], "can't be blank"
+  end
+
+  test "updates the model" do
+    peter = users(:peter)
+    form = UserFormFixture.new(peter)
+    params = {
+      name: "Petrakos",
+      age: peter.age,
+      gender: peter.gender
+    }
+
+    form.submit(params)
+
+    assert_difference('User.count', 0) do
+      form.save
+    end
+
+    assert form.persisted?
+    assert_equal "Petrakos", form.name
   end
 
   test "responds to #persisted?" do
     assert_respond_to @form, :persisted?
     assert_not @form.persisted?
+    
     assert save_user
     assert @form.persisted?
   end
@@ -118,6 +149,7 @@ class SingleModelFormTest < ActiveSupport::TestCase
   test "responds to #to_key" do
     assert_respond_to @form, :to_key
     assert_nil @form.to_key
+    
     assert save_user
     assert_equal @user.id, @form.to_key
   end
@@ -125,6 +157,7 @@ class SingleModelFormTest < ActiveSupport::TestCase
   test "responds to #to_param" do
     assert_respond_to @form, :to_param
     assert_nil @form.to_param
+    
     assert save_user
     assert_equal @user.to_param, @form.to_param
   end
