@@ -178,21 +178,24 @@ class NestedModelRenderingTest < ActionView::TestCase
     form_for user_form do |f|
       concat f.label(:name)
       concat f.text_field(:name)
+
       concat f.label(:age)
       concat f.number_field(:age)
+      
       concat f.label(:gender)
       concat f.select(:gender, User.get_genders_dropdown)
 
-      concat f.fields_for(:email, user_form.email) { |e|
-        concat e.label(:address)
-        concat e.text_field(:address)
+      concat f.fields_for(:email, user_form.email) { |email_fields|
+        concat email_fields.label(:address)
+        concat email_fields.text_field(:address)
       }
 
-      concat f.fields_for(:profile, user_form.profile) { |p|
-        concat p.label(:twitter_name)
-        concat p.text_field(:twitter_name)
-        concat p.label(:github_name)
-        concat p.text_field(:github_name)
+      concat f.fields_for(:profile, user_form.profile) { |profile_fields|
+        concat profile_fields.label(:twitter_name)
+        concat profile_fields.text_field(:twitter_name)
+
+        concat profile_fields.label(:github_name)
+        concat profile_fields.text_field(:github_name)
       }
 
       concat f.submit
@@ -231,21 +234,24 @@ class NestedModelRenderingTest < ActionView::TestCase
     form_for user_form do |f|
       concat f.label(:name)
       concat f.text_field(:name)
+
       concat f.label(:age)
       concat f.number_field(:age)
+
       concat f.label(:gender)
       concat f.select(:gender, User.get_genders_dropdown)
 
-      concat f.fields_for(:email, user_form.email) { |e|
-        concat e.label(:address)
-        concat e.text_field(:address)
+      concat f.fields_for(:email, user_form.email) { |email_fields|
+        concat email_fields.label(:address)
+        concat email_fields.text_field(:address)
       }
 
-      concat f.fields_for(:profile, user_form.profile) { |p|
-        concat p.label(:twitter_name)
-        concat p.text_field(:twitter_name)
-        concat p.label(:github_name)
-        concat p.text_field(:github_name)
+      concat f.fields_for(:profile, user_form.profile) { |profile_fields|
+        concat profile_fields.label(:twitter_name)
+        concat profile_fields.text_field(:twitter_name)
+
+        concat profile_fields.label(:github_name)
+        concat profile_fields.text_field(:github_name)
       }
 
       concat f.submit
@@ -281,7 +287,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input name="commit" type="submit" value="Update User" \/>/, output_buffer
   end
 
-  test "form_for renders correctly a new instance of Form Model containing a nested collection" do
+  test "form_for renders correctly a new instance of ProjectWithTasksFormFixture" do
     project = Project.new
     project_form = ProjectWithTasksFormFixture.new(project)
 
@@ -289,9 +295,9 @@ class NestedModelRenderingTest < ActionView::TestCase
       concat f.label(:name)
       concat f.text_field(:name)
 
-      concat f.fields_for(:tasks, project_form.tasks) { |t|
-        concat t.label(:task)
-        concat t.text_field(:name)
+      concat f.fields_for(:tasks, project_form.tasks) { |task_fields|
+        concat task_fields.label(:task)
+        concat task_fields.text_field(:name)
       }
 
       concat f.submit
@@ -313,7 +319,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input name="commit" type="submit" value="Create Project" \/>/, output_buffer
   end
 
-  test "form_for renders correctly a existing instance of Form Model containing a nested collection" do
+  test "form_for renders correctly a existing instance of ProjectWithTasksFormFixture" do
     project = projects(:yard)
     project_form = ProjectWithTasksFormFixture.new(project)
 
@@ -321,9 +327,9 @@ class NestedModelRenderingTest < ActionView::TestCase
       concat f.label(:name)
       concat f.text_field(:name)
 
-      concat f.fields_for(:tasks, project_form.tasks) { |t|
-        concat t.label(:task)
-        concat t.text_field(:name)
+      concat f.fields_for(:tasks, project_form.tasks) { |task_fields|
+        concat task_fields.label(:task)
+        concat task_fields.text_field(:name)
       }
 
       concat f.submit
@@ -348,7 +354,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input name="commit" type="submit" value="Update Project" \/>/, output_buffer
   end
 
-  test "form_for renders correctly a new instance of Form Model with two nesting level" do
+  test "form_for renders correctly a new instance of SongsFormFixture" do
     song = Song.new
     song_form = SongsFormFixture.new(song)
     artist = song_form.artist
@@ -357,18 +363,20 @@ class NestedModelRenderingTest < ActionView::TestCase
     form_for song_form do |f|
       concat f.label(:title)
       concat f.text_field(:title)
+
       concat f.label(:length)
       concat f.text_field(:length)
 
-      concat f.fields_for(:artist, artist) { |a|
-        concat a.label(:name)
-        concat a.text_field(:name)
+      concat f.fields_for(:artist, artist) { |artist_fields|
+        concat artist_fields.label(:name)
+        concat artist_fields.text_field(:name)
 
-        concat a.fields_for(:producer, producer) { |p| 
-          concat p.label(:name)
-          concat p.text_field(:name)
-          concat p.label(:studio)
-          concat p.text_field(:studio)
+        concat artist_fields.fields_for(:producer, producer) { |producer_fields| 
+          concat producer_fields.label(:name)
+          concat producer_fields.text_field(:name)
+
+          concat producer_fields.label(:studio)
+          concat producer_fields.text_field(:studio)
         }
       }
     end
@@ -392,7 +400,7 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input id="song_artist_attributes_producer_attributes_studio" name="song\[artist_attributes\]\[producer_attributes\]\[studio\]" type="text" \/>/, output_buffer
   end
 
-  test "form_for renders correctly a existing instance of Form Model with two nesting level" do
+  test "form_for renders correctly a existing instance of SongsFormFixture" do
     song = songs(:lockdown)
     song_form = SongsFormFixture.new(song)
     artist = song_form.artist
@@ -401,18 +409,20 @@ class NestedModelRenderingTest < ActionView::TestCase
     form_for song_form do |f|
       concat f.label(:title)
       concat f.text_field(:title)
+
       concat f.label(:length)
       concat f.text_field(:length)
 
-      concat f.fields_for(:artist, artist) { |a|
-        concat a.label(:name)
-        concat a.text_field(:name)
+      concat f.fields_for(:artist, artist) { |artist_fields|
+        concat artist_fields.label(:name)
+        concat artist_fields.text_field(:name)
 
-        concat a.fields_for(:producer, producer) { |p| 
-          concat p.label(:name)
-          concat p.text_field(:name)
-          concat p.label(:studio)
-          concat p.text_field(:studio)
+        concat artist_fields.fields_for(:producer, producer) { |producer_fields| 
+          concat producer_fields.label(:name)
+          concat producer_fields.text_field(:name)
+
+          concat producer_fields.label(:studio)
+          concat producer_fields.text_field(:studio)
         }
       }
     end

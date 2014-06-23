@@ -7,6 +7,7 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
   def setup
     @song = Song.new
     @form = SongsFormFixture.new(@song)
+    @producer_form = @form.artist.producer
     @model = @form
   end
 
@@ -27,22 +28,18 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
 
   test "contains getter for producer sub-form" do
     assert_respond_to @form.artist, :producer
-    assert_instance_of Form, @form.artist.producer
+    assert_instance_of Form, @producer_form
   end
 
   test "producer sub-form contains association name and parent model" do
-    producer_form = @form.artist.producer
-
-    assert_equal :producer, producer_form.association_name
-    assert_instance_of Producer, producer_form.model
-    assert_instance_of Artist, producer_form.parent
+    assert_equal :producer, @producer_form.association_name
+    assert_instance_of Producer, @producer_form.model
+    assert_instance_of Artist, @producer_form.parent
   end
 
   test "producer sub-form initializes models for new parent" do
-    producer_form = @form.artist.producer
-
-    assert_equal @form.artist.model.producer, @form.artist.producer.model
-    assert @form.artist.producer.model.new_record?
+    assert_equal @form.artist.model.producer, @producer_form.model
+    assert @producer_form.model.new_record?
   end
 
   test "producer sub-form fetches models for existing parent" do
@@ -67,23 +64,22 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     attributes = [:name, :name=, :studio, :studio=]
 
     attributes.each do |attribute|
-      assert_respond_to @form.artist.producer, attribute
+      assert_respond_to @producer_form, attribute
     end
   end
 
   test "producer sub-form delegates attributes to model" do
-    producer_form = @form.artist.producer
-    producer_form.name = "Phoebos"
-    producer_form.studio = "MADog"
+    @producer_form.name = "Phoebos"
+    @producer_form.studio = "MADog"
 
-    assert_equal "Phoebos", producer_form.name
-    assert_equal "MADog", producer_form.studio
+    assert_equal "Phoebos", @producer_form.name
+    assert_equal "MADog", @producer_form.studio
 
-    assert_equal "Phoebos", producer_form.model.name
-    assert_equal "MADog", producer_form.model.studio
+    assert_equal "Phoebos", @producer_form.model.name
+    assert_equal "MADog", @producer_form.model.studio
   end
 
-  test "main form syncs model in producer sub-form" do
+  test "main form syncs its model and the models in nested sub-forms" do
     params = {
       title: "Diamonds",
       length: "360",
@@ -103,16 +99,26 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "Diamonds", @form.title
     assert_equal "360", @form.length
     assert_equal "Karras", @form.artist.name
-    assert_equal "Phoebos", @form.artist.producer.name
-    assert_equal "MADog", @form.artist.producer.studio
+    assert_equal "Phoebos", @producer_form.name
+    assert_equal "MADog", @producer_form.studio
   end
 
   test "main form validates itself" do
-    @form.title = nil
-    @form.length = nil
-    @form.artist.name = nil
-    @form.artist.producer.name = nil
-    @form.artist.producer.studio = nil
+    params = {
+      title: nil,
+      length: nil,
+
+      artist_attributes: {
+        name: nil,
+
+        producer_attributes: {
+          name: nil,
+          studio: nil
+        }
+      }
+    }
+
+    @form.submit(params)
 
     assert_not @form.valid?
     assert_includes @form.errors.messages[:title], "can't be blank"
@@ -123,18 +129,29 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     @form.title = "Diamonds"
     @form.length = "355"
     @form.artist.name = "Karras"
-    @form.artist.producer.name = "Phoebos"
-    @form.artist.producer.studio = "MADog"
+    @producer_form.name = "Phoebos"
+    @producer_form.studio = "MADog"
 
     assert @form.valid?
   end
 
   test "main form validates the models" do
     song = songs(:lockdown)
-    @form.title = song.title
-    @form.artist.name = song.artist.name
-    @form.artist.producer.name = song.artist.producer.name
-    @form.artist.producer.studio = song.artist.producer.studio
+    params = {
+      title: song.title,
+      length: nil,
+
+      artist_attributes: {
+        name: song.artist.name,
+
+        producer_attributes: {
+          name: song.artist.producer.name,
+          studio: song.artist.producer.studio
+        }
+      }
+    }
+    
+    @form.submit(params)
 
     assert_not @form.valid?
     assert_includes @form.errors.messages[:title], "has already been taken"
@@ -143,7 +160,7 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_includes @form.errors.messages[:studio], "has already been taken"
   end
 
-  test "main form saves all the models" do
+  test "main form saves its model and the models in nested sub-forms" do
     params = {
       title: "Diamonds",
       length: "360",
@@ -167,15 +184,15 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert_equal "Diamonds", @form.title
     assert_equal "360", @form.length
     assert_equal "Karras", @form.artist.name
-    assert_equal "Phoebos", @form.artist.producer.name
-    assert_equal "MADog", @form.artist.producer.studio
+    assert_equal "Phoebos", @producer_form.name
+    assert_equal "MADog", @producer_form.studio
 
     assert @form.persisted?
     assert @form.artist.persisted?
-    assert @form.artist.producer.persisted?
+    assert @producer_form.persisted?
   end
 
-  test "main form updates all the models" do
+  test "main form updates its model and the models in nested sub-forms" do
     song = songs(:lockdown)
     params = {
       title: "Diamonds",
@@ -209,4 +226,8 @@ class TwoNestingLevelFormTest < ActiveSupport::TestCase
     assert form.artist.producer.persisted?
   end
 
+  test "main form responds to writer method" do
+    assert_respond_to @form, :artist_attributes=
+    assert_respond_to @form.artist, :producer_attributes=
+  end
 end
