@@ -400,7 +400,7 @@ class NestedModelRenderingTest < ActionView::TestCase
 
   test "form_for renders correctly a existing instance of ProjectWithTasksContainingDeliverableFormFixture" do
     project = projects(:yard)
-    project_form = ProjectWithTasksFormFixture.new(project)
+    project_form = ProjectWithTasksContainingDeliverableFormFixture.new(project)
     tasks = project_form.tasks
 
     form_for project_form do |f|
@@ -435,8 +435,9 @@ class NestedModelRenderingTest < ActionView::TestCase
       assert_match /<input id="project_tasks_attributes_#{i}_name" name="project\[tasks_attributes\]\[#{i}\]\[name\]" type="text" value="#{project_form.tasks[i].name}" \/>/, output_buffer
       assert_match /<input id="project_tasks_attributes_#{i}_id" name="project\[tasks_attributes\]\[#{i}\]\[id\]" type="hidden" value="#{project_form.tasks[i].id}" \/>/, output_buffer
 
-      #assert_match /<label for="project_tasks_attributes_#{i}_deliverable_description">Description<\/label>/, output_buffer
-      #assert_match /<input id="project_tasks_attributes_#{i}_deliverable_attributes_description" name="project\[tasks_attributes\]\[#{i}\]\[deliverable_attributes\]\[description\]" type="text" value="this" \/>/, output_buffer
+      assert_match /<label for="project_tasks_attributes_#{i}_deliverable_attributes_description">Description<\/label>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_deliverable_attributes_description" name="project\[tasks_attributes\]\[#{i}\]\[deliverable_attributes\]\[description\]" type="text" value="#{project_form.tasks[i].deliverable.description}" \/>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_deliverable_attributes_id" name="project\[tasks_attributes\]\[#{i}\]\[deliverable_attributes\]\[id\]" type="hidden" value="#{project_form.tasks[i].deliverable.id}" \/>/, output_buffer
     end
 
     assert_match /<input name="commit" type="submit" value="Update Project" \/>/, output_buffer
@@ -738,6 +739,7 @@ class NestedModelRenderingTest < ActionView::TestCase
   
     assert_match /<label for="survey_questions_attributes_0_content">Content<\/label>/, output_buffer
     assert_match /<input id="survey_questions_attributes_0_content" name="survey\[questions_attributes\]\[0\]\[content\]" type="text" value="Which language allows closures\?" \/>/, output_buffer
+    assert_match /<input id="survey_questions_attributes_0_id" name="survey\[questions_attributes\]\[0\]\[id\]" type="hidden" value="#{questions[0].id}" \/>/, output_buffer
   
     [0, 1].each do |i|
       assert_match /<label for="survey_questions_attributes_0_answers_attributes_#{i}_content">Content<\/label>/, output_buffer

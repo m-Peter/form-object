@@ -10,15 +10,22 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     @model = @form
   end
 
-  test "declares collection association" do
-    assert_respond_to SurveyFormFixture, :association
+  test "Form declares association" do
+    assert_respond_to Form, :association
   end
 
-  test "contains a forms list for has_many associations" do
-    assert_equal 1, SurveyFormFixture.forms.size
+  test "Form contains a list of sub-forms" do
+    assert_respond_to Form, :forms
+    assert_equal 1, Form.forms.size
   end
 
-  test "main provides getter method for collection form" do
+  test "forms list contains form definitions" do
+    answers_definition = Form.forms.first
+
+    assert_equal :answers, answers_definition.assoc_name
+  end
+
+  test "main form provides getter method for questions collection form" do
     questions_form = @form.forms.first
 
     assert_instance_of FormCollection, questions_form
@@ -31,7 +38,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_not questions_form.represents?("question")
   end
 
-  test "main provides getter method for collection objects" do
+  test "main form provides getter method for collection objects" do
     assert_respond_to @form, :questions
 
     questions = @form.questions
@@ -42,7 +49,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form contains association name and parent model" do
+  test "questions sub-form contains association name and parent model" do
     questions_form = @form.forms.first
 
     assert_equal :questions, questions_form.association_name
@@ -69,7 +76,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "questions sub-form initializes the number of records specified" do
+  test "main form initializes the number of records specified" do
     questions_form = @form.forms.first
 
     assert_respond_to questions_form, :models
@@ -97,7 +104,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal 1, @form.model.questions.size
   end
 
-  test "questions sub-form fetches parent and association objects" do
+  test "main form fetches parent and association objects" do
     survey = surveys(:programming)
 
     form = SurveyFormFixture.new(survey)
@@ -109,7 +116,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal survey.questions[0].answers[1], form.questions[0].answers[1].model
   end
 
-  test "questions sub-form syncs models with submitted params" do
+  test "main form syncs its model and the models in nested sub-forms" do
     params = {
       name: "Programming languages",
 
@@ -134,7 +141,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal 1, @form.questions.size
   end
 
-  test "questions sub-form validates itself" do
+  test "main form validates itself" do
     params = {
       name: "Programming languages",
 
@@ -176,7 +183,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_includes @form.errors.messages[:content], "can't be blank"
   end
 
-  test "questions sub-form validates the model" do
+  test "main form validates the model" do
     params = {
       name: surveys(:programming).name,
 
@@ -198,7 +205,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_includes @form.errors.messages[:name], "has already been taken"
   end
 
-  test "questions sub-form saves all the models" do
+  test "main form saves its model and the models in nested sub-forms" do
     params = {
       name: "Programming languages",
 
@@ -236,7 +243,7 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "questions sub-form updates all the models" do
+  test "main form updates its model and the models in nested sub-forms" do
     survey = surveys(:programming)
     form = SurveyFormFixture.new(survey)
     params = {

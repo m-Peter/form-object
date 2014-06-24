@@ -5,5 +5,5 @@ leaves:
   task: rake 
 
 fence:
-  description: Yard's fence will be fresh painted
+  description: Yards fence will be fresh painted
   task: paint
