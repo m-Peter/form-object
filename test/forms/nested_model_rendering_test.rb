@@ -1,10 +1,12 @@
 require 'test_helper'
 require_relative 'user_with_email_and_profile_form_fixture'
 require_relative 'project_with_tasks_form_fixture'
+require_relative 'project_with_tasks_containing_deliverable_form_fixture'
 require_relative 'songs_form_fixture'
 require_relative 'user_form_fixture'
 require_relative 'user_with_email_form_fixture'
 require_relative 'conference_form_fixture'
+require_relative 'survey_form_fixture'
 
 class NestedModelRenderingTest < ActionView::TestCase
   def form_for(*)
@@ -355,6 +357,91 @@ class NestedModelRenderingTest < ActionView::TestCase
     assert_match /<input name="commit" type="submit" value="Update Project" \/>/, output_buffer
   end
 
+  test "form_for renders correctly a new instance of ProjectWithTasksContainingDeliverableFormFixture" do
+    project = Project.new
+    project_form = ProjectWithTasksContainingDeliverableFormFixture.new(project)
+    tasks = project_form.tasks
+
+    form_for project_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.fields_for(:tasks, tasks) { |task_fields|
+        concat task_fields.label(:task)
+        concat task_fields.text_field(:name)
+
+        concat task_fields.fields_for(:deliverable, task_fields.object.deliverable) { |deliverable_fields|
+          concat deliverable_fields.label(:description)
+          concat deliverable_fields.text_field(:description)
+        }
+      }
+
+      concat f.submit
+    end
+
+    assert_match /action="\/projects"/, output_buffer
+    assert_match /class="new_project"/, output_buffer
+    assert_match /id="new_project"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="project_name">Name<\/label>/, output_buffer
+    assert_match /<input id="project_name" name="project\[name\]" type="text" \/>/, output_buffer
+
+    [0, 1].each do |i|
+      assert_match /<label for="project_tasks_attributes_#{i}_task">Task<\/label>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_name" name="project\[tasks_attributes\]\[#{i}\]\[name\]" type="text" \/>/, output_buffer
+
+      assert_match /<label for="project_tasks_attributes_#{i}_deliverable_attributes_description">Description<\/label>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_deliverable_attributes_description" name="project\[tasks_attributes\]\[#{i}\]\[deliverable_attributes\]\[description\]" type="text" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Create Project" \/>/, output_buffer
+  end
+
+  test "form_for renders correctly a existing instance of ProjectWithTasksContainingDeliverableFormFixture" do
+    project = projects(:yard)
+    project_form = ProjectWithTasksFormFixture.new(project)
+    tasks = project_form.tasks
+
+    form_for project_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.fields_for(:tasks, tasks) { |task_fields|
+        concat task_fields.label(:task)
+        concat task_fields.text_field(:name)
+
+        concat task_fields.fields_for(:deliverable) { |deliverable_fields|
+          concat deliverable_fields.label(:description)
+          concat deliverable_fields.text_field(:description)
+        }
+      }
+
+      concat f.submit
+    end
+
+    id = project.id
+
+    assert_match /action="\/projects\/#{id}"/, output_buffer
+    assert_match /class="edit_project"/, output_buffer
+    assert_match /id="edit_project_#{id}"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="project_name">Name<\/label>/, output_buffer
+    assert_match /<input id="project_name" name="project\[name\]" type="text" value="#{project_form.name}" \/>/, output_buffer
+
+    [0, 1].each do |i|
+      assert_match /<label for="project_tasks_attributes_#{i}_task">Task<\/label>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_name" name="project\[tasks_attributes\]\[#{i}\]\[name\]" type="text" value="#{project_form.tasks[i].name}" \/>/, output_buffer
+      assert_match /<input id="project_tasks_attributes_#{i}_id" name="project\[tasks_attributes\]\[#{i}\]\[id\]" type="hidden" value="#{project_form.tasks[i].id}" \/>/, output_buffer
+
+      #assert_match /<label for="project_tasks_attributes_#{i}_deliverable_description">Description<\/label>/, output_buffer
+      #assert_match /<input id="project_tasks_attributes_#{i}_deliverable_attributes_description" name="project\[tasks_attributes\]\[#{i}\]\[deliverable_attributes\]\[description\]" type="text" value="this" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Update Project" \/>/, output_buffer
+  end
+
   test "form_for renders correctly a new instance of SongsFormFixture" do
     song = Song.new
     song_form = SongsFormFixture.new(song)
@@ -574,5 +661,89 @@ class NestedModelRenderingTest < ActionView::TestCase
     end
 
     assert_match /<input name="commit" type="submit" value="Update Conference" \/>/, output_buffer
+  end
+
+  test "form_for renders correctly a new instance of SurveyFormFixture" do
+    survey = Survey.new
+    survey_form = SurveyFormFixture.new(survey)
+    questions = survey_form.questions
+
+    form_for survey_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.fields_for(:questions, questions) { |question_fields|
+        concat question_fields.label(:content)
+        concat question_fields.text_field(:content)
+
+        concat question_fields.fields_for(:answers, question_fields.object.answers) { |answer_fields|
+          concat answer_fields.label(:content)
+          concat answer_fields.text_field(:content)
+        }
+      }
+
+      concat f.submit
+    end
+
+    assert_match /action="\/surveys"/, output_buffer
+    assert_match /class="new_survey"/, output_buffer
+    assert_match /id="new_survey"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="survey_name">Name<\/label>/, output_buffer
+    assert_match /<input id="survey_name" name="survey\[name\]" type="text" \/>/, output_buffer
+
+    assert_match /<label for="survey_questions_attributes_0_content">Content<\/label>/, output_buffer
+    assert_match /<input id="survey_questions_attributes_0_content" name="survey\[questions_attributes\]\[0\]\[content\]" type="text" \/>/, output_buffer
+
+    [0, 1].each do |i|
+      assert_match /<label for="survey_questions_attributes_0_answers_attributes_#{i}_content">Content<\/label>/, output_buffer
+      assert_match /<input id="survey_questions_attributes_0_answers_attributes_#{i}_content" name="survey\[questions_attributes\]\[0\]\[answers_attributes\]\[#{i}\]\[content\]" type="text" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Create Survey" \/>/, output_buffer
+  end
+
+  test "form_for renders correctly a existing instance of SurveyFormFixture" do
+    survey = surveys(:programming)
+    survey_form = SurveyFormFixture.new(survey)
+    questions = survey_form.questions
+
+    form_for survey_form do |f|
+      concat f.label(:name)
+      concat f.text_field(:name)
+
+      concat f.fields_for(:questions, questions) { |question_fields|
+        concat question_fields.label(:content)
+        concat question_fields.text_field(:content)
+
+        concat question_fields.fields_for(:answers, question_fields.object.answers) { |answer_fields|
+          concat answer_fields.label(:content)
+          concat answer_fields.text_field(:content)
+        }
+      }
+
+      concat f.submit
+    end
+
+    id = survey.id
+
+    assert_match /action="\/surveys\/#{id}"/, output_buffer
+    assert_match /class="edit_survey"/, output_buffer
+    assert_match /id="edit_survey_#{id}"/, output_buffer
+    assert_match /method="post"/, output_buffer
+
+    assert_match /<label for="survey_name">Name<\/label>/, output_buffer
+    assert_match /<input id="survey_name" name="survey\[name\]" type="text" value="#{survey_form.name}" \/>/, output_buffer
+  
+    assert_match /<label for="survey_questions_attributes_0_content">Content<\/label>/, output_buffer
+    assert_match /<input id="survey_questions_attributes_0_content" name="survey\[questions_attributes\]\[0\]\[content\]" type="text" value="Which language allows closures\?" \/>/, output_buffer
+  
+    [0, 1].each do |i|
+      assert_match /<label for="survey_questions_attributes_0_answers_attributes_#{i}_content">Content<\/label>/, output_buffer
+      assert_match /<input id="survey_questions_attributes_0_answers_attributes_#{i}_content" name="survey\[questions_attributes\]\[0\]\[answers_attributes\]\[#{i}\]\[content\]" type="text" value="#{questions[0].answers[i].content}" \/>/, output_buffer
+    end
+
+    assert_match /<input name="commit" type="submit" value="Update Survey" \/>/, output_buffer
   end
 end

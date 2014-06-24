@@ -10,15 +10,22 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     @model = @form
   end
 
-  test "declares collection association" do
-    assert_respond_to ProjectWithTasksContainingDeliverableFormFixture, :association
+  test "Form declares association" do
+    assert_respond_to Form, :association
   end
 
-  test "contains a forms list for has_many associations" do
-    assert_equal 1, ProjectWithTasksContainingDeliverableFormFixture.forms.size
+  test "Form contains a list of sub-forms" do
+    assert_respond_to Form, :forms
+    assert_equal 1, Form.forms.size
   end
 
-  test "main provides getter method for tasks collection form" do
+  test "forms list contains form definitions" do
+    deliverable_definition = Form.forms.first
+
+    assert_equal :deliverable, deliverable_definition.assoc_name
+  end
+
+  test "main form provides getter method for tasks collection form" do
     tasks_form = @form.forms.first
 
     assert_instance_of FormCollection, tasks_form
@@ -31,7 +38,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_not tasks_form.represents?("task")
   end
 
-  test "main provides getter method for collection objects" do
+  test "main form provides getter method for collection objects" do
     assert_respond_to @form, :tasks
 
     tasks = @form.tasks
@@ -42,7 +49,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form contains association name and parent model" do
+  test "tasks sub-form contains association name and parent model" do
     tasks_form = @form.forms.first
 
     assert_equal :tasks, tasks_form.association_name
@@ -65,7 +72,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "tasks sub-form initializes the number of records specified" do
+  test "main form initializes the number of records specified" do
     tasks_form = @form.forms.first
 
     assert_respond_to tasks_form, :models
@@ -86,7 +93,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal 2, @form.model.tasks.size
   end
 
-  test "tasks sub-form fetches parent and association objects" do
+  test "main form fetches parent and association objects" do
     project = projects(:yard)
 
     form = ProjectWithTasksContainingDeliverableFormFixture.new(project)
@@ -98,7 +105,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal project.tasks[1].deliverable, form.tasks[1].deliverable.model
   end
 
-  test "collection sub-form syncs models with submitted params" do
+  test "main form syncs its model and the models in nested sub-forms" do
     params = {
       name: "Life",
       
@@ -129,7 +136,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal "You will have a clean soul.", @form.tasks[1].deliverable.description
   end
 
-  test "collection sub-form validates itself" do
+  test "main form validates itself" do
     params = {
       name: "Life",
       
@@ -184,7 +191,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     assert_equal 5, @form.errors.messages[:name].size
   end
 
-  test "collection sub-form saves all the models" do
+  test "main form saves its model and the models in nested sub-forms" do
     params = {
       name: "Life",
       
@@ -227,7 +234,7 @@ class MainCollectionFormTest < ActiveSupport::TestCase
     end
   end
 
-  test "collection sub-form updates all the models" do
+  test "main form updates its model and the models in nested sub-forms" do
     project = projects(:yard)
     form = ProjectWithTasksContainingDeliverableFormFixture.new(project)
     params = {
