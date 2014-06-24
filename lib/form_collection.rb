@@ -11,6 +11,7 @@ class FormCollection
     @records = records
     @forms = []
     assign_forms
+    enable_autosave
   end
 
   def submit(params)
@@ -29,10 +30,7 @@ class FormCollection
   end
 
   def valid?
-    forms.each do |form|
-      form.valid?
-      collect_errors_from(form)
-    end
+    aggregate_form_errors
 
     errors.empty?
   end
@@ -53,11 +51,27 @@ class FormCollection
 
   private
 
+  def association_reflection
+    parent.class.reflect_on_association(association_name)
+  end
+
+  def enable_autosave
+    reflection = association_reflection
+    reflection.autosave = true
+  end
+
   def assign_forms
     if parent.persisted?
       fetch_models
     else
       initialize_models
+    end
+  end
+
+  def aggregate_form_errors
+    forms.each do |form|
+      form.valid?
+      collect_errors_from(form)
     end
   end
 

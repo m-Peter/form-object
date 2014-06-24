@@ -9,13 +9,13 @@ class Form
     @model = assign_model(model)
     @forms = []
     self.class_eval &proc
-    enable_autosave
+    
     populate_forms
   end
 
   def submit(params)
     params.each do |key, value|
-      if value.is_a?(Hash)
+      if nested_params?(value)
         fill_association_with_attributes(key, value)
       else
         model.send("#{key}=", value)
@@ -58,7 +58,7 @@ class Form
     alias_method :attribute, :attributes
 
     def association(name, options={}, &block)
-      if is_plural?(name.to_s)
+      if is_plural?(name)
         collection(name, options, &block)
       else  
         form(name, &block)
@@ -84,6 +84,7 @@ class Form
     end
 
     def is_plural?(str)
+      str = str.to_s
       str.pluralize == str
     end
   end
@@ -94,12 +95,19 @@ class Form
 
   def fill_association_with_attributes(association, attributes)
     assoc_name = find_association_name_in(association).to_sym
+    form = find_form_by_assoc_name(assoc_name)
+    
+    form.submit(attributes)
+  end
 
+  def find_form_by_assoc_name(assoc_name)
     forms.each do |form|
-      if form.represents?(assoc_name)
-        form.submit(attributes)
-      end
+      return form if form.represents?(assoc_name)
     end
+  end
+
+  def nested_params?(value)
+    value.is_a?(Hash)
   end
 
   def find_association_name_in(key)
@@ -119,11 +127,6 @@ class Form
 
   def association_reflection
     parent.class.reflect_on_association(association_name)
-  end
-
-  def enable_autosave
-    reflection = association_reflection
-    reflection.autosave = true
   end
 
   def build_model
