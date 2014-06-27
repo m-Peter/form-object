@@ -4,8 +4,3 @@ peter:
   name: Peter Markou
   occupation: Developer
   conference: ruby
-
-two:
-  name: MyString
-  occupation: MyString
-  conference_id: 
