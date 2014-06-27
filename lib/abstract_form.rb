@@ -44,17 +44,15 @@ class AbstractForm
   end
 
   def to_key
-    return nil unless persisted?
-    model.id
+    model.to_key
   end
 
   def to_param
-    return nil unless persisted?
-    model.id.to_s
+    model.to_param
   end
 
   def to_partial_path
-    ""
+    model.to_partial_path
   end
 
   def to_model

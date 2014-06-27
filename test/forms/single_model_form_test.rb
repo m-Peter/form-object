@@ -150,7 +150,7 @@ class SingleModelFormTest < ActiveSupport::TestCase
     assert_nil @form.to_key
     
     assert save_user
-    assert_equal @user.id, @form.to_key
+    assert_equal @user.to_key, @form.to_key
   end
 
   test "responds to #to_param" do
