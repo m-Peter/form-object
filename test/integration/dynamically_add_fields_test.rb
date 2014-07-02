@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
+  def setup
+    Capybara.default_driver = :selenium
+  end
+
   test "dynamically add a task field" do
     visit new_project_path
 
@@ -10,6 +14,7 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     page.assert_selector(".field", :count => 4)
     
     click_link('Add a Task')
+    page.assert_selector(".field", :count => 5)
 
     assert_difference('Project.count') do
       post_via_redirect "/projects", project: {
