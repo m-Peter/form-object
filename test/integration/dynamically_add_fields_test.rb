@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
+  self.use_transactional_fixtures = false
+
   def setup
     Capybara.default_driver = :selenium
   end
@@ -55,8 +57,7 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  #test "dynamically add a task field to existing Project" do
-  test "one" do
+  test "dynamically add a task field to existing Project" do
     project = projects(:yard)
 
     visit edit_project_path(project)
@@ -102,6 +103,42 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
         assert_select element, "li", "paint the fence"
         assert_select element, "li", "clean the gutters"
         assert_select element, "li", "plant red roses"
+      end
+    end
+  end
+
+  test "dynamically remove a task field from existing Project" do
+    project = projects(:yard)
+
+    visit edit_project_path(project)
+
+    assert_equal edit_project_path(project), current_path
+    assert_equal 4, page.all(:xpath, '//a[@href="#"]').size
+    
+    page.assert_selector(".field", :count => 4)
+
+    all("a", :text => "Delete").last.click
+
+    click_button "Update Project"
+
+    project = Project.find(project.id)
+
+    assert_equal "Yard Work", project.name
+    assert_equal 2, project.tasks.size
+    project.tasks.each do |task|
+      task.persisted?
+    end
+    assert_equal "rake the leaves", project.tasks[0].name
+    assert_equal "paint the fence", project.tasks[1].name
+    
+    assert_equal "/projects/#{project.id}", path
+    assert_template :show
+
+    assert_select "p", "Project Name:\n  Yard Work"
+    assert_select "ol" do |elements|
+      elements.each do |element|
+        assert_select element, "li", "rake the leaves"
+        assert_select element, "li", "paint the fence"
       end
     end
   end

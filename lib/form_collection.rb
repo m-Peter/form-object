@@ -20,8 +20,15 @@ class FormCollection
       if parent.persisted?
         id = value[:id]
         if id
-          form = find_form_by_model_id(id)
-          form.submit(value)
+          if value[:_destroy] == "1"
+            forms.delete_if { |form| form.id == id }
+            form = find_form_by_model_id(id)
+            form.model.destroy
+          else
+            value.delete("_destroy")
+            form = find_form_by_model_id(id)
+            form.submit(value)
+          end
         else
           new_form = Form.new(association_name, parent, proc)
           forms << new_form
@@ -112,6 +119,14 @@ class FormCollection
     forms.each do |form|
       if form.id == id.to_i
         return form
+      end
+    end
+  end
+
+  def delete_form_by_model_id(id)
+    forms.each do |form|
+      if form.id == id.to_i
+        
       end
     end
   end

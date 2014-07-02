@@ -13,6 +13,8 @@ class Form
     populate_forms
   end
 
+  def _destroy; end
+
   def submit(params)
     params.each do |key, value|
       if nested_params?(value)
