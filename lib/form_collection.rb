@@ -19,8 +19,14 @@ class FormCollection
     params.each do |key, value|
       if parent.persisted?
         id = value[:id]
-        form = find_form_by_model_id(id)
-        form.submit(value)
+        if id
+          form = find_form_by_model_id(id)
+          form.submit(value)
+        else
+          new_form = Form.new(association_name, parent, proc)
+          forms << new_form
+          new_form.submit(value)
+        end
       else
         i = key.to_i
         
