@@ -24,12 +24,12 @@ class FormCollection
       else
         i = key.to_i
         
-        if i <= forms.size
-          forms[i].submit(value)
-        else
+        if dynamic_key?(i)
           new_form = Form.new(association_name, parent, proc)
           forms << new_form
           new_form.submit(value)
+        else
+          forms[i].submit(value)
         end
       end
     end
@@ -63,6 +63,10 @@ class FormCollection
     else
       initialize_models
     end
+  end
+
+  def dynamic_key?(i)
+    i > forms.size
   end
 
   def aggregate_form_errors
