@@ -17,9 +17,13 @@
   </div>
 
   <h2>Tasks</h2>
-  <%= f.fields_for :tasks, @project_form.tasks do |task_fields| %>
-    <%= render "tasks", :task => task_fields %>
-  <% end %>
+  <div id="tasks">
+    <%= f.fields_for :tasks, @project_form.tasks do |task_fields| %>
+      <%= render "tasks", :f => task_fields %>
+    <% end %>
+  </div>
+
+  <%= link_to_add_fields("Add a Task", f, :tasks) %>
 
   <div class="actions">
     <%= f.submit %>

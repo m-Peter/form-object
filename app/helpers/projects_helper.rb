@@ -1,7 +1,11 @@
 module ProjectsHelper
-  def add_task_link(name)
-    link_to_function name do |page|
-      page.insert_html :bottom, :tasks, :partial => 'task', :object => Task.new
+  def link_to_add_fields(name, f, association, options = {})
+    new_object = f.object.model.class.reflect_on_association(association).klass.new
+    
+    fields = f.fields_for(association, new_object, :child_index => "new_#{ association }") do |builder|
+      render(association.to_s, :f => builder)
     end
+
+    link_to name, '#', onclick: "add_fields(this, \"#{ association }\", \"#{ escape_javascript(fields) }\"); return false;"
   end
 end

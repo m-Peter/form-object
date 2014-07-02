@@ -14,3 +14,10 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+
+function add_fields(link, association, content) {
+    var new_id = new Date().getTime();
+    var regex = new RegExp("new_" + association, "g");
+    
+    $('#tasks').after(content.replace(regex, new_id));
+}

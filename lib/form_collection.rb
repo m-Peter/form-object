@@ -14,7 +14,7 @@ class FormCollection
   end
 
   def submit(params)
-    check_record_limit!(records, params)
+    #check_record_limit!(records, params)
 
     params.each do |key, value|
       if parent.persisted?
@@ -23,7 +23,14 @@ class FormCollection
         form.submit(value)
       else
         i = key.to_i
-        forms[i].submit(value)
+        
+        if i <= forms.size
+          forms[i].submit(value)
+        else
+          new_form = Form.new(association_name, parent, proc)
+          forms << new_form
+          new_form.submit(value)
+        end
       end
     end
   end
