@@ -53,46 +53,46 @@ class FormCollection
     form.submit(attributes.except(*UNASSIGNABLE_KEYS))
 
     if has_destroy_flag?(attributes)
-      form.model.mark_for_destruction 
+      form.delete
       remove_form(form)
     end
   end
 
-  def existing_record?(hash)
-    hash[:id] != nil
+  def existing_record?(attributes)
+    attributes[:id] != nil
   end
 
-  def update_record(value)
-    id = value[:id]
+  def update_record(attributes)
+    id = attributes[:id]
     form = find_form_by_model_id(id)
-    assign_to_or_mark_for_destruction(form, value)
+    assign_to_or_mark_for_destruction(form, attributes)
   end
 
-  def create_record(value)
+  def create_record(attributes)
     new_form = create_form
-    new_form.submit(value)
+    new_form.submit(attributes)
   end
 
-  def create_or_update_record(value)
-    if existing_record?(value)
-      update_record(value)
+  def create_or_update_record(attributes)
+    if existing_record?(attributes)
+      update_record(attributes)
     else
-      create_record(value)
+      create_record(attributes)
     end
   end
 
-  def create_or_assign_record(key, value)
+  def create_or_assign_record(key, attributes)
     i = key.to_i
 
     if dynamic_key?(i)
-      create_record(value)
+      create_record(attributes)
     else
-      forms[i].submit(value)
+      forms[i].submit(attributes)
     end
   end
 
-  def has_destroy_flag?(hash)
-    hash['_destroy'] == "1"
+  def has_destroy_flag?(attributes)
+    attributes['_destroy'] == "1"
   end
 
   def assign_forms
