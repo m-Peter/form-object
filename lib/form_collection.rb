@@ -18,32 +18,9 @@ class FormCollection
 
     params.each do |key, value|
       if parent.persisted?
-        id = value[:id]
-        if id
-          if value["_destroy"] == "1"
-            form = find_form_by_model_id(id)
-            forms.delete_if { |form| form.id == id }
-            form.model.destroy
-          else
-            value.delete("_destroy")
-            form = find_form_by_model_id(id)
-            form.submit(value)
-          end
-        else
-          new_form = Form.new(association_name, parent, proc)
-          forms << new_form
-          new_form.submit(value)
-        end
+        create_or_update_record(value)
       else
-        i = key.to_i
-        
-        if dynamic_key?(i)
-          new_form = Form.new(association_name, parent, proc)
-          forms << new_form
-          new_form.submit(value)
-        else
-          forms[i].submit(value)
-        end
+        create_or_assign_record(key, value)
       end
     end
   end
@@ -69,6 +46,54 @@ class FormCollection
   end
 
   private
+
+  UNASSIGNABLE_KEYS = %w( id _destroy )
+
+  def assign_to_or_mark_for_destruction(form, attributes)
+    form.submit(attributes.except(*UNASSIGNABLE_KEYS))
+
+    if has_destroy_flag?(attributes)
+      form.model.mark_for_destruction 
+      remove_form(form)
+    end
+  end
+
+  def existing_record?(hash)
+    hash[:id] != nil
+  end
+
+  def update_record(value)
+    id = value[:id]
+    form = find_form_by_model_id(id)
+    assign_to_or_mark_for_destruction(form, value)
+  end
+
+  def create_record(value)
+    new_form = create_form
+    new_form.submit(value)
+  end
+
+  def create_or_update_record(value)
+    if existing_record?(value)
+      update_record(value)
+    else
+      create_record(value)
+    end
+  end
+
+  def create_or_assign_record(key, value)
+    i = key.to_i
+
+    if dynamic_key?(i)
+      create_record(value)
+    else
+      forms[i].submit(value)
+    end
+  end
+
+  def has_destroy_flag?(hash)
+    hash['_destroy'] == "1"
+  end
 
   def assign_forms
     if parent.persisted?
@@ -121,5 +146,15 @@ class FormCollection
         return form
       end
     end
+  end
+
+  def remove_form(form)
+    forms.delete(form)
+  end
+
+  def create_form
+    new_form = Form.new(association_name, parent, proc)
+    forms << new_form
+    new_form
   end
 end

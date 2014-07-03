@@ -13,8 +13,6 @@ class Form
     populate_forms
   end
 
-  def _destroy; end
-
   def submit(params)
     params.each do |key, value|
       if nested_params?(value)
@@ -37,6 +35,10 @@ class Form
 
   def id
     model.id
+  end
+
+  def _destroy
+    model.marked_for_destruction?
   end
 
   def persisted?
