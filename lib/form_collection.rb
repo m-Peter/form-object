@@ -20,9 +20,9 @@ class FormCollection
       if parent.persisted?
         id = value[:id]
         if id
-          if value[:_destroy] == "1"
-            forms.delete_if { |form| form.id == id }
+          if value["_destroy"] == "1"
             form = find_form_by_model_id(id)
+            forms.delete_if { |form| form.id == id }
             form.model.destroy
           else
             value.delete("_destroy")
@@ -119,14 +119,6 @@ class FormCollection
     forms.each do |form|
       if form.id == id.to_i
         return form
-      end
-    end
-  end
-
-  def delete_form_by_model_id(id)
-    forms.each do |form|
-      if form.id == id.to_i
-        
       end
     end
   end

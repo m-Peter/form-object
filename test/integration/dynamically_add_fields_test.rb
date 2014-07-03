@@ -7,7 +7,7 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     Capybara.default_driver = :selenium
   end
 
-  test "dynamically add a task field" do
+  test "dynamically add a Task field to new Project" do
     visit new_project_path
 
     assert_equal new_project_path, current_path
@@ -57,7 +57,7 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "dynamically add a task field to existing Project" do
+  test "dynamically add a Task field to existing Project" do
     project = projects(:yard)
 
     visit edit_project_path(project)
@@ -123,23 +123,13 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
 
     project = Project.find(project.id)
 
-    assert_equal "Yard Work", project.name
     assert_equal 2, project.tasks.size
     project.tasks.each do |task|
       task.persisted?
     end
+
+    assert_equal "Yard Work", project.name
     assert_equal "rake the leaves", project.tasks[0].name
     assert_equal "paint the fence", project.tasks[1].name
-    
-    assert_equal "/projects/#{project.id}", path
-    assert_template :show
-
-    assert_select "p", "Project Name:\n  Yard Work"
-    assert_select "ol" do |elements|
-      elements.each do |element|
-        assert_select element, "li", "rake the leaves"
-        assert_select element, "li", "paint the fence"
-      end
-    end
   end
 end

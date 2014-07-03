@@ -174,6 +174,37 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     end
   end
 
+  test "main form saves its model and dynamically added models in nested sub-forms" do
+    params = {
+      name: "Life",
+
+      tasks_attributes: {
+        "0" => { name: "Eat" },
+        "1" => { name: "Pray" },
+        "2" => { name: "Love" },
+        "1404292088779" => { name: "Repeat" }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference('Project.count') do
+      @form.save
+    end
+
+    assert_equal "Life", @form.name
+    assert_equal "Eat", @form.tasks[0].name
+    assert_equal "Pray", @form.tasks[1].name
+    assert_equal "Love", @form.tasks[2].name
+    assert_equal "Repeat", @form.tasks[3].name
+    assert_equal 4, @form.tasks.size
+
+    assert @form.persisted?
+    @form.tasks.each do |task|
+      assert task.persisted?
+    end
+  end
+
   test "main form updates its model and the models in nested sub-forms" do
     project = projects(:yard)
     form = ProjectWithTasksFormFixture.new(project)
@@ -200,6 +231,101 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     assert_equal 3, form.tasks.size
     
     assert form.persisted?
+  end
+
+  test "main form updates its model and saves dynamically added models in nested sub-forms" do
+    project = projects(:yard)
+    form = ProjectWithTasksFormFixture.new(project)
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => { name: "Eat", id: tasks(:rake).id },
+        "1" => { name: "Pray", id: tasks(:paint).id },
+        "2" => { name: "Love", id: tasks(:clean).id },
+        "1404292088779" => { name: "Repeat" }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Project.count', 0) do
+      form.save
+    end
+
+    assert_equal "Life", form.name
+    assert_equal "Eat", form.tasks[0].name
+    assert_equal "Pray", form.tasks[1].name
+    assert_equal "Love", form.tasks[2].name
+    assert_equal "Repeat", form.tasks[3].name
+    assert_equal 4, form.tasks.size
+    
+    assert form.persisted?
+    form.tasks.each do |task|
+      assert task.persisted?
+    end
+  end
+
+  test "main form deletes models in nested sub-forms" do
+    project = projects(:yard)
+    form = ProjectWithTasksFormFixture.new(project)
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => { name: "Eat", id: tasks(:rake).id },
+        "1" => { name: "Pray", id: tasks(:paint).id },
+        "2" => { name: "Love", id: tasks(:clean).id, "_destroy" => "1" },
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Project.count', 0) do
+      form.save
+    end
+
+    assert_equal "Life", form.name
+    assert_equal "Eat", form.tasks[0].name
+    assert_equal "Pray", form.tasks[1].name
+    assert_equal 2, form.tasks.size
+
+    assert form.persisted?
+    form.tasks.each do |task|
+      assert task.persisted?
+    end
+  end
+
+  test "main form deletes and adds models in nested sub-forms" do
+    project = projects(:yard)
+    form = ProjectWithTasksFormFixture.new(project)
+    params = {
+      name: "Life",
+      
+      tasks_attributes: {
+        "0" => { name: "Eat", id: tasks(:rake).id },
+        "1" => { name: "Pray", id: tasks(:paint).id },
+        "2" => { name: "Love", id: tasks(:clean).id, "_destroy" => "1" },
+        "1404292088779" => { name: "Repeat" }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Project.count', 0) do
+      form.save
+    end
+
+    assert_equal "Life", form.name
+    assert_equal "Eat", form.tasks[0].name
+    assert_equal "Pray", form.tasks[1].name
+    assert_equal "Repeat", form.tasks[2].name
+    assert_equal 3, form.tasks.size
+
+    assert form.persisted?
+    form.tasks.each do |task|
+      assert task.persisted?
+    end
   end
 
   test "main form responds to writer method" do
