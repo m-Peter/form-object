@@ -281,6 +281,8 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
 
     form.submit(params)
 
+    assert project.tasks[2].marked_for_destruction?
+
     assert_difference('Project.count', 0) do
       form.save
     end
@@ -311,6 +313,8 @@ class NestedCollectionAssociationFormTest < ActiveSupport::TestCase
     }
 
     form.submit(params)
+
+    assert project.tasks[2].marked_for_destruction?
 
     assert_difference('Project.count', 0) do
       form.save
