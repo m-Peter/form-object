@@ -8,7 +8,7 @@ class Form
     @parent = parent
     @model = assign_model(model)
     @forms = []
-    self.class_eval &proc
+    class_eval &proc
     enable_autosave
     populate_forms
   end
