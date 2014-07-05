@@ -15,9 +15,13 @@
 //= require turbolinks
 //= require_tree .
 
-function remove_fields(link) {
+function remove_fields(link, dynamic) {
+  if (dynamic) {
+    $(link).closest(".field").remove();
+  } else {
     $(link).prev("input[type=hidden]").val("1");
     $(link).closest(".field").hide();
+  }
 }
 
 function add_fields(link, association, content) {
