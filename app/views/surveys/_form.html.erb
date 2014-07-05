@@ -17,9 +17,11 @@
   </div>
 
   <h2>Questions</h2>
-  <%= f.fields_for :questions, @survey_form.questions do |question_fields| %>
-    <%= render "questions", :question => question_fields %>
-  <% end %>
+  <div id="field_collection">
+    <%= f.fields_for :questions, @survey_form.questions do |question_fields| %>
+      <%= render "questions", :f => question_fields %>
+    <% end %>
+  </div>
 
   <div class="actions">
     <%= f.submit %>

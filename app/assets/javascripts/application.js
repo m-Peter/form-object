@@ -17,16 +17,16 @@
 
 function remove_fields(link, dynamic) {
   if (dynamic) {
-    $(link).closest(".field").remove();
+    $(link).closest(".fields").remove();
   } else {
     $(link).prev("input[type=hidden]").val("1");
-    $(link).closest(".field").hide();
+    $(link).closest(".fields").hide();
   }
 }
 
 function add_fields(link, association, content) {
-    var new_id = new Date().getTime();
-    var regex = new RegExp("new_" + association, "g");
+  var new_id = new Date().getTime();
+  var regex = new RegExp("new_" + association, "g");
     
-    $('#tasks').after(content.replace(regex, new_id));
+  $('#field_collection').after(content.replace(regex, new_id));
 }
