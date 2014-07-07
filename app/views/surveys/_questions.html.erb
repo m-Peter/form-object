@@ -6,7 +6,7 @@
 
   <h2>Answers</h2>
   <div id="field_collection">
-    <%= f.fields_for :answers, f.object.answers do |answer_fields| %>
+    <%= f.fields_for :answers do |answer_fields| %>
       <%= render "answers", :f => answer_fields %>
     <% end %>
   </div>

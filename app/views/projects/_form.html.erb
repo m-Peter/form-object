@@ -18,7 +18,7 @@
 
   <h2>Tasks</h2>
   <div id="field_collection">
-    <%= f.fields_for :tasks, @project_form.tasks do |task_fields| %>
+    <%= f.fields_for :tasks do |task_fields| %>
       <%= render "tasks", :f => task_fields %>
     <% end %>
   </div>
