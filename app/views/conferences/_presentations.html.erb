@@ -1,4 +1,4 @@
-<div class="fields">
+<div class="nested-fields">
   <div class="field">
     <%= f.label :topic %><br>
     <%= f.text_field :topic %>
@@ -7,9 +7,9 @@
   <div class="field">
     <%= f.label :duration %><br>
     <%= f.text_field :duration %>
-  </div>
+  </div>  
 
   <%= link_to_remove_fields("Delete", f) %>
-</div>
 
-<hr />
+  <hr />
+</div>
