@@ -57,6 +57,59 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "remove a dynamic added Task Field from Project" do
+    project = projects(:yard)
+
+    visit edit_project_path(project)
+
+    assert_equal edit_project_path(project), current_path
+    assert find_link('Add a Task').visible?
+    
+    page.assert_selector(".field", :count => 4)
+
+    click_link('Add a Task')
+    page.assert_selector(".field", :count => 5)
+
+    assert page.has_xpath?("//a[@href='#']")
+    assert page.has_xpath?("//a[@onclick='remove_fields(this, true); return false;']")
+    
+    all(:xpath, '//a[text()="Delete"]').last.click
+    page.assert_selector(".field", :count => 4)
+
+    assert_difference('Project.count', 0) do
+      patch_via_redirect "/projects/#{project.id}", project: {
+        name: project.name,
+
+        tasks_attributes: {
+          "0" => { name: tasks(:rake).name, id: tasks(:rake).id },
+          "1" => { name: tasks(:paint).name, id: tasks(:paint).id },
+          "2" => { name: tasks(:clean).name, id: tasks(:clean).id },
+        }
+      }
+    end
+
+    assert_equal "Yard Work", project.name
+    assert_equal 3, project.tasks.size
+    project.tasks.each do |task|
+      task.persisted?
+    end
+    assert_equal "rake the leaves", project.tasks[0].name
+    assert_equal "paint the fence", project.tasks[1].name
+    assert_equal "clean the gutters", project.tasks[2].name
+    
+    assert_equal "/projects/#{project.id}", path
+    assert_template :show
+
+    assert_select "p", "Project Name:\n  Yard Work"
+    assert_select "ol" do |elements|
+      elements.each do |element|
+        assert_select element, "li", "rake the leaves"
+        assert_select element, "li", "paint the fence"
+        assert_select element, "li", "clean the gutters"
+      end
+    end
+  end
+
   test "dynamically add a Task field to existing Project" do
     project = projects(:yard)
 
@@ -107,7 +160,7 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "dynamically remove a task field from existing Project" do
+  test "dynamically remove a Task field from existing Project" do
     project = projects(:yard)
 
     visit edit_project_path(project)
