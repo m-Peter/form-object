@@ -1,13 +1,14 @@
 class Form
   include ActiveModel::Validations
 
-  attr_reader :association_name, :parent, :model, :forms
+  attr_reader :association_name, :parent, :model, :forms, :proc
 
   def initialize(assoc_name, parent, proc, model=nil)
     @association_name = assoc_name
     @parent = parent
     @model = assign_model(model)
     @forms = []
+    @proc = proc
     class_eval &proc
     enable_autosave
     populate_forms
@@ -21,6 +22,19 @@ class Form
         model.send("#{key}=", value)
       end
     end
+  end
+
+  def get_model(assoc_name)
+    if is_plural?(assoc_name)
+      FormCollection.new(assoc_name, model, proc, 1)
+    else  
+      Form.new(association_name, parent, proc)
+    end
+  end
+
+  def is_plural?(str)
+    str = str.to_s
+    str.pluralize == str
   end
 
   def delete
