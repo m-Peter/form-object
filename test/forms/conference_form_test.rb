@@ -249,6 +249,48 @@ class ConferenceFormTest < ActiveSupport::TestCase
     end
   end
 
+  test "main form saves its model and dynamically added models in nested sub-forms" do
+    params = {
+      name: "Euruco",
+      city: "Athens",
+
+      speaker_attributes: {
+        name: "Petros Markou",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Ruby OOP", duration: "1h" },
+          "1" => { topic: "Ruby Closures", duration: "1h" },
+          "1404292088779" => { topic: "Ruby Blocks", duration: "1h" }
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference(['Conference.count', 'Speaker.count']) do
+      @form.save
+    end
+
+    assert_equal "Euruco", @form.name
+    assert_equal "Athens", @form.city
+    assert_equal "Petros Markou", @form.speaker.name
+    assert_equal "Developer", @form.speaker.occupation
+    assert_equal "Ruby OOP", @form.speaker.presentations[0].topic
+    assert_equal "1h", @form.speaker.presentations[0].duration
+    assert_equal "Ruby Closures", @form.speaker.presentations[1].topic
+    assert_equal "1h", @form.speaker.presentations[1].duration
+    assert_equal "Ruby Blocks", @form.speaker.presentations[2].topic
+    assert_equal "1h", @form.speaker.presentations[2].duration
+    assert_equal 3, @form.speaker.presentations.size
+
+    assert @form.persisted?
+    assert @form.speaker.persisted?
+    @form.speaker.presentations.each do |presentation|
+      assert presentation.persisted?
+    end
+  end
+
   test "main form updates its model and the models in nested sub-forms" do
     conference = conferences(:ruby)
     form = ConferenceFormFixture.new(conference)
@@ -284,6 +326,127 @@ class ConferenceFormTest < ActiveSupport::TestCase
     assert_equal 2, form.speaker.presentations.size
     
     assert form.persisted?
+  end
+
+  test "main form updates its model and saves dynamically added models in nested sub-forms" do
+    conference = conferences(:ruby)
+    form = ConferenceFormFixture.new(conference)
+    params = {
+      name: "GoGaruco",
+      city: "Golden State",
+
+      speaker_attributes: {
+        name: "John Doe",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Rails OOP", duration: "1h", id: presentations(:ruby_oop).id },
+          "1" => { topic: "Rails Patterns", duration: "1h", id: presentations(:ruby_closures).id },
+          "1404292088779" => { topic: "Rails Migrations", duration: "1h" }
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference(['Conference.count', 'Speaker.count'], 0) do
+      form.save
+    end
+
+    assert_equal "GoGaruco", form.name
+    assert_equal "Golden State", form.city
+    assert_equal "John Doe", form.speaker.name
+    assert_equal "Developer", form.speaker.occupation
+    assert_equal "Rails Patterns", form.speaker.presentations[0].topic
+    assert_equal "1h", form.speaker.presentations[0].duration
+    assert_equal "Rails OOP", form.speaker.presentations[1].topic
+    assert_equal "1h", form.speaker.presentations[1].duration
+    assert_equal "Rails Migrations", form.speaker.presentations[2].topic
+    assert_equal "1h", form.speaker.presentations[2].duration
+    assert_equal 3, form.speaker.presentations.size
+    
+    assert form.persisted?
+  end
+
+  test "main form deletes models in nested sub-forms" do
+    conference = conferences(:ruby)
+    form = ConferenceFormFixture.new(conference)
+    params = {
+      name: "GoGaruco",
+      city: "Golden State",
+
+      speaker_attributes: {
+        name: "John Doe",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Rails OOP", duration: "1h", id: presentations(:ruby_oop).id, "_destroy" => "1" },
+          "1" => { topic: "Rails Patterns", duration: "1h", id: presentations(:ruby_closures).id },
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert conference.speaker.presentations[1].marked_for_destruction?
+
+    assert_difference(['Conference.count', 'Speaker.count'], 0) do
+      form.save
+    end
+
+    assert_equal "GoGaruco", form.name
+    assert_equal "Golden State", form.city
+    assert_equal "John Doe", form.speaker.name
+    assert_equal "Developer", form.speaker.occupation
+    assert_equal "Rails Patterns", form.speaker.presentations[0].topic
+    assert_equal "1h", form.speaker.presentations[0].duration
+    assert_equal 1, form.speaker.presentations.size
+
+    assert form.persisted?
+    form.speaker.presentations.each do |presentation|
+      assert presentation.persisted?
+    end
+  end
+
+  test "main form deletes and adds models in nested sub-forms" do
+    conference = conferences(:ruby)
+    form = ConferenceFormFixture.new(conference)
+    params = {
+      name: "GoGaruco",
+      city: "Golden State",
+
+      speaker_attributes: {
+        name: "John Doe",
+        occupation: "Developer",
+
+        presentations_attributes: {
+          "0" => { topic: "Rails OOP", duration: "1h", id: presentations(:ruby_oop).id, "_destroy" => "1" },
+          "1" => { topic: "Rails Patterns", duration: "1h", id: presentations(:ruby_closures).id },
+          "1404292088779" => { topic: "Rails Testing", duration: "2h" }
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference(['Conference.count', 'Speaker.count'], 0) do
+      form.save
+    end
+
+    assert_equal "GoGaruco", form.name
+    assert_equal "Golden State", form.city
+    assert_equal "John Doe", form.speaker.name
+    assert_equal "Developer", form.speaker.occupation
+    assert_equal "Rails Patterns", form.speaker.presentations[0].topic
+    assert_equal "1h", form.speaker.presentations[0].duration
+    assert_equal "Rails Testing", form.speaker.presentations[1].topic
+    assert_equal "2h", form.speaker.presentations[1].duration
+    assert_equal 2, form.speaker.presentations.size
+
+    assert form.persisted?
+    form.speaker.presentations.each do |presentation|
+      assert presentation.persisted?
+    end
   end
 
   test "main form responds to writer method" do
