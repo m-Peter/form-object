@@ -1,9 +1,17 @@
 module ApplicationHelper
   def link_to_remove_fields(name, f, options = {})
-    if f.object.persisted?
-      f.hidden_field(:_destroy) + link_to(name, '#', onclick: "remove_fields(this, false); return false;")
+    html_options = {}
+    is_existing = f.object.persisted?
+    
+    classes = []
+    classes << "remove_fields"
+    classes << (is_existing ? 'existing' : 'dynamic')
+    html_options[:class] = [classes.join(' ')]
+
+    if is_existing
+      f.hidden_field(:_destroy) + link_to(name, '#', html_options)
     else
-      link_to(name, '#', onclick: "remove_fields(this, true); return false;")
+      link_to(name, '#', html_options)
     end
   end
 

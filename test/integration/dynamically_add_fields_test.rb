@@ -66,14 +66,14 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     assert find_link('Add a Task').visible?
     
     page.assert_selector(".field", :count => 4)
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields existing']").size
 
     click_link('Add a Task')
+    assert_equal 1, all(:xpath, "//a[@class='remove_fields dynamic']").size
     page.assert_selector(".field", :count => 5)
-
-    assert page.has_xpath?("//a[@href='#']")
-    assert page.has_xpath?("//a[@onclick='remove_fields(this, true); return false;']")
     
     all(:xpath, '//a[text()="Delete"]').last.click
+
     page.assert_selector(".field", :count => 4)
 
     assert_difference('Project.count', 0) do

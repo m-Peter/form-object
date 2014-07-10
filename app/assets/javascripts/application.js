@@ -15,18 +15,25 @@
 //= require turbolinks
 //= require_tree .
 
-function remove_fields(link, dynamic) {
-  if (dynamic) {
-    $(link).closest(".nested-fields").remove();
-  } else {
-    $(link).prev("input[type=hidden]").val("1");
-    $(link).closest(".nested-fields").hide();
-  }
-}
-
 function add_fields(link, association, content) {
   var new_id = new Date().getTime();
   var regex = new RegExp("new_" + association, "g");
   
   $(link).before(content.replace(regex, new_id));
 }
+
+(function($) {
+  $(document).on('click', '.remove_fields.dynamic, .remove_fields.existing', function(e) {
+    var $this = $(this), 
+        node_to_delete = $this.closest('.nested-fields');
+
+    e.preventDefault();
+
+    if ($this.hasClass('dynamic')) {
+        node_to_delete.remove();
+    } else {
+        $this.prev("input[type=hidden]").val("1");
+        node_to_delete.hide();
+    }
+  });
+})(jQuery);
