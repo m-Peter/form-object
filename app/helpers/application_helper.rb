@@ -22,6 +22,11 @@ module ApplicationHelper
       render(association.to_s, :f => builder)
     end
 
-    link_to name, '#', onclick: "add_fields(this, \"#{ association }\", \"#{ escape_javascript(fields) }\"); return false;"
+    html_options = {}
+    html_options[:class] = "add_fields"
+    html_options[:'data-association'] = association.to_s.singularize
+    html_options[:'data-association-insertion-template'] = CGI.escapeHTML(fields).html_safe
+
+    link_to(name, '#', html_options)
   end
 end

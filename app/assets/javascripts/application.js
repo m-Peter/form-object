@@ -15,13 +15,6 @@
 //= require turbolinks
 //= require_tree .
 
-function add_fields(link, association, content) {
-  var new_id = new Date().getTime();
-  var regex = new RegExp("new_" + association, "g");
-  
-  $(link).before(content.replace(regex, new_id));
-}
-
 (function($) {
   $(document).on('click', '.remove_fields.dynamic, .remove_fields.existing', function(e) {
     var $this = $(this), 
@@ -35,5 +28,17 @@ function add_fields(link, association, content) {
         $this.prev("input[type=hidden]").val("1");
         node_to_delete.hide();
     }
+  });
+
+  $(document).on('click', '.add_fields', function(e) {
+    e.preventDefault();
+    
+    var $this = $(this),
+      association = $this.data('association'),
+      content = $this.data('association-insertion-template');
+
+    var new_id = new Date().getTime();
+    var regex = new RegExp("new_" + association, "g");
+    $this.before(content.replace(regex, new_id));
   });
 })(jQuery);
