@@ -25,16 +25,11 @@ class Form
   end
 
   def get_model(assoc_name)
-    if is_plural?(assoc_name)
-      FormCollection.new(assoc_name, model, proc, 1)
+    if form = find_form_by_assoc_name(assoc_name)
+      form.get_model(assoc_name)
     else  
       Form.new(association_name, parent, proc)
     end
-  end
-
-  def is_plural?(str)
-    str = str.to_s
-    str.pluralize == str
   end
 
   def delete
