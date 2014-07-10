@@ -236,6 +236,57 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert @form.persisted?
     @form.questions.each do |question|
       assert question.persisted?
+      assert_equal 2, question.answers.size
+
+      question.answers.each do |answer|
+        assert answer.persisted?
+      end
+    end
+  end
+
+  test "main form saves its model and dynamically added models in nested sub-forms" do
+    params = {
+      name: "Programming languages",
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language allows closures?",
+
+          answers_attributes: {
+            "0" => { content: "Ruby Programming Language" },
+            "1" => { content: "CSharp Programming Language" }
+          }
+        },
+        "1404292088779" => {
+          content: "Which language allows blocks?",
+
+          answers_attributes: {
+            "0" => { content: "Ruby Programming Language" },
+            "1" => { content: "C Programming Language" }
+          }
+        }
+      }
+    }
+
+    @form.submit(params)
+
+    assert_difference('Survey.count') do
+      @form.save
+    end
+
+    assert_equal "Programming languages", @form.name
+    assert_equal "Which language allows closures?", @form.questions[0].content
+    assert_equal "Ruby Programming Language", @form.questions[0].answers[0].content
+    assert_equal "CSharp Programming Language", @form.questions[0].answers[1].content
+    assert_equal "Which language allows blocks?", @form.questions[1].content
+    assert_equal "Ruby Programming Language", @form.questions[1].answers[0].content
+    assert_equal "C Programming Language", @form.questions[1].answers[1].content
+    assert_equal 2, @form.questions.size
+
+    assert @form.persisted?
+    @form.questions.each do |question|
+      assert question.persisted?
+      assert_equal 2, question.answers.size
 
       question.answers.each do |answer|
         assert answer.persisted?
@@ -273,6 +324,127 @@ class TwoNestedCollectionsFormTest < ActiveSupport::TestCase
     assert_equal "The Latin Language", form.questions[0].answers[0].content
     assert_equal "The English Language", form.questions[0].answers[1].content
     assert_equal 1, form.questions.size
+  end
+
+  test "main form updates its model and saves dynamically added models in nested sub-forms" do
+    survey = surveys(:programming)
+    form = SurveyFormFixture.new(survey)
+    params = {
+      name: "Native languages",
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language is spoken in England?",
+          id: questions(:one).id,
+
+          answers_attributes: {
+            "0" => { content: "The English Language", id: answers(:ruby).id },
+            "1" => { content: "The Latin Language", id: answers(:cs).id }
+          }
+        },
+        "1404292088779" => {
+          content: "Which language is spoken in America?",
+
+          answers_attributes: {
+            "0" => { content: "The English Language" },
+            "1" => { content: "The American Language" }
+          }
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Survey.count', 0) do
+      form.save
+    end
+
+    assert_equal "Native languages", form.name
+    assert_equal "Which language is spoken in England?", form.questions[0].content
+    assert_equal "The Latin Language", form.questions[0].answers[0].content
+    assert_equal "The English Language", form.questions[0].answers[1].content
+    assert_equal "Which language is spoken in America?", form.questions[1].content
+    assert_equal "The English Language", form.questions[1].answers[0].content
+    assert_equal "The American Language", form.questions[1].answers[1].content
+    assert_equal 2, form.questions.size
+  end
+
+  test "main form deletes models in nested sub-forms" do
+    survey = surveys(:programming)
+    form = SurveyFormFixture.new(survey)
+    params = {
+      name: "Native languages",
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language is spoken in England?",
+          id: questions(:one).id,
+
+          answers_attributes: {
+            "0" => { content: "The English Language", id: answers(:ruby).id },
+            "1" => { content: "The Latin Language", id: answers(:cs).id, "_destroy" => "1" },
+          }
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert survey.questions[0].answers[0].marked_for_destruction?
+
+    assert_difference('Survey.count', 0) do
+      form.save
+    end
+
+    assert_equal "Native languages", form.name
+    assert_equal "Which language is spoken in England?", form.questions[0].content
+    assert_equal "The English Language", form.questions[0].answers[0].content
+    assert_equal 1, form.questions.size
+    assert_equal 1, form.questions[0].answers.size
+  end
+
+  test "main form deletes and adds models in nested sub-forms" do
+    survey = surveys(:programming)
+    form = SurveyFormFixture.new(survey)
+    params = {
+      name: "Native languages",
+
+      questions_attributes: {
+        "0" => {
+          content: "Which language is spoken in England?",
+          id: questions(:one).id,
+          "_destroy" => "1",
+
+          answers_attributes: {
+            "0" => { content: "The English Language", id: answers(:ruby).id },
+            "1" => { content: "The Latin Language", id: answers(:cs).id }
+          }
+        },
+        "1404292088779" => {
+          content: "Which language is spoken in America?",
+
+          answers_attributes: {
+            "0" => { content: "The English Language" },
+            "1" => { content: "The American Language" },
+            "1404292088777" => { content: "The French Language" }
+          }
+        }
+      }
+    }
+
+    form.submit(params)
+
+    assert_difference('Survey.count', 0) do
+      form.save
+    end
+
+    assert_equal "Native languages", form.name
+    assert_equal "Which language is spoken in America?", form.questions[0].content
+    assert_equal "The English Language", form.questions[0].answers[0].content
+    assert_equal "The American Language", form.questions[0].answers[1].content
+    assert_equal "The French Language", form.questions[0].answers[2].content
+    assert_equal 1, form.questions.size
+    assert_equal 3, form.questions[0].answers.size
   end
 
   test "main form responds to writer method" do
