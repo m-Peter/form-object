@@ -49,7 +49,7 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     assert_template :show
   end
 
-  test "remove a dynamic added Task Field from Project" do
+  test "remove a dynamic added Task field from Project" do
     project = projects(:yard)
 
     visit edit_project_path(project)
@@ -356,4 +356,201 @@ class DynamicallyAddFieldsTest < ActionDispatch::IntegrationTest
     assert_equal "/conferences/#{conference.id}", path
     assert_template :show
   end
+
+  test "dynamically add a Question field to new Survey" do
+    visit new_survey_path
+
+    assert_equal new_survey_path, current_path
+    assert find_link('Add a Question').visible?
+
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields dynamic']").size
+
+    click_link('Add a Question')
+    assert_equal 6, all(:xpath, "//a[@class='remove_fields dynamic']").size
+
+    assert_difference('Survey.count') do
+      post_via_redirect "/surveys", survey: {
+        name: "Programming languages",
+
+        questions_attributes: {
+          "0" => {
+            content: "Which language allows closures?",
+
+            answers_attributes: {
+              "0" => { content: "Ruby Programming Language" },
+              "1" => { content: "CSharp Programming Language" }
+            }
+          },
+          "1404292088779" => {
+            content: "Which language allows blocks?",
+
+            answers_attributes: {
+              "0" => { content: "Ruby Programming Language" },
+              "1" => { content: "C Programming Language" }
+            }
+          }
+        }
+      }
+    end
+
+    survey = Survey.last
+
+    survey.questions.each do |question|
+      assert question.persisted?
+      assert_equal 2, question.answers.size
+
+      question.answers.each do |answer|
+        assert answer.persisted?
+      end
+    end
+
+    assert_equal "Programming languages", survey.name
+    assert_equal "Which language allows closures?", survey.questions[0].content
+    assert_equal "Ruby Programming Language", survey.questions[0].answers[0].content
+    assert_equal "CSharp Programming Language", survey.questions[0].answers[1].content
+    assert_equal "Which language allows blocks?", survey.questions[1].content
+    assert_equal "Ruby Programming Language", survey.questions[1].answers[0].content
+    assert_equal "C Programming Language", survey.questions[1].answers[1].content
+
+    assert_equal "/surveys/#{survey.id}", path
+    assert_template :show
+  end
+
+  test "remove a dynamic added Question field from Survey" do
+    survey = surveys(:programming)
+
+    visit edit_survey_path(survey)
+
+    assert_equal edit_survey_path(survey), current_path
+    assert find_link('Add a Question').visible?
+
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields existing']").size
+
+    click_link('Add a Question')
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields dynamic']").size
+
+    all(:xpath, "//a[text()='remove']").last.click
+
+    assert_equal 0, all(:xpath, "//a[@class='remove_fields dynamic']").size
+
+    assert_difference('Survey.count', 0) do
+      patch_via_redirect "/surveys/#{survey.id}", survey: {
+        name: survey.name,
+
+        questions_attributes: {
+          "0" => {
+            content: "Which language is spoken in England?",
+            id: questions(:one).id,
+
+            answers_attributes: {
+              "0" => { content: "The English Language", id: answers(:ruby).id },
+              "1" => { content: "The Latin Language", id: answers(:cs).id },
+            }
+          }
+        }
+      }
+    end
+
+    assert_equal 1, survey.questions.size
+    assert_equal 2, survey.questions[0].answers.size
+
+    assert_equal "Your favorite programming language", survey.name
+    assert_equal "Which language is spoken in England?", survey.questions[0].content
+    assert_equal "The Latin Language", survey.questions[0].answers[0].content
+    assert_equal "The English Language", survey.questions[0].answers[1].content
+
+    assert_equal "/surveys/#{survey.id}", path
+    assert_template :show
+  end
+
+  test "dynamically add a Question field to existing Survey" do
+    survey = surveys(:programming)
+
+    visit edit_survey_path(survey)
+
+    assert_equal edit_survey_path(survey), current_path
+    assert find_link('Add a Question').visible?
+
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields existing']").size
+
+    click_link('Add a Question')
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields dynamic']").size
+
+    assert_difference('Survey.count', 0) do
+      patch_via_redirect "/surveys/#{survey.id}", survey: {
+        name: survey.name,
+
+        questions_attributes: {
+          "0" => {
+            content: "Which language is spoken in England?",
+            id: questions(:one).id,
+
+            answers_attributes: {
+              "0" => { content: "The English Language", id: answers(:ruby).id },
+              "1" => { content: "The Latin Language", id: answers(:cs).id },
+            }
+          },
+          "21342141565" => {
+            content: "Which language is spoken in Canada?",
+
+            answers_attributes: {
+              "0" => { content: "The English Language" },
+              "1" => { content: "The Canadian Language" },
+            }
+          }
+        }
+      }
+    end
+
+    assert_equal 2, survey.questions.size
+    assert_equal 2, survey.questions[0].answers.size
+
+    assert_equal "Your favorite programming language", survey.name
+    assert_equal "Which language is spoken in England?", survey.questions[0].content
+    assert_equal "The Latin Language", survey.questions[0].answers[0].content
+    assert_equal "The English Language", survey.questions[0].answers[1].content
+    assert_equal "Which language is spoken in Canada?", survey.questions[1].content
+    assert_equal "The English Language", survey.questions[1].answers[0].content
+    assert_equal "The Canadian Language", survey.questions[1].answers[1].content
+
+    assert_equal "/surveys/#{survey.id}", path
+    assert_template :show
+  end
+
+  test "dynamically remove a Question field from existing Survey" do
+    survey = surveys(:programming)
+
+    visit edit_survey_path(survey)
+
+    assert_equal edit_survey_path(survey), current_path
+    assert find_link('Add a Question').visible?
+
+    assert_equal 3, all(:xpath, "//a[@class='remove_fields existing']").size
+
+    all(:xpath, "//a[text()='remove']").last.click
+
+    assert_equal 0, all(:xpath, "//a[@class='remove_fields dynamic']").size
+
+    assert_difference('Survey.count', 0) do
+      patch_via_redirect "/surveys/#{survey.id}", survey: {
+        name: survey.name,
+
+        questions_attributes: {
+          "0" => {
+            content: "Which language is spoken in England?",
+            id: questions(:one).id,
+            "_destroy" => "1",
+
+            answers_attributes: {
+              "0" => { content: "The English Language", id: answers(:ruby).id },
+              "1" => { content: "The Latin Language", id: answers(:cs).id },
+            }
+          }
+        }
+      }
+    end
+
+    assert_equal 0, survey.questions.size
+  end
+
 end
