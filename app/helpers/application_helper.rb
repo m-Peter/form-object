@@ -17,14 +17,15 @@ module ApplicationHelper
 
   def link_to_add_fields(name, f, association, options = {})
     new_object = f.object.get_model(association)
+    assoc = association.to_s.singularize
     
-    fields = f.fields_for(association, new_object, :child_index => "new_#{ association }") do |builder|
+    fields = f.fields_for(association, new_object, :child_index => "new_#{assoc}") do |builder|
       render(association.to_s, :f => builder)
     end
 
     html_options = {}
     html_options[:class] = "add_fields"
-    html_options[:'data-association'] = association.to_s.singularize
+    html_options[:'data-association'] = assoc
     html_options[:'data-association-insertion-template'] = CGI.escapeHTML(fields).html_safe
 
     link_to(name, '#', html_options)
