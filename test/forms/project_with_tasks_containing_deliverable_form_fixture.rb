@@ -1,15 +1,11 @@
 class ProjectWithTasksContainingDeliverableFormFixture < AbstractForm
-  attribute :name
+  attribute :name, required: true
 
   association :tasks, records: 2 do
-    attribute :name
+    attribute :name, required: true
 
     association :deliverable do
       attribute :description
     end
-
-    validates :name, presence: true
   end
-
-  validates :name, presence: true
 end
