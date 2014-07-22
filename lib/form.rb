@@ -172,9 +172,7 @@ class Form
     if parent.send("#{association_name}")
       model = parent.send("#{association_name}")
     else
-      model_class = association_name.to_s.camelize.constantize
-      model = model_class.new
-      parent.send("#{association_name}=", model)
+      model = parent.send("build_#{association_name}")
     end
   end
 
