@@ -170,9 +170,9 @@ class Form
 
   def fetch_or_initialize_model
     if parent.send("#{association_name}")
-      model = parent.send("#{association_name}")
+      parent.send("#{association_name}")
     else
-      model = parent.send("build_#{association_name}")
+      parent.send("build_#{association_name}")
     end
   end
 
